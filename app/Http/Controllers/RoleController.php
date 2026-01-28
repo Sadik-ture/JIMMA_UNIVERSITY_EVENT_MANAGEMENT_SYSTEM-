@@ -47,7 +47,28 @@ class RoleController extends Controller
     public function show(Role $role)
     {
         $role->load(['permissions', 'users']);
-        return view('roles.show', compact('role'));
+        
+        // Initialize permission types array for the chart
+        $permissionTypes = [
+            'view' => 0,
+            'create' => 0,
+            'edit' => 0,
+            'delete' => 0,
+            'manage' => 0,
+            'other' => 0
+        ];
+        
+        // Count permission types
+        foreach ($role->permissions as $permission) {
+            $type = explode('_', $permission->slug)[0];
+            if (array_key_exists($type, $permissionTypes)) {
+                $permissionTypes[$type]++;
+            } else {
+                $permissionTypes['other']++;
+            }
+        }
+        
+        return view('roles.show', compact('role', 'permissionTypes'));
     }
 
     public function edit(Role $role)

@@ -22,24 +22,68 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+    ];
 
+    // Relationship with role
     public function role()
     {
         return $this->belongsTo(Role::class);
     }
 
-    public function hasPermission($permission)
+    // Check if user has a specific permission
+    public function hasPermission($permissionSlug)
     {
-        if ($this->role && $this->role->permissions) {
-            return $this->role->permissions->contains('slug', $permission);
+        // If user doesn't have a role, return false
+        if (!$this->role) {
+            return false;
         }
+        
+        // If user is super admin, they have all permissions
+        if ($this->role->slug === 'super-admin') {
+            return true;
+        }
+        
+        // Check if role has the permission
+        return $this->role->permissions()->where('slug', $permissionSlug)->exists();
+    }
+
+    // Check if user has any of the given permissions
+    public function hasAnyPermission($permissions)
+    {
+        if (!is_array($permissions)) {
+            $permissions = [$permissions];
+        }
+        
+        // If user doesn't have a role, return false
+        if (!$this->role) {
+            return false;
+        }
+        
+        // If user is super admin, they have all permissions
+        if ($this->role->slug === 'super-admin') {
+            return true;
+        }
+        
+        // Check each permission
+        foreach ($permissions as $permission) {
+            if ($this->hasPermission($permission)) {
+                return true;
+            }
+        }
+        
         return false;
+    }
+
+    // Check if user has a specific role
+    public function hasRole($roleSlug)
+    {
+        if (!$this->role) {
+            return false;
+        }
+        
+        return $this->role->slug === $roleSlug;
     }
 }

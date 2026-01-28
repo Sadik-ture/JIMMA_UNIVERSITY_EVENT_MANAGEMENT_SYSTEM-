@@ -402,26 +402,9 @@
         // Permission distribution chart
         const ctx = document.getElementById('permissionChart').getContext('2d');
         
-        // Count permissions by type
-        const permissionTypes = {
-            view: 0,
-            create: 0,
-            edit: 0,
-            delete: 0,
-            manage: 0,
-            other: 0
-        };
-        
-        @foreach($role->permissions as $permission)
-            @php
-                $type = explode('_', $permission->slug)[0];
-            @endphp
-            @if(array_key_exists($type, permissionTypes))
-                permissionTypes.{{ $type }}++;
-            @else
-                permissionTypes.other++;
-            @endif
-        @endforeach
+        // Get the permission counts from the controller via JSON
+        // This uses the $permissionTypes variable that we added to the controller
+        const permissionTypes = @json($permissionTypes);
         
         const chart = new Chart(ctx, {
             type: 'pie',

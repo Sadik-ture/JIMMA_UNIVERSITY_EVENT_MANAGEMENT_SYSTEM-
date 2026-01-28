@@ -1,0 +1,201 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Speaker;
+use Illuminate\Http\Request;
+
+class SpeakerController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index(Request $request)
+    {
+        $query = Speaker::query();
+        
+        // Apply search
+        if ($request->filled('search')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('name', 'like', "%{$request->search}%")
+                  ->orWhere('title', 'like', "%{$request->search}%")
+                  ->orWhere('department', 'like', "%{$request->search}%")
+                  ->orWhere('bio', 'like', "%{$request->search}%");
+            });
+        }
+        
+        // Filter by department
+        if ($request->filled('department')) {
+            $query->where('department', $request->department);
+        }
+        
+        // Filter by active status
+        if ($request->filled('status')) {
+            if ($request->status == 'active') {
+                $query->where('is_active', true);
+            } elseif ($request->status == 'inactive') {
+                $query->where('is_active', false);
+            }
+        }
+        
+        // Filter by featured
+        if ($request->filled('featured') && $request->featured == '1') {
+            $query->where('is_featured', true);
+        }
+        
+        // Apply sorting
+        $sort = $request->get('sort', 'name');
+        $order = $request->get('order', 'asc');
+        $query->orderBy($sort, $order);
+        
+        // Get statistics
+        $totalCount = Speaker::count();
+        $activeCount = Speaker::where('is_active', true)->count();
+        $featuredCount = Speaker::where('is_featured', true)->where('is_active', true)->count();
+        $upcomingTalks = 0; // You can implement this based on your events
+        
+        // Get paginated results with events count
+        $speakers = $query->withCount('events')->paginate(20)->withQueryString();
+        
+        return view('admin.speakers.index', compact(
+            'speakers', 
+            'totalCount', 
+            'activeCount', 
+            'featuredCount', 
+            'upcomingTalks'
+        ));
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        return view('admin.speakers.create');
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'title' => 'required|string|max:255',
+            'department' => 'required|string|max:255',
+            'email' => 'required|email|unique:speakers,email',
+            'phone' => 'nullable|string|max:20',
+            'bio' => 'required|string',
+            'expertise' => 'nullable|string',
+            'website' => 'nullable|url',
+            'linkedin' => 'nullable|url',
+            'twitter' => 'nullable|url',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'is_active' => 'boolean',
+            'is_featured' => 'boolean',
+        ]);
+
+        // Handle photo upload
+        if ($request->hasFile('photo')) {
+            $photoPath = $request->file('photo')->store('speakers', 'public');
+            $validated['photo'] = $photoPath;
+        }
+
+        Speaker::create($validated);
+
+        return redirect()->route('speakers.index')
+            ->with('success', 'Speaker created successfully.');
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(Speaker $speaker)
+    {
+        $speaker->load('events');
+        return view('admin.speakers.show', compact('speaker'));
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Speaker $speaker)
+    {
+        return view('admin.speakers.edit', compact('speaker'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, Speaker $speaker)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'title' => 'required|string|max:255',
+            'department' => 'required|string|max:255',
+            'email' => 'required|email|unique:speakers,email,' . $speaker->id,
+            'phone' => 'nullable|string|max:20',
+            'bio' => 'required|string',
+            'expertise' => 'nullable|string',
+            'website' => 'nullable|url',
+            'linkedin' => 'nullable|url',
+            'twitter' => 'nullable|url',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'is_active' => 'boolean',
+            'is_featured' => 'boolean',
+        ]);
+
+        // Handle photo upload
+        if ($request->hasFile('photo')) {
+            // Delete old photo if exists
+            if ($speaker->photo) {
+                \Storage::disk('public')->delete($speaker->photo);
+            }
+            $photoPath = $request->file('photo')->store('speakers', 'public');
+            $validated['photo'] = $photoPath;
+        }
+
+        $speaker->update($validated);
+
+        return redirect()->route('speakers.index')
+            ->with('success', 'Speaker updated successfully.');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Speaker $speaker)
+    {
+        // Delete photo if exists
+        if ($speaker->photo) {
+            \Storage::disk('public')->delete($speaker->photo);
+        }
+        
+        $speaker->delete();
+
+        return redirect()->route('speakers.index')
+            ->with('success', 'Speaker deleted successfully.');
+    }
+
+    /**
+     * Toggle active status
+     */
+    public function toggleActive(Speaker $speaker)
+    {
+        $speaker->update(['is_active' => !$speaker->is_active]);
+        
+        return redirect()->back()
+            ->with('success', 'Speaker status updated successfully.');
+    }
+
+    /**
+     * Toggle featured status
+     */
+    public function toggleFeatured(Speaker $speaker)
+    {
+        $speaker->update(['is_featured' => !$speaker->is_featured]);
+        
+        return redirect()->back()
+            ->with('success', 'Featured status updated successfully.');
+    }
+}
