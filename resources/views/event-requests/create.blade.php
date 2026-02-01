@@ -13,7 +13,7 @@
             </h4>
         </div>
         <div class="card-body">
-            <form action="{{ route('event-requests.store') }}" method="POST">
+            <form action="{{ route('event-requests.store') }}" method="POST" id="eventRequestForm">
                 @csrf
                 
                 <div class="row">
@@ -101,27 +101,86 @@
                                 
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
-                                        <label for="proposed_venue" class="form-label">Preferred Venue *</label>
-                                        <input type="text" class="form-control @error('proposed_venue') is-invalid @enderror" 
-                                               id="proposed_venue" name="proposed_venue" 
-                                               value="{{ old('proposed_venue') }}" required>
-                                        @error('proposed_venue')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label for="proposed_campus" class="form-label">Campus</label>
-                                        <select class="form-control @error('proposed_campus') is-invalid @enderror" 
-                                                id="proposed_campus" name="proposed_campus">
+                                        <label for="campus_id" class="form-label">Campus *</label>
+                                        <select class="form-control @error('campus_id') is-invalid @enderror" 
+                                                id="campus_id" name="campus_id" required onchange="loadBuildings(this.value)">
                                             <option value="">Select campus</option>
-                                            <option value="Main Campus" {{ old('proposed_campus') == 'Main Campus' ? 'selected' : '' }}>Main Campus</option>
-                                            <option value="Technology Campus" {{ old('proposed_campus') == 'Technology Campus' ? 'selected' : '' }}>Technology Campus</option>
-                                            <option value="Medical Campus" {{ old('proposed_campus') == 'Medical Campus' ? 'selected' : '' }}>Medical Campus</option>
+                                            @foreach($campuses as $campus)
+                                                <option value="{{ $campus->id }}" {{ old('campus_id') == $campus->id ? 'selected' : '' }}>
+                                                    {{ $campus->name }}
+                                                </option>
+                                            @endforeach
                                         </select>
-                                        @error('proposed_campus')
+                                        @error('campus_id')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
+                                    
+                                    <div class="col-md-6 mb-3">
+                                        <label for="building_id" class="form-label">Building</label>
+                                        <select class="form-control @error('building_id') is-invalid @enderror" 
+                                                id="building_id" name="building_id" onchange="loadVenues(this.value)">
+                                            <option value="">Select building first</option>
+                                        </select>
+                                        @error('building_id')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-12 mb-3">
+                                        <label for="venue_id" class="form-label">Preferred Venue *</label>
+                                        <select class="form-control select2 @error('venue_id') is-invalid @enderror" 
+                                                id="venue_id" name="venue_id" required>
+                                            <option value="">Select venue</option>
+                                            @foreach($venues as $venue)
+                                                <option value="{{ $venue->id }}" {{ old('venue_id') == $venue->id ? 'selected' : '' }}
+                                                    data-capacity="{{ $venue->capacity }}"
+                                                    data-building="{{ $venue->building->name ?? 'N/A' }}"
+                                                    data-campus="{{ $venue->building->campus->name ?? 'N/A' }}"
+                                                    data-type="{{ $venue->type }}">
+                                                    {{ $venue->name }} (Capacity: {{ $venue->capacity }} | {{ ucfirst($venue->type) }})
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        @error('venue_id')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                        <small class="text-muted">Select your preferred venue from available options</small>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <!-- Venue Details Display -->
+                                        <div class="card ju-card mb-3" id="venueDetailsCard" style="display: none;">
+                                            <div class="card-body">
+                                                <h6 class="mb-3">Venue Details</h6>
+                                                <div class="row">
+                                                    <div class="col-md-4">
+                                                        <p class="mb-1"><strong>Type:</strong> <span id="venueType"></span></p>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <p class="mb-1"><strong>Capacity:</strong> <span id="venueCapacity"></span></p>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <p class="mb-1"><strong>Building:</strong> <span id="venueBuilding"></span></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Alternative venue input (if venue not found in dropdown) -->
+                                <div class="mb-3">
+                                    <label for="alternative_venue" class="form-label">Alternative Venue Request</label>
+                                    <input type="text" class="form-control" 
+                                           id="alternative_venue" name="alternative_venue" 
+                                           value="{{ old('alternative_venue') }}"
+                                           placeholder="If your preferred venue is not listed, describe it here">
+                                    <small class="text-muted">Use this only if your venue is not in the dropdown above</small>
                                 </div>
                             </div>
                         </div>
@@ -176,6 +235,7 @@
                                     <label for="additional_requirements" class="form-label">Special Requirements</label>
                                     <textarea class="form-control" id="additional_requirements" 
                                               name="additional_requirements" rows="3">{{ old('additional_requirements') }}</textarea>
+                                    <small class="text-muted">Any special equipment, setup, or other requirements</small>
                                 </div>
                             </div>
                         </div>
@@ -184,7 +244,7 @@
                         <div class="card ju-card">
                             <div class="card-body">
                                 <div class="d-grid gap-2">
-                                    <button type="submit" class="btn btn-ju">
+                                    <button type="submit" class="btn btn-ju" id="submitBtn">
                                         <i class="fas fa-paper-plane me-1"></i> Submit Request
                                     </button>
                                     <a href="{{ route('event-requests.index') }}" class="btn btn-ju-outline">
@@ -200,14 +260,178 @@
     </div>
 </div>
 
+@push('styles')
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style>
+    .select2-container .select2-selection--single {
+        height: 38px;
+        padding: 5px;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 36px;
+    }
+    .select2-container--default .select2-selection--single {
+        border: 1px solid #ced4da;
+        border-radius: 0.375rem;
+    }
+</style>
+@endpush
+
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Select2
+    $('#venue_id').select2({
+        theme: 'bootstrap-5',
+        placeholder: 'Select a venue',
+        allowClear: true,
+        width: '100%'
+    });
+    
     // Set minimum date to today
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('proposed_start_date').min = today;
     document.getElementById('proposed_end_date').min = today;
+    
+    // Handle venue selection change
+    $('#venue_id').on('change', function() {
+        const selectedOption = $(this).find('option:selected');
+        const capacity = selectedOption.data('capacity');
+        const building = selectedOption.data('building');
+        const campus = selectedOption.data('campus');
+        const type = selectedOption.data('type');
+        
+        if (capacity) {
+            $('#venueDetailsCard').show();
+            $('#venueCapacity').text(capacity);
+            $('#venueBuilding').text(building);
+            $('#venueType').text(type.charAt(0).toUpperCase() + type.slice(1));
+            
+            // Update expected attendees field with venue capacity as max
+            const attendeesInput = document.getElementById('expected_attendees');
+            if (attendeesInput.value > capacity) {
+                attendeesInput.value = capacity;
+                showToast('Expected attendees adjusted to venue capacity', 'info');
+            }
+            attendeesInput.max = capacity;
+        } else {
+            $('#venueDetailsCard').hide();
+        }
+    });
+    
+    // Load buildings when campus is selected
+    @if(old('campus_id'))
+        loadBuildings({{ old('campus_id') }}, {{ old('building_id') }});
+    @endif
+    
+    // Form validation
+    document.getElementById('eventRequestForm').addEventListener('submit', function(e) {
+        const venueId = document.getElementById('venue_id').value;
+        const alternativeVenue = document.getElementById('alternative_venue').value;
+        
+        if (!venueId && !alternativeVenue.trim()) {
+            e.preventDefault();
+            showToast('Please select a venue or provide an alternative venue request', 'error');
+            return false;
+        }
+        
+        // Show loading state
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Submitting...';
+    });
 });
+
+function loadBuildings(campusId, selectedBuildingId = null) {
+    if (!campusId) {
+        $('#building_id').html('<option value="">Select campus first</option>');
+        return;
+    }
+    
+    $('#building_id').html('<option value="">Loading...</option>');
+    
+    fetch(`/admin/buildings/by-campus/${campusId}`)
+        .then(response => response.json())
+        .then(data => {
+            let options = '<option value="">Select building</option>';
+            data.forEach(building => {
+                const selected = (selectedBuildingId && building.id == selectedBuildingId) ? 'selected' : '';
+                options += `<option value="${building.id}" ${selected}>${building.name} ${building.code ? '(' + building.code + ')' : ''}</option>`;
+            });
+            $('#building_id').html(options);
+            
+            // Load venues if building was previously selected
+            if (selectedBuildingId) {
+                loadVenues(selectedBuildingId);
+            }
+        })
+        .catch(error => {
+            console.error('Error loading buildings:', error);
+            $('#building_id').html('<option value="">Error loading buildings</option>');
+        });
+}
+
+function loadVenues(buildingId) {
+    if (!buildingId) {
+        return;
+    }
+    
+    // Show loading in venues dropdown
+    const venueSelect = $('#venue_id');
+    const currentVal = venueSelect.val();
+    venueSelect.prop('disabled', true);
+    
+    fetch(`/admin/events/get-venues/${buildingId}`)
+        .then(response => response.json())
+        .then(data => {
+            let options = '<option value="">Select venue</option>';
+            data.forEach(venue => {
+                const selected = (currentVal && venue.id == currentVal) ? 'selected' : '';
+                options += `<option value="${venue.id}" ${selected}
+                    data-capacity="${venue.capacity}"
+                    data-type="${venue.type}">${venue.name} (Capacity: ${venue.capacity} | ${venue.type.charAt(0).toUpperCase() + venue.type.slice(1)})</option>`;
+            });
+            
+            venueSelect.html(options);
+            venueSelect.prop('disabled', false);
+            
+            // Reinitialize Select2
+            venueSelect.select2({
+                theme: 'bootstrap-5',
+                placeholder: 'Select a venue',
+                allowClear: true,
+                width: '100%'
+            });
+            
+            // Trigger change if value was restored
+            if (currentVal) {
+                venueSelect.val(currentVal).trigger('change');
+            }
+        })
+        .catch(error => {
+            console.error('Error loading venues:', error);
+            venueSelect.html('<option value="">Error loading venues</option>');
+            venueSelect.prop('disabled', false);
+        });
+}
+
+// Toast notification function
+function showToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    toast.className = `alert alert-${type} alert-dismissible fade show`;
+    toast.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    const container = document.querySelector('.toast-container') || document.body;
+    container.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.remove();
+    }, 5000);
+}
 </script>
 @endpush
 @endsection

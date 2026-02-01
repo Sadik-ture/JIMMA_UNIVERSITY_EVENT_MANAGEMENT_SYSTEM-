@@ -13,22 +13,22 @@ class SpeakerController extends Controller
     public function index(Request $request)
     {
         $query = Speaker::query();
-        
+
         // Apply search
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
                 $q->where('name', 'like', "%{$request->search}%")
-                  ->orWhere('title', 'like', "%{$request->search}%")
-                  ->orWhere('department', 'like', "%{$request->search}%")
-                  ->orWhere('bio', 'like', "%{$request->search}%");
+                    ->orWhere('title', 'like', "%{$request->search}%")
+                    ->orWhere('department', 'like', "%{$request->search}%")
+                    ->orWhere('bio', 'like', "%{$request->search}%");
             });
         }
-        
+
         // Filter by department
         if ($request->filled('department')) {
             $query->where('department', $request->department);
         }
-        
+
         // Filter by active status
         if ($request->filled('status')) {
             if ($request->status == 'active') {
@@ -37,31 +37,31 @@ class SpeakerController extends Controller
                 $query->where('is_active', false);
             }
         }
-        
+
         // Filter by featured
         if ($request->filled('featured') && $request->featured == '1') {
             $query->where('is_featured', true);
         }
-        
+
         // Apply sorting
         $sort = $request->get('sort', 'name');
         $order = $request->get('order', 'asc');
         $query->orderBy($sort, $order);
-        
+
         // Get statistics
         $totalCount = Speaker::count();
         $activeCount = Speaker::where('is_active', true)->count();
         $featuredCount = Speaker::where('is_featured', true)->where('is_active', true)->count();
         $upcomingTalks = 0; // You can implement this based on your events
-        
+
         // Get paginated results with events count
         $speakers = $query->withCount('events')->paginate(20)->withQueryString();
-        
+
         return view('admin.speakers.index', compact(
-            'speakers', 
-            'totalCount', 
-            'activeCount', 
-            'featuredCount', 
+            'speakers',
+            'totalCount',
+            'activeCount',
+            'featuredCount',
             'upcomingTalks'
         ));
     }
@@ -82,18 +82,19 @@ class SpeakerController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'title' => 'required|string|max:255',
-            'department' => 'required|string|max:255',
             'email' => 'required|email|unique:speakers,email',
             'phone' => 'nullable|string|max:20',
-            'bio' => 'required|string',
+            'bio' => 'nullable|string',
             'expertise' => 'nullable|string',
             'website' => 'nullable|url',
             'linkedin' => 'nullable|url',
             'twitter' => 'nullable|url',
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'photo' => 'nullable|image|max:2048',
             'is_active' => 'boolean',
-            'is_featured' => 'boolean',
         ]);
+
+        // Generate slug from name
+        $validated['slug'] = \Illuminate\Support\Str::slug($validated['name']);
 
         // Handle photo upload
         if ($request->hasFile('photo')) {
@@ -132,27 +133,31 @@ class SpeakerController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'title' => 'required|string|max:255',
-            'department' => 'required|string|max:255',
             'email' => 'required|email|unique:speakers,email,' . $speaker->id,
             'phone' => 'nullable|string|max:20',
-            'bio' => 'required|string',
+            'bio' => 'nullable|string',
             'expertise' => 'nullable|string',
             'website' => 'nullable|url',
             'linkedin' => 'nullable|url',
             'twitter' => 'nullable|url',
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'photo' => 'nullable|image|max:2048',
             'is_active' => 'boolean',
-            'is_featured' => 'boolean',
         ]);
+
+        // Update slug if name changed
+        if ($speaker->name !== $validated['name']) {
+            $validated['slug'] = \Illuminate\Support\Str::slug($validated['name']);
+        }
 
         // Handle photo upload
         if ($request->hasFile('photo')) {
-            // Delete old photo if exists
-            if ($speaker->photo) {
-                \Storage::disk('public')->delete($speaker->photo);
-            }
             $photoPath = $request->file('photo')->store('speakers', 'public');
             $validated['photo'] = $photoPath;
+
+            // Delete old photo if exists
+            if ($speaker->photo) {
+                Storage::disk('public')->delete($speaker->photo);
+            }
         }
 
         $speaker->update($validated);
@@ -170,7 +175,7 @@ class SpeakerController extends Controller
         if ($speaker->photo) {
             \Storage::disk('public')->delete($speaker->photo);
         }
-        
+
         $speaker->delete();
 
         return redirect()->route('speakers.index')
@@ -183,7 +188,7 @@ class SpeakerController extends Controller
     public function toggleActive(Speaker $speaker)
     {
         $speaker->update(['is_active' => !$speaker->is_active]);
-        
+
         return redirect()->back()
             ->with('success', 'Speaker status updated successfully.');
     }
@@ -194,7 +199,7 @@ class SpeakerController extends Controller
     public function toggleFeatured(Speaker $speaker)
     {
         $speaker->update(['is_featured' => !$speaker->is_featured]);
-        
+
         return redirect()->back()
             ->with('success', 'Featured status updated successfully.');
     }

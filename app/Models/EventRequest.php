@@ -25,6 +25,10 @@ class EventRequest extends Model
         'review_notes',
         'reviewed_at',
         'event_id',
+        'venue_id',
+    'campus_id',
+    'building_id',
+    'alternative_venue',
     ];
 
     protected $casts = [
@@ -108,4 +112,22 @@ class EventRequest extends Model
     {
         return '<span class="badge bg-' . $this->status_color . '">' . ucfirst($this->status) . '</span>';
     }
+
+
+    // Add these to your EventRequest model:
+public function venueRelation()
+{
+    return $this->belongsTo(Venue::class, 'venue_id');
+}
+
+public function campusRelation()
+{
+    return $this->belongsTo(Campus::class, 'campus_id');
+}
+
+public function buildingRelation()
+{
+    return $this->belongsTo(Building::class, 'building_id');
+}
+
 }

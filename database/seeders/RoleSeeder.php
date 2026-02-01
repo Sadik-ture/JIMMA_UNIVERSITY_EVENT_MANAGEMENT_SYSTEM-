@@ -43,7 +43,10 @@ class RoleSeeder extends Seeder
         ];
 
         foreach ($roles as $role) {
-            Role::create($role);
+            Role::firstOrCreate(
+                ['slug' => $role['slug']], // Use slug as unique identifier
+                $role
+            );
         }
     }
 }

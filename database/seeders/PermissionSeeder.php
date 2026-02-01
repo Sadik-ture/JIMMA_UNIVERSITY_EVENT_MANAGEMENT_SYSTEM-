@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Permission;
 use App\Models\Role;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class PermissionSeeder extends Seeder
 {
@@ -53,12 +54,39 @@ class PermissionSeeder extends Seeder
             ['name' => 'Edit Event Request', 'slug' => 'edit_event_request', 'description' => 'Can edit event requests'],
             ['name' => 'Delete Event Request', 'slug' => 'delete_event_request', 'description' => 'Can delete event requests'],
             ['name' => 'Approve Event Requests', 'slug' => 'approve_event_requests', 'description' => 'Can approve event requests'],
+            ['name' => 'Reject Event Requests', 'slug' => 'reject_event_requests', 'description' => 'Can reject event requests'],
+            ['name' => 'Cancel Event Requests', 'slug' => 'cancel_event_requests', 'description' => 'Can cancel event requests'],
+        
+            // Notification permissions
+            ['name' => 'Manage Notifications', 'slug' => 'manage_notifications', 'description' => 'Can send and manage notifications'],
+            ['name' => 'View Notifications', 'slug' => 'view_notifications', 'description' => 'Can view notifications'],
+            ['name' => 'Send Notifications', 'slug' => 'send_notifications', 'description' => 'Can send notifications'],
+            ['name' => 'View Notification Statistics', 'slug' => 'view_notification_stats', 'description' => 'Can view notification statistics'],
+
+            // Announcement permissions
+            ['name' => 'Manage Announcements', 'slug' => 'manage_announcements', 'description' => 'Can create and manage announcements'],
+            ['name' => 'View Announcements', 'slug' => 'view_announcements', 'description' => 'Can view announcements'],
+            ['name' => 'Create Announcements', 'slug' => 'create_announcements', 'description' => 'Can create announcements'],
+            ['name' => 'Edit Announcements', 'slug' => 'edit_announcements', 'description' => 'Can edit announcements'],
+            ['name' => 'Delete Announcements', 'slug' => 'delete_announcements', 'description' => 'Can delete announcements'],
+            ['name' => 'View Announcement Statistics', 'slug' => 'view_announcement_stats', 'description' => 'Can view announcement statistics'],
+
+            // Feedback permissions
+            ['name' => 'Manage Feedback', 'slug' => 'manage_feedback', 'description' => 'Can manage all feedback'],
+            ['name' => 'View Feedback', 'slug' => 'view_feedback', 'description' => 'Can view feedback list'],
+            ['name' => 'Create Feedback', 'slug' => 'create_feedback', 'description' => 'Can submit feedback'],
+            ['name' => 'Update Feedback', 'slug' => 'update_feedback', 'description' => 'Can update feedback status'],
+            ['name' => 'Delete Feedback', 'slug' => 'delete_feedback', 'description' => 'Can delete feedback'],
+            ['name' => 'Respond to Feedback', 'slug' => 'respond_feedback', 'description' => 'Can respond to feedback'],
+            ['name' => 'Export Feedback', 'slug' => 'export_feedback', 'description' => 'Can export feedback data'],
+            ['name' => 'View Feedback Analytics', 'slug' => 'view_feedback_analytics', 'description' => 'Can view feedback analytics'],
         ];
 
         foreach ($permissions as $permission) {
-            Permission::firstOrCreate([
-                'slug' => $permission['slug']
-            ], $permission);
+            Permission::updateOrCreate(
+                ['slug' => $permission['slug']],
+                $permission
+            );
         }
 
         // Assign all permissions to Super Admin
@@ -68,7 +96,7 @@ class PermissionSeeder extends Seeder
             $superAdmin->permissions()->sync($allPermissions->pluck('id'));
         }
 
-        // Assign basic permissions to Admin
+        // Assign permissions to Admin
         $admin = Role::where('slug', 'admin')->first();
         if ($admin) {
             $adminPermissions = Permission::whereIn('slug', [
@@ -77,41 +105,67 @@ class PermissionSeeder extends Seeder
                 'view_permissions', 'view_dashboard',
                 'manage_events', 'view_events', 'create_events', 'edit_events', 'delete_events',
                 'manage_speakers', 'view_speakers', 'create_speaker', 'edit_speaker', 'delete_speaker',
-                'manage_event_requests', 'view_event_requests', 'create_event_request', 'edit_event_request', 'delete_event_request', 'approve_event_requests'
+                'manage_event_requests', 'view_event_requests', 'create_event_request', 
+                'edit_event_request', 'delete_event_request', 'approve_event_requests', 'reject_event_requests',
+                'manage_notifications', 'view_notifications', 'send_notifications', 'view_notification_stats',
+                'manage_announcements', 'view_announcements', 'create_announcements', 
+                'edit_announcements', 'delete_announcements', 'view_announcement_stats',
+                'manage_feedback', 'view_feedback', 'update_feedback', 'respond_feedback', 
+                'export_feedback', 'view_feedback_analytics'
             ])->get();
             $admin->permissions()->sync($adminPermissions->pluck('id'));
         }
 
-        // Assign basic permissions to Event Manager
+        // Assign permissions to Event Manager
         $eventManager = Role::where('slug', 'event-manager')->first();
         if ($eventManager) {
             $eventManagerPermissions = Permission::whereIn('slug', [
                 'view_dashboard',
                 'manage_events', 'view_events', 'create_events', 'edit_events',
                 'manage_speakers', 'view_speakers', 'create_speaker', 'edit_speaker',
-                'manage_event_requests', 'view_event_requests', 'create_event_request', 'edit_event_request', 'approve_event_requests'
+                'manage_event_requests', 'view_event_requests', 'create_event_request', 
+                'edit_event_request', 'approve_event_requests', 'reject_event_requests',
+                'manage_notifications', 'view_notifications', 'send_notifications',
+                'view_announcements',
+                'view_feedback', 'create_feedback'
             ])->get();
             $eventManager->permissions()->sync($eventManagerPermissions->pluck('id'));
         }
 
-        // Assign basic permissions to Faculty
+        // Assign permissions to Faculty
         $faculty = Role::where('slug', 'faculty')->first();
         if ($faculty) {
             $facultyPermissions = Permission::whereIn('slug', [
                 'view_dashboard', 'view_events',
-                'create_event_request', 'view_event_requests', 'edit_event_request'
+                'create_event_request', 'view_event_requests', 'edit_event_request',
+                'view_notifications',
+                'view_announcements',
+                'create_feedback', 'view_feedback'
             ])->get();
             $faculty->permissions()->sync($facultyPermissions->pluck('id'));
         }
 
-        // Assign basic permissions to Student
+        // Assign permissions to Student
         $student = Role::where('slug', 'student')->first();
         if ($student) {
             $studentPermissions = Permission::whereIn('slug', [
                 'view_dashboard', 'view_events',
-                'create_event_request', 'view_event_requests'
+                'create_event_request', 'view_event_requests',
+                'view_notifications',
+                'view_announcements',
+                'create_feedback'
             ])->get();
             $student->permissions()->sync($studentPermissions->pluck('id'));
+        }
+
+        // Assign permissions to Guest
+        $guest = Role::where('slug', 'guest')->first();
+        if ($guest) {
+            $guestPermissions = Permission::whereIn('slug', [
+                'view_events',
+                'create_feedback'
+            ])->get();
+            $guest->permissions()->sync($guestPermissions->pluck('id'));
         }
     }
 }

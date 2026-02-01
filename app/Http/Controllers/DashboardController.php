@@ -23,4 +23,11 @@ class DashboardController extends Controller
 
         return view('dashboard.index', compact('stats', 'recentUsers', 'userRoleDistribution'));
     }
+
+    // Add this method to DashboardController
+public function admin()
+{
+    return view('admin.dashboard');
+}
+
 }
