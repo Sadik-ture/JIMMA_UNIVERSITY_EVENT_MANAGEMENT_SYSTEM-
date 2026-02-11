@@ -127,10 +127,10 @@
                                     </td>
                                     <td>
                                         <div class="btn-group btn-group-sm">
-                                            <a href="{{ route('events.guest.show', $registration->event) }}" 
+                                            <!-- <a href="{{ route('events.guest.show', $registration->event) }}" 
                                                class="btn btn-outline-primary" title="View Event">
                                                 <i class="fas fa-eye"></i>
-                                            </a>
+                                            </a> -->
                                             <a href="{{ route('event-registration.show', $registration) }}" 
                                                class="btn btn-outline-info" title="View Registration">
                                                 <i class="fas fa-ticket-alt"></i>

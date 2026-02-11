@@ -1,5 +1,5 @@
 <?php
-// app/Http/Controllers/EventRequestController.php (Fixed Version)
+// app/Http/Controllers/EventRequestController.php (FULL FIXED VERSION)
 
 namespace App\Http\Controllers;
 
@@ -16,20 +16,23 @@ use Illuminate\Support\Str;
 class EventRequestController extends Controller
 {
     /**
-     * Display a listing of event requests
+     * Display a listing of event requests - FOR ADMIN ONLY
      */
     public function index(Request $request)
     {
+        // Check if user has permission to manage event requests (admin only)
+        if (!Auth::user()->hasPermission('manage_event_requests') && 
+            !Auth::user()->hasPermission('view_event_requests') &&
+            !Auth::user()->hasPermission('approve_event_requests')) {
+            // If not admin, redirect to my-requests
+            return redirect()->route('event-requests.my-requests');
+        }
+
         $query = EventRequest::with(['user', 'reviewer', 'event']);
         
         // Filter by status
         if ($request->filled('status')) {
             $query->where('status', $request->status);
-        }
-        
-        // Filter by user (if not admin)
-        if (!Auth::user()->hasPermission('manage_event_requests')) {
-            $query->where('user_id', Auth::id());
         }
         
         // Search
@@ -59,6 +62,47 @@ class EventRequestController extends Controller
             'rejectedCount',
             'cancelledCount',
             'myRequestsCount'
+        ));
+    }
+
+    /**
+     * Display a listing of the authenticated user's event requests
+     */
+    public function myRequests(Request $request)
+    {
+        $query = EventRequest::with(['reviewer', 'event'])
+            ->where('user_id', Auth::id());
+        
+        // Filter by status
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+        
+        // Search
+        if ($request->filled('search')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('title', 'like', "%{$request->search}%")
+                  ->orWhere('description', 'like', "%{$request->search}%")
+                  ->orWhere('organizer_name', 'like', "%{$request->search}%");
+            });
+        }
+        
+        $eventRequests = $query->latest()->paginate(20);
+        
+        // Statistics
+        $totalCount = $query->count();
+        $pendingCount = EventRequest::where('user_id', Auth::id())->pending()->count();
+        $approvedCount = EventRequest::where('user_id', Auth::id())->approved()->count();
+        $rejectedCount = EventRequest::where('user_id', Auth::id())->rejected()->count();
+        $cancelledCount = EventRequest::where('user_id', Auth::id())->where('status', 'cancelled')->count();
+        
+        return view('event-requests.my-requests', compact(
+            'eventRequests',
+            'totalCount',
+            'pendingCount',
+            'approvedCount',
+            'rejectedCount',
+            'cancelledCount'
         ));
     }
 
@@ -276,7 +320,7 @@ class EventRequestController extends Controller
         
         $eventRequest->delete();
         
-        return redirect()->route('event-requests.index')
+        return redirect()->route('event-requests.my-requests')
             ->with('success', 'Event request deleted successfully.');
     }
 
@@ -305,20 +349,19 @@ class EventRequestController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Event request cancelled successfully!',
-                'redirect' => route('event-requests.index')
+                'redirect' => route('event-requests.my-requests')
             ]);
         }
         
-        return redirect()->route('event-requests.show', $eventRequest)
+        return redirect()->route('event-requests.my-requests')
             ->with('success', 'Event request cancelled successfully.');
     }
 
     /**
-     * Approve an event request - FIXED AUTHORIZATION
+     * Approve an event request
      */
     public function approve(Request $request, EventRequest $eventRequest)
     {
-        // Check if user has permission to approve event requests
         if (!Auth::user()->hasPermission('approve_event_requests')) {
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json([
@@ -334,7 +377,6 @@ class EventRequestController extends Controller
             'create_event' => 'boolean',
         ]);
         
-        // Create event if requested
         $event = null;
         if ($request->has('create_event') && $request->boolean('create_event')) {
             $event = $this->createEventFromRequest($eventRequest);
@@ -361,13 +403,11 @@ class EventRequestController extends Controller
     }
 
     /**
-     * Reject an event request - FIXED AUTHORIZATION
+     * Reject an event request
      */
     public function reject(Request $request, EventRequest $eventRequest)
     {
-        // Check if user has permission to reject event requests
         if (!Auth::user()->hasPermission('reject_event_requests')) {
-            // Fallback: if reject_event_requests doesn't exist, check for approve_event_requests
             if (!Auth::user()->hasPermission('approve_event_requests')) {
                 if ($request->ajax() || $request->wantsJson()) {
                     return response()->json([
@@ -444,7 +484,6 @@ class EventRequestController extends Controller
      */
     public function quickApprove(Request $request, EventRequest $eventRequest)
     {
-        // Check if user has permission to approve event requests
         if (!Auth::user()->hasPermission('approve_event_requests')) {
             return response()->json([
                 'success' => false,
@@ -469,9 +508,7 @@ class EventRequestController extends Controller
      */
     public function quickReject(Request $request, EventRequest $eventRequest)
     {
-        // Check if user has permission to reject event requests
         if (!Auth::user()->hasPermission('reject_event_requests')) {
-            // Fallback: if reject_event_requests doesn't exist, check for approve_event_requests
             if (!Auth::user()->hasPermission('approve_event_requests')) {
                 return response()->json([
                     'success' => false,
@@ -498,7 +535,6 @@ class EventRequestController extends Controller
      */
     public function quickCancel(Request $request, EventRequest $eventRequest)
     {
-        // Authorization check - only owner can cancel
         if (Auth::id() !== $eventRequest->user_id) {
             return response()->json([
                 'success' => false,

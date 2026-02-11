@@ -8,27 +8,30 @@ return new class extends Migration
 {
     public function up()
     {
+        // First, drop existing tables if they exist
+        Schema::dropIfExists('user_notifications');
+        Schema::dropIfExists('notifications');
+        
+        // Create notifications table with all required columns
         Schema::create('notifications', function (Blueprint $table) {
             $table->id();
             $table->string('title');
             $table->text('message');
-            $table->enum('type', ['announcement', 'event', 'system', 'alert', 'info', 'warning', 'success'])->default('info');
-            $table->json('data')->nullable();
+            $table->enum('type', ['announcement', 'event', 'system', 'alert', 'info', 'warning', 'success'])
+                  ->default('announcement');
             $table->foreignId('created_by')->nullable()->constrained('users')->onDelete('set null');
             $table->string('action_url')->nullable();
             $table->string('action_text')->nullable();
-            $table->integer('priority')->default(0);
-            $table->timestamp('scheduled_at')->nullable();
-            $table->timestamp('expires_at')->nullable();
+            $table->tinyInteger('priority')->default(0); // 0=normal, 1=high, 2=urgent
+            $table->json('data')->nullable();
             $table->boolean('is_public')->default(false);
             $table->timestamps();
             
-            $table->index('type');
+            $table->index(['type', 'created_at']);
             $table->index('priority');
-            $table->index('created_by');
-            $table->index(['scheduled_at', 'expires_at']);
         });
-
+        
+        // Create user_notifications pivot table
         Schema::create('user_notifications', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
@@ -40,8 +43,6 @@ return new class extends Migration
             $table->timestamps();
             
             $table->unique(['user_id', 'notification_id']);
-            $table->index('read_at');
-            $table->index('dismissed_at');
             $table->index(['user_id', 'read_at', 'dismissed_at']);
         });
     }

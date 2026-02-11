@@ -1,4 +1,5 @@
 <?php
+// app/Models/Event.php - COMPLETE FIXED VERSION
 
 namespace App\Models;
 
@@ -40,7 +41,8 @@ class Event extends Model
         'tags',
         'image',
         'status',
-        'additional_venue_info'
+        'additional_venue_info',
+        'views_count',
     ];
 
     protected $casts = [
@@ -52,7 +54,21 @@ class Event extends Model
         'tags' => 'array',
         'additional_venue_info' => 'array',
         'max_attendees' => 'integer',
-        'registered_attendees' => 'integer'
+        'registered_attendees' => 'integer',
+        'views_count' => 'integer',
+    ];
+
+    protected $appends = [
+        'image_url',
+        'formatted_date_range',
+        'is_full',
+        'available_seats',
+        'attendance_percentage',
+        'remaining_seats',
+        'status',
+        'venue_name',
+        'building_name',
+        'campus_name'
     ];
 
     /**
@@ -70,6 +86,13 @@ class Event extends Model
                     $event->slug = Str::slug($event->title) . '-' . $counter;
                     $counter++;
                 }
+            }
+        });
+
+        static::deleting(function ($event) {
+            // Delete image when event is deleted
+            if ($event->image) {
+                Storage::disk('public')->delete($event->image);
             }
         });
     }
@@ -107,6 +130,14 @@ class Event extends Model
     }
 
     /**
+     * Get confirmed registrations.
+     */
+    public function confirmedRegistrations()
+    {
+        return $this->hasMany(EventRegistration::class)->where('status', 'confirmed');
+    }
+
+    /**
      * Get waitlists.
      */
     public function waitlists()
@@ -115,13 +146,11 @@ class Event extends Model
     }
 
     /**
-     * Check if current user is registered for this event.
+     * Check if a user is registered for this event.
      */
     public function isRegisteredByUser($userId = null)
     {
-        if (!$userId && Auth::check()) {
-            $userId = Auth::id();
-        }
+        $userId = $userId ?? Auth::id();
         
         if (!$userId) {
             return false;
@@ -134,13 +163,11 @@ class Event extends Model
     }
 
     /**
-     * Check if current user is on waitlist for this event.
+     * Check if a user is on the waitlist for this event.
      */
     public function isOnWaitlistByUser($userId = null)
     {
-        if (!$userId && Auth::check()) {
-            $userId = Auth::id();
-        }
+        $userId = $userId ?? Auth::id();
         
         if (!$userId) {
             return false;
@@ -150,6 +177,90 @@ class Event extends Model
             ->where('user_id', $userId)
             ->whereNull('converted_at')
             ->exists();
+    }
+
+    /**
+     * Get user's waitlist position.
+     */
+    public function getUserWaitlistPosition($userId = null)
+    {
+        $userId = $userId ?? Auth::id();
+        
+        if (!$userId) {
+            return null;
+        }
+        
+        $waitlist = $this->waitlists()
+            ->where('user_id', $userId)
+            ->whereNull('converted_at')
+            ->first();
+            
+        return $waitlist ? $waitlist->position : null;
+    }
+
+    /**
+     * Add a user to the waitlist.
+     */
+    public function addToWaitlist($userId = null)
+    {
+        $userId = $userId ?? Auth::id();
+        
+        if (!$userId) {
+            return null;
+        }
+        
+        // Check if already on waitlist
+        if ($this->isOnWaitlistByUser($userId)) {
+            return null;
+        }
+        
+        // Get next position
+        $nextPosition = $this->waitlists()->whereNull('converted_at')->max('position') ?? 0;
+        $nextPosition++;
+        
+        return $this->waitlists()->create([
+            'user_id' => $userId,
+            'position' => $nextPosition,
+            'joined_at' => now(),
+        ]);
+    }
+
+    /**
+     * Fill seats from waitlist when spots become available.
+     */
+    public function fillFromWaitlist($numberOfSpots = 1)
+    {
+        $movedUsers = [];
+        
+        $waitlistEntries = $this->waitlists()
+            ->with('user')
+            ->whereNull('converted_at')
+            ->orderBy('position')
+            ->limit($numberOfSpots)
+            ->get();
+        
+        foreach ($waitlistEntries as $waitlistEntry) {
+            // Create registration
+            $registration = EventRegistration::create([
+                'event_id' => $this->id,
+                'user_id' => $waitlistEntry->user_id,
+                'guest_count' => 1,
+                'status' => 'confirmed',
+                'confirmed_at' => now(),
+            ]);
+            
+            // Update registered attendees count
+            $this->increment('registered_attendees', 1);
+            
+            // Mark waitlist as converted
+            $waitlistEntry->update([
+                'converted_at' => now(),
+            ]);
+            
+            $movedUsers[] = $waitlistEntry->user;
+        }
+        
+        return $movedUsers;
     }
 
     /**
@@ -174,68 +285,6 @@ class Event extends Model
         }
         
         return max(0, $this->max_attendees - $this->registered_attendees);
-    }
-
-    /**
-     * Add user to waitlist.
-     */
-    public function addToWaitlist($userId)
-    {
-        if ($this->isOnWaitlistByUser($userId)) {
-            return false;
-        }
-        
-        $position = $this->waitlists()->whereNull('converted_at')->count() + 1;
-        
-        return $this->waitlists()->create([
-            'user_id' => $userId,
-            'position' => $position,
-        ]);
-    }
-
-    /**
-     * Fill spots from waitlist.
-     */
-    public function fillFromWaitlist($spots = 1)
-    {
-        $movedUsers = [];
-        $waitlists = $this->waitlists()
-            ->whereNull('converted_at')
-            ->orderBy('position')
-            ->limit($spots)
-            ->get();
-        
-        foreach ($waitlists as $waitlist) {
-            // Create registration
-            EventRegistration::create([
-                'event_id' => $this->id,
-                'user_id' => $waitlist->user_id,
-                'status' => 'confirmed',
-                'guest_count' => 1,
-                'confirmed_at' => now(),
-            ]);
-            
-            // Update waitlist
-            $waitlist->update([
-                'converted_at' => now(),
-                'notified_at' => now(),
-            ]);
-            
-            // Increment registered count
-            $this->increment('registered_attendees');
-            
-            $movedUsers[] = $waitlist->user_id;
-        }
-        
-        return $movedUsers;
-    }
-
-    /**
-     * Get confirmed registrations.
-     */
-    public function confirmedRegistrations()
-    {
-        return $this->registrations()->where('status', 'confirmed');
     }
 
     /**
@@ -472,10 +521,32 @@ class Event extends Model
     public function getImageUrlAttribute()
     {
         if (!$this->image) {
+            return asset('images/default-event.jpg');
+        }
+        
+        // Check if it's already a URL
+        if (filter_var($this->image, FILTER_VALIDATE_URL)) {
+            return $this->image;
+        }
+        
+        // Check if file exists in storage
+        if (Storage::disk('public')->exists($this->image)) {
+            return Storage::url($this->image);
+        }
+        
+        return asset('images/default-event.jpg');
+    }
+
+    /**
+     * Get image path for storage.
+     */
+    public function getImagePathAttribute()
+    {
+        if (!$this->image) {
             return null;
         }
         
-        return Storage::url($this->image);
+        return 'public/' . $this->image;
     }
 
     /**
@@ -510,5 +581,62 @@ class Event extends Model
         ];
         
         return $colors[$this->event_type] ?? 'secondary';
+    }
+
+    /**
+     * Delete the event image from storage.
+     */
+    public function deleteImage()
+    {
+        if ($this->image && Storage::disk('public')->exists($this->image)) {
+            Storage::disk('public')->delete($this->image);
+            $this->image = null;
+            $this->save();
+        }
+    }
+
+    /**
+     * Upload a new image for the event.
+     */
+    public function uploadImage($file)
+    {
+        // Delete old image if exists
+        $this->deleteImage();
+        
+        // Generate unique filename
+        $filename = 'event-' . $this->id . '-' . time() . '.' . $file->getClientOriginalExtension();
+        
+        // Store the file
+        $path = $file->storeAs('events', $filename, 'public');
+        
+        // Update the event with new image path
+        $this->image = $path;
+        $this->save();
+        
+        return $path;
+    }
+
+    /**
+     * Get status badge class.
+     */
+    public function getStatusBadgeAttribute()
+    {
+        $status = $this->getStatusAttribute();
+        
+        $badges = [
+            'upcoming' => ['class' => 'bg-primary', 'text' => 'Upcoming'],
+            'ongoing' => ['class' => 'bg-success', 'text' => 'Ongoing'],
+            'completed' => ['class' => 'bg-secondary', 'text' => 'Completed']
+        ];
+        
+        return $badges[$status] ?? ['class' => 'bg-secondary', 'text' => 'Unknown'];
+    }
+
+    /**
+     * Check if the event has an image.
+     */
+    public function hasImage()
+    {
+        return !empty($this->image);
     }
 }

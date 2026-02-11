@@ -72,18 +72,41 @@
                                             
                                             <div class="col-md-12">
                                                 <div class="form-group">
+                                                    <label for="short_description" class="form-label">
+                                                        <i class="fas fa-align-left me-1 text-muted"></i>
+                                                        Short Description (Optional)
+                                                    </label>
+                                                    <textarea class="form-control @error('short_description') is-invalid @enderror" 
+                                                              id="short_description" 
+                                                              name="short_description" 
+                                                              rows="2" 
+                                                              placeholder="Brief summary of your event (max 200 characters)...">{{ old('short_description') }}</textarea>
+                                                    <div class="form-text">
+                                                        <small>Brief summary that appears in event cards. Leave empty to use first 100 characters of main description.</small>
+                                                    </div>
+                                                    @error('short_description')
+                                                        <div class="invalid-feedback d-flex align-items-center">
+                                                            <i class="fas fa-exclamation-circle me-2"></i>
+                                                            {{ $message }}
+                                                        </div>
+                                                    @enderror
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="col-md-12">
+                                                <div class="form-group">
                                                     <label for="description" class="form-label required">
                                                         <i class="fas fa-align-left me-1 text-muted"></i>
-                                                        Description
+                                                        Full Description
                                                     </label>
                                                     <textarea class="form-control @error('description') is-invalid @enderror" 
                                                               id="description" 
                                                               name="description" 
                                                               rows="5" 
-                                                              placeholder="Describe your event..."
+                                                              placeholder="Describe your event in detail..."
                                                               required>{{ old('description') }}</textarea>
                                                     <div class="form-text">
-                                                        <small>Provide a clear and detailed description of your event.</small>
+                                                        <small>Provide a clear and detailed description of your event. HTML is allowed.</small>
                                                     </div>
                                                     @error('description')
                                                         <div class="invalid-feedback d-flex align-items-center">
@@ -341,7 +364,7 @@
                                     <div class="ju-sub-card-header">
                                         <h5 class="mb-0">
                                             <i class="fas fa-images me-2 text-success"></i>
-                                            Event Media
+                                            Event Image
                                         </h5>
                                     </div>
                                     <div class="ju-sub-card-body">

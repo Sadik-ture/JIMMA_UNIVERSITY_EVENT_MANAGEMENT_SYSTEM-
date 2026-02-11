@@ -2,68 +2,66 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class UserNotification extends Model
 {
     use HasFactory;
 
     protected $table = 'user_notifications';
-
+    
     protected $fillable = [
         'user_id',
         'notification_id',
         'read_at',
+        'dismissed_at',
         'email_sent',
         'email_sent_at',
-        'email_response',
     ];
 
     protected $casts = [
         'read_at' => 'datetime',
+        'dismissed_at' => 'datetime',
         'email_sent_at' => 'datetime',
+        'email_sent' => 'boolean',
     ];
 
-    /**
-     * Relationship with user
-     */
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * Relationship with notification
-     */
     public function notification()
     {
         return $this->belongsTo(Notification::class);
     }
 
-    /**
-     * Scope for unread notifications
-     */
-    public function scopeUnread($query)
-    {
-        return $query->whereNull('read_at');
-    }
-
-    /**
-     * Scope for read notifications
-     */
-    public function scopeRead($query)
-    {
-        return $query->whereNotNull('read_at');
-    }
-
-    /**
-     * Mark notification as read
-     */
     public function markAsRead()
     {
-        if (!$this->read_at) {
-            $this->update(['read_at' => now()]);
-        }
+        $this->read_at = now();
+        $this->save();
+    }
+
+    public function markAsUnread()
+    {
+        $this->read_at = null;
+        $this->save();
+    }
+
+    public function dismiss()
+    {
+        $this->dismissed_at = now();
+        $this->save();
+    }
+
+    public function isRead()
+    {
+        return !is_null($this->read_at);
+    }
+
+    public function isDismissed()
+    {
+        return !is_null($this->dismissed_at);
     }
 }

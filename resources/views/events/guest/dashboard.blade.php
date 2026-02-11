@@ -1,829 +1,1569 @@
+{{-- resources/views/events/guest/dashboard.blade.php --}}
 @extends('layouts.app')
 
 @section('title', 'Events Dashboard | Jimma University')
-@section('page-title', 'Events Dashboard')
-@section('page-subtitle', 'University Events & Activities')
+@section('page-title', 'University Events Dashboard')
+@section('page-subtitle', 'Discover Campus Activities, Conferences & Cultural Events')
 
 @section('breadcrumb-items')
     <li class="breadcrumb-item">
-        <a href="{{ route('home') }}" class="d-flex align-items-center text-decoration-none">
-            <i class="fas fa-home me-2 text-success"></i>Home
+        <a href="{{ route('home') }}" class="d-flex align-items-center text-decoration-none hover-lift">
+            <i class="fas fa-home me-2" style="color: var(--ju-gold);"></i>Home
         </a>
     </li>
     <li class="breadcrumb-item active">
-        <span class="text-success fw-semibold">Events</span>
+        <span class="fw-semibold" style="color: var(--ju-blue-dark);">Events Dashboard</span>
     </li>
 @endsection
 
 @section('content')
 <style>
+    /* ============================================
+           PREMIUM JIMMA UNIVERSITY DASHBOARD
+           DARK BLUE & GOLD Color Scheme - OFFICIAL
+           Perfectly Fitted Cards | Fixed Search
+        ============================================ */
+    
     :root {
-        --ju-green: #006747;
-        --ju-gold: #FFC72C;
-        --ju-dark-green: #00573D;
-        --ju-light-green: #E8F5E9;
-        --ju-border: #D1E7DD;
-        --ju-card-shadow: 0 3px 10px rgba(0, 103, 71, 0.08);
-        --ju-card-hover: 0 8px 20px rgba(0, 103, 71, 0.15);
+        /* DARK BLUE - Official Jimma University Primary Color */
+        --ju-blue: #0a2c6e;
+        --ju-blue-dark: #041c47;
+        --ju-blue-darker: #021230;
+        --ju-blue-light: #1e4a8a;
+        --ju-blue-lighter: #3a6ab0;
+        --ju-blue-soft: rgba(10, 44, 110, 0.08);
+        --ju-blue-glow: rgba(10, 44, 110, 0.2);
+        --ju-blue-gradient: linear-gradient(145deg, #0a2c6e, #041c47);
+        --ju-blue-gradient-light: linear-gradient(145deg, #0a2c6e, #1e4a8a);
+        
+        /* Ethiopian Gold Accents - Official */
+        --ju-gold: #c4a747;
+        --ju-gold-dark: #a5862e;
+        --ju-gold-darker: #7e6623;
+        --ju-gold-light: #d8be6e;
+        --ju-gold-soft: rgba(196, 167, 71, 0.12);
+        --ju-gold-glow: rgba(196, 167, 71, 0.25);
+        --ju-gold-gradient: linear-gradient(145deg, #c4a747, #a5862e);
+        
+        /* Neutral Colors */
+        --ju-white: #ffffff;
+        --ju-offwhite: #f8fafc;
+        --ju-gray-50: #f9fbfd;
+        --ju-gray-100: #f1f5f9;
+        --ju-gray-200: #e9edf2;
+        --ju-gray-300: #dee4e9;
+        --ju-gray-400: #b8c2cc;
+        --ju-gray-500: #8f9aa8;
+        --ju-gray-600: #64748b;
+        --ju-gray-700: #475569;
+        --ju-gray-800: #334155;
+        
+        /* Shadows - Dark Blue Tinted */
+        --shadow-sm: 0 4px 12px rgba(10,44,110,0.08);
+        --shadow: 0 8px 20px rgba(10,44,110,0.12);
+        --shadow-lg: 0 16px 32px rgba(10,44,110,0.16);
+        --shadow-gold: 0 8px 20px rgba(196,167,71,0.2);
+        --shadow-gold-lg: 0 16px 32px rgba(196,167,71,0.25);
+        
+        /* Border Radius - Consistent */
+        --radius-sm: 8px;
+        --radius: 12px;
+        --radius-md: 16px;
+        --radius-lg: 20px;
+        --radius-xl: 24px;
+        --radius-2xl: 28px;
+        --radius-full: 9999px;
+        
+        /* Transitions */
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        --transition-bounce: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
-    
-    /* Fixed Header Section */
-    .ju-fixed-header {
-        background: linear-gradient(135deg, #006747 0%, #00573D 100%);
-        padding: 20px;
-        color: white;
-        position: sticky;
+
+    /* ============================================
+           RESET & BASE - Fix All Spacing Issues
+        ============================================ */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        background: var(--ju-offwhite);
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        overflow-x: hidden;
+    }
+
+    .dashboard-container {
+        background: var(--ju-offwhite);
+        min-height: 100vh;
+    }
+
+    /* ============================================
+           PREMIUM HEADER - Dark Blue Excellence
+        ============================================ */
+    .ju-premium-header {
+        background: linear-gradient(145deg, var(--ju-blue), var(--ju-blue-dark));
+        position: relative;
+        padding: 60px 0 100px;
+        margin-bottom: 0;
+        overflow: hidden;
+        border-bottom: 4px solid var(--ju-gold);
+    }
+
+    .ju-premium-header::before {
+        content: '';
+        position: absolute;
         top: 0;
-        z-index: 1000;
-        box-shadow: 0 4px 12px rgba(0, 103, 71, 0.2);
-        border-bottom: 3px solid #FFC72C;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+            radial-gradient(circle at 10% 20%, rgba(255,255,255,0.1) 0%, transparent 40%),
+            radial-gradient(circle at 90% 70%, rgba(196,167,71,0.15) 0%, transparent 40%),
+            radial-gradient(circle at 30% 80%, rgba(255,255,255,0.08) 0%, transparent 35%),
+            radial-gradient(circle at 70% 30%, rgba(196,167,71,0.12) 0%, transparent 45%);
+        pointer-events: none;
     }
-    
+
     .header-content {
         max-width: 1400px;
         margin: 0 auto;
+        padding: 0 32px;
+        position: relative;
+        z-index: 10;
     }
-    
-    .ju-stats {
-        display: flex;
-        gap: 20px;
-        margin-top: 10px;
+
+    .premium-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        padding: 8px 24px;
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.15);
+        border-radius: var(--radius-full);
+        color: white;
+        font-size: 0.85rem;
+        font-weight: 600;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        margin-bottom: 24px;
     }
-    
-    .ju-stat-item {
-        text-align: center;
-        padding: 8px 15px;
-        background: rgba(255, 255, 255, 0.12);
-        border-radius: 8px;
-        min-width: 90px;
-        backdrop-filter: blur(5px);
+
+    .premium-badge i {
+        color: var(--ju-gold);
     }
-    
-    /* Search & Filter Section */
-    .search-filter-section {
-        background: white;
-        padding: 20px;
-        margin-bottom: 25px;
-        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
-        border: 1px solid var(--ju-border);
-        border-radius: 10px;
-        position: sticky;
-        top: 120px; /* Below fixed header */
-        z-index: 999;
+
+    .premium-title {
+        font-size: 3.2rem;
+        font-weight: 800;
+        color: white;
+        margin-bottom: 16px;
+        line-height: 1.1;
+        letter-spacing: -1.5px;
+        text-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    }
+
+    .gold-text {
+        color: var(--ju-gold);
+        position: relative;
+        display: inline-block;
+        text-shadow: 0 2px 10px rgba(196,167,71,0.3);
+    }
+
+    .premium-subtitle {
+        font-size: 1.2rem;
+        color: rgba(255,255,255,0.95);
+        max-width: 700px;
+        margin-bottom: 40px;
+        line-height: 1.6;
+    }
+
+    /* ============================================
+           FIXED STATS GRID - Dark Blue Cards
+        ============================================ */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 24px;
         margin-top: 20px;
     }
-    
-    .search-box-container {
+
+    @media (max-width: 1200px) {
+        .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        .premium-title { font-size: 2.8rem; }
+    }
+
+    @media (max-width: 768px) {
+        .stats-grid { grid-template-columns: 1fr; }
+        .premium-title { font-size: 2.2rem; }
+        .header-content { padding: 0 20px; }
+        .ju-premium-header { padding: 40px 0 80px; }
+    }
+
+    .premium-stat-card {
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: var(--radius-lg);
+        padding: 24px;
+        transition: var(--transition-bounce);
         position: relative;
-        width: 100%;
-    }
-    
-    .search-box-container input {
-        width: 100%;
-        padding: 12px 50px 12px 15px;
-        border: 2px solid var(--ju-border);
-        border-radius: 8px;
-        font-size: 0.95rem;
-        transition: all 0.3s ease;
-        background: white;
-    }
-    
-    .search-box-container input:focus {
-        outline: none;
-        border-color: var(--ju-green);
-        box-shadow: 0 0 0 3px rgba(0, 103, 71, 0.1);
-    }
-    
-    .search-icon-btn {
-        position: absolute;
-        right: 10px;
-        top: 50%;
-        transform: translateY(-50%);
-        background: var(--ju-green);
-        color: white;
-        border: none;
-        border-radius: 6px;
-        padding: 8px 15px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-    
-    .search-icon-btn:hover {
-        background: var(--ju-dark-green);
-    }
-    
-    /* Quick Filters */
-    .quick-filters-container {
-        display: flex;
-        gap: 8px;
-        margin-top: 15px;
-        flex-wrap: wrap;
-    }
-    
-    .filter-chip {
-        padding: 8px 16px;
-        background: white;
-        border: 2px solid var(--ju-border);
-        border-radius: 20px;
-        color: #495057;
-        text-decoration: none;
-        font-weight: 500;
-        font-size: 0.85rem;
-        transition: all 0.2s ease;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        white-space: nowrap;
-    }
-    
-    .filter-chip:hover {
-        border-color: var(--ju-green);
-        color: var(--ju-green);
-    }
-    
-    .filter-chip.active {
-        background: var(--ju-green);
-        color: white;
-        border-color: var(--ju-green);
-    }
-    
-    /* PERFECT EVENT CARDS - NO OVERLAPPING */
-    .event-card-container {
-        background: white;
-        border-radius: 10px;
-        height: 400px; /* Fixed height */
-        transition: all 0.3s ease;
-        box-shadow: var(--ju-card-shadow);
-        border: 1px solid var(--ju-border);
-        display: flex;
-        flex-direction: column;
-        position: relative;
-        overflow: hidden; /* Keep everything inside */
-    }
-    
-    .event-card-container:hover {
-        transform: translateY(-3px);
-        box-shadow: var(--ju-card-hover);
-        border-color: var(--ju-green);
-    }
-    
-    /* Card Image - Fixed Height */
-    .card-image-section {
-        height: 130px;
-        position: relative;
-        flex-shrink: 0;
-        background: linear-gradient(135deg, #E8F5E9 0%, #D1E7DD 100%);
-    }
-    
-    .card-image-section img {
-        width: 100%;
+        overflow: hidden;
         height: 100%;
-        object-fit: cover;
-        transition: transform 0.5s ease;
+        width: 100%;
     }
-    
-    .event-card-container:hover .card-image-section img {
-        transform: scale(1.05);
+
+    .premium-stat-card:hover {
+        transform: translateY(-6px);
+        background: rgba(255, 255, 255, 0.12);
+        border-color: var(--ju-gold);
+        box-shadow: var(--shadow-gold);
     }
-    
-    /* Event Type Badge - Properly Positioned */
-    .event-type-badge {
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        padding: 5px 10px;
-        background: white;
-        color: var(--ju-green);
-        border-radius: 15px;
-        font-size: 0.7rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-        border: 1px solid var(--ju-border);
-        z-index: 2;
-        max-width: 80px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-    
-    /* Status Badges - Properly Positioned */
-    .status-badge-container {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        display: flex;
-        flex-direction: column;
-        gap: 5px;
-        z-index: 2;
-    }
-    
-    .status-badge {
-        padding: 4px 10px;
-        border-radius: 12px;
-        font-size: 0.65rem;
-        font-weight: 700;
-        color: white;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        white-space: nowrap;
-    }
-    
-    .featured-badge {
-        background: var(--ju-gold);
-        color: #000;
-    }
-    
-    .live-badge {
-        background: #DC3545;
-        animation: pulse 2s infinite;
-    }
-    
-    @keyframes pulse {
-        0% { opacity: 1; }
-        50% { opacity: 0.8; }
-        100% { opacity: 1; }
-    }
-    
-    /* Card Body - No Overlapping */
-    .card-body-content {
-        padding: 15px;
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        overflow: hidden; /* Prevent content from spilling out */
-    }
-    
-    /* Event Title - Perfect Fit */
-    .event-title {
-        font-size: 1rem;
-        font-weight: 700;
-        color: var(--ju-green);
-        line-height: 1.3;
-        margin: 0;
-        height: 42px; /* Fixed height for 2 lines */
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    
-    /* Event Description - Perfect Fit */
-    .event-description {
-        color: #6c757d;
-        font-size: 0.85rem;
-        line-height: 1.4;
-        margin: 0;
-        height: 40px; /* Fixed height for 2 lines */
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        flex: none; /* Don't grow */
-    }
-    
-    /* Event Details - Clean Grid */
-    .event-details-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
-        margin-top: 5px;
-        padding: 12px;
-        background: var(--ju-light-green);
-        border-radius: 8px;
-        border: 1px solid var(--ju-border);
-        flex: none; /* Fixed height */
-        min-height: 110px; /* Reserve space */
-    }
-    
-    .detail-item {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        min-width: 0;
-    }
-    
-    .detail-icon {
-        width: 26px;
-        height: 26px;
-        background: white;
-        border-radius: 6px;
+
+    .stat-icon-wrapper {
+        width: 56px;
+        height: 56px;
+        background: rgba(255,255,255,0.12);
+        border-radius: var(--radius);
         display: flex;
         align-items: center;
         justify-content: center;
-        color: var(--ju-green);
-        font-size: 0.8rem;
-        flex-shrink: 0;
-        border: 1px solid var(--ju-border);
+        font-size: 1.5rem;
+        color: white;
+        margin-bottom: 16px;
+        border: 1px solid rgba(255,255,255,0.2);
+        transition: var(--transition-bounce);
     }
-    
-    .detail-text {
-        flex: 1;
-        min-width: 0;
-        overflow: hidden;
+
+    .premium-stat-card:hover .stat-icon-wrapper {
+        background: var(--ju-gold);
+        color: var(--ju-blue-dark);
+        transform: scale(1.1) rotate(5deg);
+        border-color: var(--ju-gold);
     }
-    
-    .detail-label {
-        font-size: 0.65rem;
-        color: #6c757d;
-        margin-bottom: 2px;
-        text-transform: uppercase;
-        letter-spacing: 0.3px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+
+    .stat-number {
+        font-size: 2.4rem;
+        font-weight: 800;
+        color: white;
+        line-height: 1;
+        margin-bottom: 6px;
+        font-family: 'Montserrat', sans-serif;
     }
-    
-    .detail-value {
-        font-size: 0.8rem;
+
+    .stat-label {
+        font-size: 0.85rem;
+        color: rgba(255,255,255,0.9);
         font-weight: 600;
-        color: var(--ju-green);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        display: block;
+        text-transform: uppercase;
+        letter-spacing: 1px;
     }
-    
-    /* Card Footer - Perfectly Positioned */
-    .card-footer-section {
-        padding: 12px 15px;
-        background: white;
-        border-top: 1px solid var(--ju-border);
+
+    .stat-trend {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: var(--ju-gold);
+        background: rgba(196,167,71,0.15);
+        padding: 4px 12px;
+        border-radius: var(--radius-full);
+        border: 1px solid rgba(196,167,71,0.3);
+    }
+
+    /* ============================================
+           FIXED FILTER SECTION - Dark Blue Theme
+        ============================================ */
+    .premium-filter-section {
+        max-width: 1400px;
+        margin: -50px auto 50px;
+        padding: 0 24px;
+        position: relative;
+        z-index: 100;
+    }
+
+    .filter-glass-card {
+        background: var(--ju-white);
+        backdrop-filter: blur(20px);
+        border-radius: var(--radius-xl);
+        padding: 32px;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--ju-gray-200);
+        position: relative;
+    }
+
+    .filter-glass-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, var(--ju-blue), var(--ju-gold), var(--ju-blue));
+        border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    }
+
+    /* FIXED SEARCH WRAPPER - No Overlap */
+    .premium-search-wrapper {
+        position: relative;
+        margin-bottom: 28px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .premium-search-icon {
+        position: absolute;
+        left: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--ju-blue);
+        font-size: 1.1rem;
+        z-index: 10;
+    }
+
+    .premium-search-input {
+        flex: 1;
+        padding: 16px 24px 16px 56px;
+        border: 2px solid var(--ju-gray-200);
+        border-radius: var(--radius-lg);
+        font-size: 1rem;
+        background: var(--ju-white);
+        color: var(--ju-gray-800);
+        transition: var(--transition);
+        height: 60px;
+        box-shadow: inset 0 2px 6px rgba(0,0,0,0.02);
+    }
+
+    .premium-search-input:focus {
+        outline: none;
+        border-color: var(--ju-blue);
+        box-shadow: 0 0 0 4px rgba(10,44,110,0.1);
+    }
+
+    .premium-search-input:focus + .premium-search-icon {
+        color: var(--ju-blue);
+        transform: translateY(-50%) scale(1.1);
+    }
+
+    /* FIXED SEARCH BUTTON - Dark Blue */
+    .premium-search-btn {
+        background: var(--ju-blue-gradient);
+        color: white;
+        border: none;
+        border-radius: var(--radius-lg);
+        padding: 0 32px;
+        height: 60px;
+        font-weight: 700;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: var(--transition-bounce);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        box-shadow: 0 8px 20px rgba(10,44,110,0.25);
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    .premium-search-btn:hover {
+        background: var(--ju-blue-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 12px 28px rgba(10,44,110,0.35);
+    }
+
+    .premium-search-btn i {
+        font-size: 1rem;
+        transition: var(--transition);
+    }
+
+    .premium-search-btn:hover i {
+        transform: rotate(90deg);
+    }
+
+    @media (max-width: 768px) {
+        .premium-search-wrapper {
+            flex-direction: column;
+        }
+        
+        .premium-search-btn {
+            width: 100%;
+            padding: 0 24px;
+        }
+    }
+
+    /* Premium Filter Tabs - Dark Blue */
+    .premium-filter-tabs {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .premium-filter-tab {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 24px;
+        background: var(--ju-gray-100);
+        border: 1px solid var(--ju-gray-200);
+        border-radius: var(--radius-full);
+        color: var(--ju-gray-700);
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-decoration: none;
+        transition: var(--transition-bounce);
+    }
+
+    .premium-filter-tab:hover {
+        background: var(--ju-blue);
+        color: white;
+        border-color: var(--ju-blue);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(10,44,110,0.2);
+    }
+
+    .premium-filter-tab:hover i {
+        color: var(--ju-gold);
+    }
+
+    .premium-filter-tab.active {
+        background: var(--ju-blue);
+        color: white;
+        border-color: var(--ju-blue);
+        box-shadow: 0 8px 16px rgba(10,44,110,0.25);
+    }
+
+    .premium-filter-tab.active i {
+        color: var(--ju-gold);
+    }
+
+    /* ============================================
+           FIXED EVENTS SECTION - Dark Blue Theme
+        ============================================ */
+    .events-section {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 24px 60px;
+    }
+
+    .section-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        flex-shrink: 0; /* Fixed height */
-        min-height: 60px; /* Reserve space */
+        margin-bottom: 32px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid rgba(10,44,110,0.1);
     }
-    
-    .attendance-container {
+
+    .section-title-wrapper {
         display: flex;
         align-items: center;
+        gap: 16px;
+    }
+
+    .section-icon {
+        width: 56px;
+        height: 56px;
+        background: rgba(10,44,110,0.08);
+        border-radius: var(--radius);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: var(--ju-blue);
+        border: 1px solid rgba(10,44,110,0.15);
+    }
+
+    .section-title {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: var(--ju-blue);
+        margin: 0;
+        letter-spacing: -1px;
+    }
+
+    .section-subtitle {
+        color: var(--ju-gray-600);
+        margin: 4px 0 0;
+        font-size: 1rem;
+    }
+
+    .premium-sort-select {
+        padding: 12px 32px 12px 20px;
+        border: 2px solid var(--ju-gray-200);
+        border-radius: var(--radius-lg);
+        background: white;
+        color: var(--ju-gray-800);
+        font-weight: 600;
+        font-size: 0.9rem;
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%230a2c6e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 16px center;
+        background-size: 16px;
+    }
+
+    .premium-sort-select:focus {
+        outline: none;
+        border-color: var(--ju-blue);
+        box-shadow: 0 0 0 4px rgba(10,44,110,0.1);
+    }
+
+    /* ============================================
+           FIXED CARDS - 3 PER ROW, PERFECT FIT
+           DARK BLUE THEME - NO CONTENT CUT OFF
+        ============================================ */
+    .premium-events-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 28px;
+        margin-bottom: 48px;
+    }
+
+    @media (max-width: 1200px) {
+        .premium-events-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 768px) {
+        .premium-events-grid { grid-template-columns: 1fr; }
+        .section-header { flex-direction: column; align-items: flex-start; gap: 16px; }
+        .premium-sort-select { width: 100%; }
+    }
+
+    /* FIXED CARD - Dark Blue Theme */
+    .premium-event-card {
+        background: white;
+        border-radius: var(--radius-xl);
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--ju-gray-200);
+        transition: var(--transition-bounce);
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        width: 100%;
+        position: relative;
+    }
+
+    .premium-event-card:hover {
+        transform: translateY(-6px);
+        box-shadow: var(--shadow);
+        border-color: var(--ju-blue);
+    }
+
+    /* FIXED CARD HEADER - Proper Height */
+    .premium-card-header {
+        position: relative;
+        height: 180px;
+        width: 100%;
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+
+    .premium-card-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.6s ease;
+    }
+
+    .premium-event-card:hover .premium-card-image {
+        transform: scale(1.08);
+    }
+
+    .premium-image-fallback {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(145deg, var(--ju-blue), var(--ju-blue-dark));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .premium-image-fallback i {
+        font-size: 3.5rem;
+        color: white;
+        opacity: 0.9;
+        filter: drop-shadow(0 8px 16px rgba(0,0,0,0.2));
+    }
+
+    /* FIXED BADGES - Gold Accents */
+    .premium-badges {
+        position: absolute;
+        top: 16px;
+        left: 16px;
+        display: flex;
+        flex-direction: column;
         gap: 8px;
-        font-size: 0.8rem;
-        color: #5d6d7e;
+        z-index: 20;
+        max-width: calc(100% - 32px);
+    }
+
+    .premium-type-badge {
+        background: rgba(255,255,255,0.98);
+        backdrop-filter: blur(10px);
+        color: var(--ju-blue);
+        padding: 6px 16px;
+        border-radius: var(--radius-full);
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border: 1px solid rgba(255,255,255,0.8);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        width: fit-content;
+    }
+
+    .premium-status-badge {
+        padding: 6px 16px;
+        border-radius: var(--radius-full);
+        font-size: 0.7rem;
+        font-weight: 700;
+        color: white;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        width: fit-content;
+    }
+
+    .premium-featured-badge {
+        background: var(--ju-gold-gradient);
+    }
+
+    .premium-live-badge {
+        background: linear-gradient(145deg, #dc2626, #b91c1c);
+    }
+
+    /* FIXED CARD BODY - Perfect Padding */
+    .premium-card-body {
+        padding: 24px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .premium-event-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--ju-gray-800);
+        line-height: 1.4;
+        margin: 0;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        min-height: 52px;
+    }
+
+    .premium-event-title a {
+        color: inherit;
+        text-decoration: none;
+        transition: var(--transition);
+    }
+
+    .premium-event-title a:hover {
+        color: var(--ju-blue);
+    }
+
+    .premium-event-description {
+        color: var(--ju-gray-600);
+        font-size: 0.9rem;
+        line-height: 1.5;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        margin: 0;
+        min-height: 42px;
+    }
+
+    /* FIXED DETAILS GRID - 2x2 Layout */
+    .premium-details-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin: 8px 0 0;
+    }
+
+    .premium-detail-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px;
+        background: var(--ju-gray-50);
+        border-radius: var(--radius);
+        border: 1px solid var(--ju-gray-200);
+        transition: var(--transition);
+        min-width: 0;
+    }
+
+    .premium-detail-icon {
+        width: 36px;
+        height: 36px;
+        background: white;
+        border-radius: var(--radius-sm);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--ju-blue);
+        font-size: 0.9rem;
+        border: 1px solid var(--ju-gray-200);
+        flex-shrink: 0;
+    }
+
+    .premium-event-card:hover .premium-detail-icon {
+        background: var(--ju-blue);
+        color: white;
+        border-color: var(--ju-blue);
+    }
+
+    .premium-detail-content {
         flex: 1;
         min-width: 0;
     }
-    
-    .attendance-icon {
-        width: 26px;
-        height: 26px;
+
+    .premium-detail-label {
+        font-size: 0.6rem;
+        font-weight: 700;
+        color: var(--ju-gray-500);
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        margin-bottom: 2px;
+    }
+
+    .premium-detail-value {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--ju-gray-800);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* FIXED CARD FOOTER - Clean */
+    .premium-card-footer {
+        padding: 20px 24px;
+        border-top: 1px solid var(--ju-gray-200);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
         background: white;
+        flex-shrink: 0;
+    }
+
+    .premium-attendance {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 0;
+        flex: 1;
+    }
+
+    .premium-attendance-icon {
+        width: 44px;
+        height: 44px;
+        background: rgba(10,44,110,0.08);
+        border-radius: var(--radius-full);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--ju-blue);
+        font-size: 1rem;
+        border: 2px solid white;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        flex-shrink: 0;
+    }
+
+    .premium-event-card:hover .premium-attendance-icon {
+        background: var(--ju-gold);
+        color: var(--ju-blue-dark);
+    }
+
+    .premium-attendance-text {
+        min-width: 0;
+        flex: 1;
+    }
+
+    .premium-attendance-count {
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: var(--ju-blue);
+        line-height: 1;
+    }
+
+    .premium-attendance-label {
+        font-size: 0.7rem;
+        color: var(--ju-gray-600);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .premium-view-btn {
+        padding: 12px 24px;
+        background: var(--ju-blue-gradient);
+        color: white;
+        border: none;
+        border-radius: var(--radius-lg);
+        font-weight: 700;
+        font-size: 0.9rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: var(--transition-bounce);
+        box-shadow: 0 8px 16px rgba(10,44,110,0.2);
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    .premium-view-btn:hover {
+        background: var(--ju-blue-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 12px 24px rgba(10,44,110,0.3);
+    }
+
+    .premium-view-btn i {
+        transition: transform 0.3s ease;
+    }
+
+    .premium-view-btn:hover i {
+        transform: translateX(6px);
+    }
+
+    /* ============================================
+           PREMIUM EMPTY STATE - Dark Blue
+        ============================================ */
+    .premium-empty-state {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 80px 40px;
+        background: white;
+        border-radius: var(--radius-xl);
+        border: 2px dashed rgba(10,44,110,0.2);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .premium-empty-icon {
+        position: relative;
+        width: 100px;
+        height: 100px;
+        margin: 0 auto 24px;
+    }
+
+    .empty-circle {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: rgba(10,44,110,0.08);
+        animation: pulseCircle 2s infinite;
+    }
+
+    .premium-empty-icon i {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 3rem;
+        color: var(--ju-blue);
+        z-index: 10;
+    }
+
+    @keyframes pulseCircle {
+        0%, 100% { transform: scale(1); opacity: 0.3; }
+        50% { transform: scale(1.1); opacity: 0.6; }
+    }
+
+    .premium-empty-title {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: var(--ju-blue);
+        margin-bottom: 16px;
+    }
+
+    .premium-empty-message {
+        color: var(--ju-gray-600);
+        font-size: 1.1rem;
+        max-width: 500px;
+        margin: 0 auto 32px;
+    }
+
+    .premium-empty-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 32px;
+        background: var(--ju-blue-gradient);
+        color: white;
+        border-radius: var(--radius-full);
+        font-weight: 700;
+        text-decoration: none;
+        transition: var(--transition-bounce);
+        box-shadow: 0 8px 20px rgba(10,44,110,0.25);
+    }
+
+    .premium-empty-btn:hover {
+        background: var(--ju-blue-dark);
+        transform: translateY(-3px);
+        box-shadow: 0 12px 28px rgba(10,44,110,0.35);
+    }
+
+    /* ============================================
+           PREMIUM RESULTS BAR & PAGINATION
+        ============================================ */
+    .premium-results-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 24px;
+        background: white;
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--ju-gray-200);
+        margin: 32px 0;
+    }
+
+    .results-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: var(--ju-gray-600);
+    }
+
+    .results-info i {
+        color: var(--ju-gold);
+    }
+
+    .results-info strong {
+        color: var(--ju-blue);
+    }
+
+    .premium-export-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 24px;
+        background: white;
+        color: var(--ju-blue);
+        border: 2px solid var(--ju-blue);
+        border-radius: var(--radius-lg);
+        font-weight: 700;
+        font-size: 0.9rem;
+        text-decoration: none;
+        transition: var(--transition-bounce);
+    }
+
+    .premium-export-btn:hover {
+        background: var(--ju-blue);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(10,44,110,0.2);
+    }
+
+    .premium-pagination-wrapper {
+        margin-top: 48px;
+    }
+
+    .premium-pagination {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .premium-pagination .page-link {
+        padding: 12px 20px;
+        border: 2px solid var(--ju-gray-200);
+        border-radius: var(--radius);
+        color: var(--ju-gray-700);
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-decoration: none;
+        background: white;
+        transition: var(--transition);
+    }
+
+    .premium-pagination .page-item.active .page-link {
+        background: var(--ju-blue);
+        color: white;
+        border-color: var(--ju-blue);
+        box-shadow: 0 8px 16px rgba(10,44,110,0.2);
+    }
+
+    .premium-pagination .page-link:hover:not(.active) {
+        background: rgba(10,44,110,0.08);
+        border-color: var(--ju-blue);
+        color: var(--ju-blue);
+        transform: translateY(-2px);
+    }
+
+    /* ============================================
+           PREMIUM FLOATING ACTION BUTTON
+        ============================================ */
+    .premium-fab {
+        position: fixed;
+        bottom: 32px;
+        right: 32px;
+        z-index: 1000;
+    }
+
+    .premium-fab-btn {
+        width: 60px;
+        height: 60px;
+        background: var(--ju-blue-gradient);
+        border: none;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: var(--ju-green);
-        font-size: 0.8rem;
-        border: 1px solid var(--ju-border);
-        flex-shrink: 0;
-    }
-    
-    .attendance-count {
-        font-weight: 600;
-        color: var(--ju-green);
-    }
-    
-    /* View Button - Perfectly Visible */
-    .view-details-button {
-        padding: 8px 18px;
-        background: var(--ju-green);
         color: white;
-        border: none;
-        border-radius: 6px;
-        font-weight: 600;
-        font-size: 0.8rem;
-        text-decoration: none;
-        transition: all 0.3s ease;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        box-shadow: 0 3px 8px rgba(0, 103, 71, 0.15);
-        white-space: nowrap;
-        flex-shrink: 0;
-        max-width: 120px;
-        height: 36px;
-        align-items: center;
-        justify-content: center;
+        font-size: 1.25rem;
+        cursor: pointer;
+        transition: var(--transition-bounce);
+        box-shadow: 0 10px 25px rgba(10,44,110,0.3);
+        border: 2px solid white;
     }
-    
-    .view-details-button:hover {
-        background: var(--ju-dark-green);
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(0, 103, 71, 0.2);
-        color: white;
+
+    .premium-fab-btn:hover {
+        background: var(--ju-blue-dark);
+        transform: translateY(-5px) scale(1.1);
+        box-shadow: 0 15px 35px rgba(10,44,110,0.4);
     }
-    
-    /* Grid Layout - No Overlapping */
-    .events-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 20px;
-        margin-top: 10px;
+
+    /* ============================================
+           PREMIUM SCROLL PROGRESS
+        ============================================ */
+    .premium-scroll-progress {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 0%;
+        height: 4px;
+        background: linear-gradient(90deg, var(--ju-blue), var(--ju-gold));
+        z-index: 9999;
+        box-shadow: 0 0 20px rgba(196,167,71,0.3);
+        transition: width 0.1s ease;
     }
-    
-    @media (max-width: 1200px) {
-        .events-grid {
-            grid-template-columns: repeat(3, 1fr);
-            gap: 18px;
-        }
+
+    /* ============================================
+           HOVER UTILITY CLASSES
+        ============================================ */
+    .hover-lift {
+        transition: transform var(--transition-bounce);
     }
-    
-    @media (max-width: 992px) {
-        .events-grid {
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-        }
+    .hover-lift:hover {
+        transform: translateY(-3px);
     }
-    
-    @media (max-width: 768px) {
-        .events-grid {
-            grid-template-columns: 1fr;
-            gap: 16px;
-        }
-        
-        .ju-fixed-header {
-            padding: 15px;
-        }
+
+    .hover-gold-shine {
+        position: relative;
+        overflow: hidden;
     }
-    
-    /* Empty State */
-    .empty-state-container {
-        grid-column: 1 / -1;
-        text-align: center;
-        padding: 40px 20px;
-        background: white;
-        border-radius: 10px;
-        border: 2px dashed var(--ju-border);
-        margin-top: 20px;
+    .hover-gold-shine::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 50%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+        transform: skewX(-15deg);
+        transition: left 0.6s ease;
     }
-    
-    /* Results Info */
-    .results-container {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin: 25px 0;
-        padding: 15px;
-        background: white;
-        border-radius: 8px;
-        border: 1px solid var(--ju-border);
-        font-size: 0.9rem;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    .hover-gold-shine:hover::before {
+        left: 150%;
     }
-    
-    /* Pagination */
-    .ju-pagination {
-        margin-top: 30px;
-        padding-bottom: 20px;
+
+    .hover-scale {
+        transition: transform var(--transition-bounce);
     }
-    
-    .ju-pagination .page-link {
-        border: 1px solid var(--ju-border);
-        border-radius: 6px;
-        margin: 0 3px;
-        color: var(--ju-green);
-        font-weight: 500;
-        padding: 6px 12px;
-        font-size: 0.9rem;
-        transition: all 0.2s ease;
+    .hover-scale:hover {
+        transform: scale(1.05);
     }
-    
-    .ju-pagination .page-item.active .page-link {
-        background: var(--ju-green);
-        border-color: var(--ju-green);
-        color: white;
+
+    .hover-rotate-icon i {
+        transition: transform var(--transition);
     }
-    
-    /* Main Content Padding */
-    .main-content {
-        padding-top: 20px;
+    .hover-rotate-icon:hover i {
+        transform: rotate(360deg);
+    }
+
+    /* ============================================
+           DARK BLUE UTILITY CLASSES
+        ============================================ */
+    .text-ju-blue {
+        color: var(--ju-blue);
+    }
+    .text-ju-gold {
+        color: var(--ju-gold);
+    }
+    .bg-ju-blue {
+        background: var(--ju-blue);
+    }
+    .bg-ju-gold {
+        background: var(--ju-gold);
+    }
+    .border-ju-blue {
+        border-color: var(--ju-blue);
+    }
+    .border-ju-gold {
+        border-color: var(--ju-gold);
     }
 </style>
 
-<div class="container-fluid px-xl-5 px-lg-4 px-md-3">
-    <!-- Fixed Header - Stays on Scroll -->
-    <div class="ju-fixed-header">
+<!-- Premium Scroll Progress Bar -->
+<div class="premium-scroll-progress" id="premiumScrollProgress"></div>
+
+<div class="dashboard-container">
+    <!-- ============================================
+           PREMIUM HEADER - Dark Blue Excellence
+        ============================================ -->
+    <div class="ju-premium-header">
         <div class="header-content">
-            <div class="row align-items-center">
-                <div class="col-lg-8">
-                    <div class="d-flex align-items-center mb-2">
-                        <div class="me-3">
-                            <i class="fas fa-calendar-alt fa-2x text-white"></i>
-                        </div>
-                        <div>
-                            <h1 class="h4 fw-bold text-white mb-1">Jimma University Events</h1>
-                            <p class="text-white opacity-85 mb-0" style="font-size: 0.9rem;">
-                                Discover campus activities, conferences & cultural events
-                            </p>
-                        </div>
+            <div class="premium-badge" data-aos="fade-down" data-aos-duration="800">
+                <i class="fas fa-star"></i>
+                <span>Official Jimma University Events Portal</span>
+                <i class="fas fa-star"></i>
+            </div>
+            
+            <h1 class="premium-title">
+                Jimma University 
+                <span class="gold-text">Events</span>
+            </h1>
+            
+            <p class="premium-subtitle">
+                Discover, engage, and participate in campus activities, academic conferences, 
+                and cultural events across all our campuses. Experience excellence in every gathering.
+            </p>
+            
+            <!-- Premium Stats Grid - Dark Blue -->
+            <div class="stats-grid">
+                <div class="premium-stat-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="stat-icon-wrapper">
+                        <i class="fas fa-calendar-day"></i>
                     </div>
-                    
-                    <div class="ju-stats">
-                        <div class="ju-stat-item">
-                            <div class="text-white fw-bold mb-1">{{ $upcomingCount ?? 0 }}</div>
-                            <small class="opacity-75">Upcoming</small>
-                        </div>
-                        
-                        <div class="ju-stat-item">
-                            <div class="text-white fw-bold mb-1">{{ $speakerCount ?? 0 }}</div>
-                            <small class="opacity-75">Speakers</small>
-                        </div>
-                        
-                        <div class="ju-stat-item">
-                            <div class="text-white fw-bold mb-1">{{ $campusCount ?? 3 }}</div>
-                            <small class="opacity-75">Campuses</small>
-                        </div>
+                    <div class="stat-number">{{ $upcomingCount ?? 0 }}</div>
+                    <div class="stat-label">Upcoming Events</div>
+                    <div class="stat-trend">
+                        <i class="fas fa-arrow-up"></i> +12%
                     </div>
                 </div>
-                <div class="col-lg-4 text-end d-none d-lg-block">
-                    <img src="{{ asset('images/calendar-illustration.svg') }}" alt="Calendar" 
-                         style="height: 60px; filter: brightness(0) invert(1); opacity: 0.8;">
+                
+                <div class="premium-stat-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="stat-icon-wrapper">
+                        <i class="fas fa-play-circle"></i>
+                    </div>
+                    <div class="stat-number">{{ $ongoingCount ?? 0 }}</div>
+                    <div class="stat-label">Live Now</div>
+                    <div class="stat-trend">
+                        <i class="fas fa-circle" style="color: #10b981;"></i> Active
+                    </div>
+                </div>
+                
+                <div class="premium-stat-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="stat-icon-wrapper">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <div class="stat-number">{{ $campusCount ?? 12 }}</div>
+                    <div class="stat-label">Campuses</div>
+                    <div class="stat-trend">
+                        <i class="fas fa-globe-africa"></i> Nationwide
+                    </div>
+                </div>
+                
+                <div class="premium-stat-card" data-aos="fade-up" data-aos-delay="400">
+                    <div class="stat-icon-wrapper">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-number">{{ $totalAttendees ?? '2.5k' }}</div>
+                    <div class="stat-label">Total Attendees</div>
+                    <div class="stat-trend">
+                        <i class="fas fa-chart-line"></i> +25%
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Search & Filter Section -->
-    <div class="search-filter-section">
-        <div class="row align-items-center">
-            <div class="col-md-8">
-                <div class="search-box-container">
-                    <input type="text" id="searchInput" placeholder="Search events by title, speaker, or topic..." 
-                           value="{{ request('search') }}">
-                    <button class="search-icon-btn" id="searchBtn">
-                        <i class="fas fa-search me-1"></i> Search
-                    </button>
-                </div>
+    <!-- ============================================
+           FIXED FILTER SECTION - Dark Blue Theme
+        ============================================ -->
+    <div class="premium-filter-section">
+        <div class="filter-glass-card" data-aos="fade-up" data-aos-duration="800">
+            <!-- FIXED: Search wrapper with proper flex layout -->
+            <div class="premium-search-wrapper">
+                <i class="fas fa-search premium-search-icon"></i>
+                <input type="text" 
+                       id="premiumSearchInput" 
+                       class="premium-search-input" 
+                       placeholder="Search events by title, department, speaker, or keywords..."
+                       value="{{ request('search') }}">
+                <button class="premium-search-btn" id="premiumSearchBtn">
+                    <i class="fas fa-search"></i>
+                    <span>Search Events</span>
+                </button>
             </div>
-            <div class="col-md-4 text-md-end mt-2 mt-md-0">
-                <span class="text-muted fw-medium">
-                    <i class="fas fa-filter me-1"></i>
-                    {{ $events->total() }} events
-                </span>
+            
+            <!-- Premium Filter Tabs - Dark Blue -->
+            <div class="premium-filter-tabs">
+                <a href="{{ route('events.guest.dashboard') }}" 
+                   class="premium-filter-tab {{ !request()->hasAny(['status', 'featured', 'event_type']) ? 'active' : '' }}">
+                    <i class="fas fa-globe-africa"></i>
+                    <span>All Events</span>
+                </a>
+                
+                <a href="?status=upcoming" 
+                   class="premium-filter-tab {{ request('status') == 'upcoming' ? 'active' : '' }}">
+                    <i class="fas fa-clock"></i>
+                    <span>Upcoming</span>
+                </a>
+                
+                <a href="?featured=1" 
+                   class="premium-filter-tab {{ request('featured') == '1' ? 'active' : '' }}">
+                    <i class="fas fa-star"></i>
+                    <span>Featured</span>
+                </a>
+                
+                <a href="?status=ongoing" 
+                   class="premium-filter-tab {{ request('status') == 'ongoing' ? 'active' : '' }}">
+                    <i class="fas fa-play-circle"></i>
+                    <span>Live Now</span>
+                </a>
+                
+                <a href="?event_type=academic" 
+                   class="premium-filter-tab {{ request('event_type') == 'academic' ? 'active' : '' }}">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>Academic</span>
+                </a>
+                
+                <a href="?event_type=cultural" 
+                   class="premium-filter-tab {{ request('event_type') == 'cultural' ? 'active' : '' }}">
+                    <i class="fas fa-music"></i>
+                    <span>Cultural</span>
+                </a>
+                
+                <a href="?event_type=sports" 
+                   class="premium-filter-tab {{ request('event_type') == 'sports' ? 'active' : '' }}">
+                    <i class="fas fa-futbol"></i>
+                    <span>Sports</span>
+                </a>
             </div>
-        </div>
-        
-        <!-- Quick Filters -->
-        <div class="quick-filters-container">
-            <a href="{{ route('events.guest.dashboard') }}" 
-               class="filter-chip {{ !request()->hasAny(['status', 'featured', 'event_type']) ? 'active' : '' }}">
-                <i class="fas fa-globe me-1"></i>All Events
-            </a>
-            
-            <a href="?status=upcoming" 
-               class="filter-chip {{ request('status') == 'upcoming' ? 'active' : '' }}">
-                <i class="fas fa-clock me-1"></i>Upcoming
-            </a>
-            
-            <a href="?featured=1" 
-               class="filter-chip {{ request('featured') == '1' ? 'active' : '' }}">
-                <i class="fas fa-star me-1"></i>Featured
-            </a>
-            
-            <a href="?status=ongoing" 
-               class="filter-chip {{ request('status') == 'ongoing' ? 'active' : '' }}">
-                <i class="fas fa-play-circle me-1"></i>Live Now
-            </a>
         </div>
     </div>
 
-    <!-- Main Content -->
-    <div class="main-content">
-        <!-- Event Cards - No Overlapping -->
-        <div class="events-grid">
-            @forelse($events as $event)
-            <div class="event-card-container">
-                <!-- Card Image -->
-                <div class="card-image-section">
-                    @if($event->featured_image)
-                    <img src="{{ asset('storage/' . $event->featured_image) }}" 
-                         alt="{{ $event->title }}">
+    <!-- ============================================
+           FIXED EVENTS SECTION - Perfect Card Fit
+           DARK BLUE THEME - 3 Cards Per Row
+        ============================================ -->
+    <div class="events-section">
+        <!-- Section Header -->
+        <div class="section-header">
+            <div class="section-title-wrapper">
+                <div class="section-icon" data-aos="zoom-in" data-aos-duration="600">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <div>
+                    <h2 class="section-title">Featured & Upcoming Events</h2>
+                    <p class="section-subtitle">
+                        <span style="color: var(--ju-blue); font-weight: 700;">{{ $events->total() }}</span> events available
+                        @if(request()->hasAny(['search', 'status', 'featured', 'event_type']))
+                            <span style="color: var(--ju-gold);">• Filtered results</span>
+                        @endif
+                    </p>
+                </div>
+            </div>
+            
+            <select class="premium-sort-select" id="premiumSortSelect">
+                <option value="date_desc" {{ request('sort') == 'date_desc' ? 'selected' : '' }}>📅 Latest First</option>
+                <option value="date_asc" {{ request('sort') == 'date_asc' ? 'selected' : '' }}>📅 Earliest First</option>
+                <option value="popularity" {{ request('sort') == 'popularity' ? 'selected' : '' }}>🔥 Most Popular</option>
+                <option value="title" {{ request('sort') == 'title' ? 'selected' : '' }}>📝 Title A-Z</option>
+            </select>
+        </div>
+
+        <!-- FIXED: Premium Events Grid - 3 Cards Per Row, Perfect Fit -->
+        <div class="premium-events-grid" id="premiumEventsContainer">
+            @forelse($events as $index => $event)
+            <div class="premium-event-card" 
+                 data-aos="fade-up" 
+                 data-aos-delay="{{ ($index % 3) * 100 }}"
+                 data-aos-duration="700">
+                
+                <!-- FIXED: Card Header with Proper Image Fit -->
+                <div class="premium-card-header">
+                    @if($event->image)
+                        <img src="{{ $event->image_url }}" 
+                             alt="{{ $event->title }}"
+                             class="premium-card-image"
+                             loading="lazy"
+                             onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'premium-image-fallback\'><i class=\'fas fa-calendar-alt\'></i></div>';">
                     @else
-                    <div class="w-100 h-100 d-flex align-items-center justify-content-center">
-                        <i class="fas fa-{{ $event->event_type == 'sports' ? 'futbol' : ($event->event_type == 'cultural' ? 'music' : ($event->event_type == 'academic' ? 'graduation-cap' : 'calendar-day')) }} fa-3x" 
-                           style="color: #006747; opacity: 0.2;"></i>
-                    </div>
+                        <div class="premium-image-fallback">
+                            <i class="fas fa-{{ $event->event_type_icon ?? 'calendar-alt' }}"></i>
+                        </div>
                     @endif
                     
-                    <!-- Event Type Badge -->
-                    <span class="event-type-badge" title="{{ ucfirst($event->event_type) }}">
-                        {{ ucfirst($event->event_type) }}
-                    </span>
-                    
-                    <!-- Status Badges -->
-                    @if($event->featured)
-                    <div class="status-badge-container">
-                        <span class="status-badge featured-badge">
+                    <!-- Premium Badges - Gold Accents -->
+                    <div class="premium-badges">
+                        <span class="premium-type-badge">
+                            @switch($event->event_type)
+                                @case('academic') <i class="fas fa-graduation-cap"></i> @break
+                                @case('cultural') <i class="fas fa-music"></i> @break
+                                @case('sports') <i class="fas fa-futbol"></i> @break
+                                @case('conference') <i class="fas fa-microphone"></i> @break
+                                @case('workshop') <i class="fas fa-tools"></i> @break
+                                @case('seminar') <i class="fas fa-chalkboard-teacher"></i> @break
+                                @default <i class="fas fa-tag"></i>
+                            @endswitch
+                            {{ Str::limit(ucfirst($event->event_type), 12) }}
+                        </span>
+                        
+                        @if($event->is_featured)
+                        <span class="premium-status-badge premium-featured-badge">
                             <i class="fas fa-star"></i> Featured
                         </span>
-                    </div>
-                    @endif
-                    
-                    @if($event->status == 'ongoing')
-                    <div class="status-badge-container">
-                        <span class="status-badge live-badge">
-                            <i class="fas fa-play-circle"></i> Live
+                        @endif
+                        
+                        @if($event->status == 'ongoing')
+                        <span class="premium-status-badge premium-live-badge">
+                            <i class="fas fa-circle"></i> Live Now
                         </span>
+                        @endif
                     </div>
-                    @endif
                 </div>
                 
-                <!-- Card Body - No Overlapping -->
-                <div class="card-body-content">
-                    <h5 class="event-title" title="{{ $event->title }}">
-                        {{ $event->title }}
+                <!-- FIXED: Card Body - Perfect Padding, No Cut Off -->
+                <div class="premium-card-body">
+                    <h5 class="premium-event-title">
+                        <a href="{{ route('events.guest.show', $event->slug) }}">
+                            {{ Str::limit($event->title, 60) }}
+                        </a>
                     </h5>
                     
-                    <p class="event-description" title="{{ strip_tags($event->description) }}">
-                        {{ Str::limit(strip_tags($event->description), 100) }}
+                    <p class="premium-event-description">
+                        {{ Str::limit(strip_tags($event->short_description ?? $event->description), 90) }}
                     </p>
                     
-                    <!-- Event Details - Clear Separation -->
-                    <div class="event-details-grid">
-                        <div class="detail-item">
-                            <div class="detail-icon">
+                    <!-- FIXED: Details Grid - 2x2 Layout -->
+                    <div class="premium-details-grid">
+                        <div class="premium-detail-item">
+                            <div class="premium-detail-icon">
                                 <i class="fas fa-calendar"></i>
                             </div>
-                            <div class="detail-text">
-                                <div class="detail-label">Date</div>
-                                <div class="detail-value">{{ $event->start_date->format('M d, Y') }}</div>
+                            <div class="premium-detail-content">
+                                <div class="premium-detail-label">Date</div>
+                                <div class="premium-detail-value">{{ $event->start_date->format('M d, Y') }}</div>
                             </div>
                         </div>
                         
-                        <div class="detail-item">
-                            <div class="detail-icon">
+                        <div class="premium-detail-item">
+                            <div class="premium-detail-icon">
                                 <i class="fas fa-clock"></i>
                             </div>
-                            <div class="detail-text">
-                                <div class="detail-label">Time</div>
-                                <div class="detail-value">{{ $event->start_date->format('h:i A') }}</div>
+                            <div class="premium-detail-content">
+                                <div class="premium-detail-label">Time</div>
+                                <div class="premium-detail-value">{{ $event->start_date->format('h:i A') }}</div>
                             </div>
                         </div>
                         
-                        <div class="detail-item">
-                            <div class="detail-icon">
+                        <div class="premium-detail-item">
+                            <div class="premium-detail-icon">
                                 <i class="fas fa-map-marker-alt"></i>
                             </div>
-                            <div class="detail-text">
-                                <div class="detail-label">Campus</div>
-                                <div class="detail-value">{{ $event->campus }}</div>
+                            <div class="premium-detail-content">
+                                <div class="premium-detail-label">Campus</div>
+                                <div class="premium-detail-value">{{ Str::limit($event->campus_name ?? 'Main Campus', 15) }}</div>
                             </div>
                         </div>
                         
-                        <div class="detail-item">
-                            <div class="detail-icon">
+                        <div class="premium-detail-item">
+                            <div class="premium-detail-icon">
                                 <i class="fas fa-users"></i>
                             </div>
-                            <div class="detail-text">
-                                <div class="detail-label">Attending</div>
-                                <div class="detail-value">{{ $event->registered_attendees }}</div>
+                            <div class="premium-detail-content">
+                                <div class="premium-detail-label">Capacity</div>
+                                <div class="premium-detail-value">{{ $event->max_attendees ?? 'Unlimited' }}</div>
                             </div>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Card Footer - Perfectly Visible -->
-                <div class="card-footer-section">
-                    <div class="attendance-container">
-                        <div class="attendance-icon">
+                <!-- FIXED: Card Footer - Clean -->
+                <div class="premium-card-footer">
+                    <div class="premium-attendance">
+                        <div class="premium-attendance-icon">
                             <i class="fas fa-user-check"></i>
                         </div>
-                        <div>
-                            <span class="attendance-count">{{ $event->registered_attendees }}</span> registered
+                        <div class="premium-attendance-text">
+                            <span class="premium-attendance-count">{{ $event->registered_attendees ?? 0 }}</span>
+                            <span class="premium-attendance-label">Attending</span>
                         </div>
                     </div>
                     
                     <a href="{{ route('events.guest.show', $event->slug) }}" 
-                       class="view-details-button">
-                        <i class="fas fa-eye me-1"></i>
-                        View Details
+                       class="premium-view-btn">
+                        <span>View</span>
+                        <i class="fas fa-arrow-right"></i>
                     </a>
                 </div>
             </div>
             @empty
-            <div class="empty-state-container">
-                <i class="fas fa-calendar-times fa-3x mb-3" style="color: var(--ju-green); opacity: 0.2;"></i>
-                <h4 class="mb-2" style="color: var(--ju-green);">No Events Found</h4>
-                <p class="text-muted mb-3" style="font-size: 0.9rem;">Try adjusting your filters or check back later.</p>
-                <a href="{{ route('events.guest.dashboard') }}" class="btn btn-success btn-sm">
-                    <i class="fas fa-redo me-2"></i>Clear Filters
+            <!-- Premium Empty State - Dark Blue -->
+            <div class="premium-empty-state" data-aos="zoom-in" data-aos-duration="600">
+                <div class="premium-empty-icon">
+                    <div class="empty-circle"></div>
+                    <i class="fas fa-calendar-times"></i>
+                </div>
+                <h3 class="premium-empty-title">No Events Found</h3>
+                <p class="premium-empty-message">
+                    @if(request()->hasAny(['search', 'status', 'featured', 'event_type']))
+                        No events match your current filters. Try adjusting your search criteria.
+                    @else
+                        There are no upcoming events at the moment. Check back soon!
+                    @endif
+                </p>
+                @if(request()->hasAny(['search', 'status', 'featured', 'event_type']))
+                <a href="{{ route('events.guest.dashboard') }}" class="premium-empty-btn">
+                    <i class="fas fa-times-circle"></i>
+                    <span>Clear All Filters</span>
                 </a>
+                @else
+                <a href="#" class="premium-empty-btn">
+                    <i class="fas fa-bell"></i>
+                    <span>Get Notified</span>
+                </a>
+                @endif
             </div>
             @endforelse
         </div>
 
-        <!-- Results Info -->
+        <!-- Premium Results Bar -->
         @if($events->count() > 0)
-        <div class="results-container">
-            <div>
-                <span class="text-muted">
-                    Showing {{ $events->firstItem() }} to {{ $events->lastItem() }} of {{ $events->total() }} events
+        <div class="premium-results-bar" data-aos="fade-up" data-aos-duration="600">
+            <div class="results-info">
+                <i class="fas fa-info-circle" style="color: var(--ju-gold);"></i>
+                <span>
+                    Showing <strong>{{ $events->firstItem() }}-{{ $events->lastItem() }}</strong> 
+                    of <strong>{{ $events->total() }}</strong> events
                 </span>
             </div>
             <div>
-                <button class="btn btn-outline-success btn-sm me-2" onclick="window.print()" title="Print List">
-                    <i class="fas fa-print"></i>
-                </button>
-                <a href="?export=1" class="btn btn-outline-primary btn-sm" title="Export Events">
+                <a href="?export=1" class="premium-export-btn">
                     <i class="fas fa-download"></i>
+                    <span>Export</span>
                 </a>
             </div>
         </div>
         @endif
 
-        <!-- Pagination -->
+        <!-- Premium Pagination -->
         @if($events->hasPages())
-        <div class="ju-pagination">
-            <nav aria-label="Events navigation">
-                <ul class="pagination justify-content-center">
-                    {{ $events->withQueryString()->links('vendor.pagination.bootstrap-5') }}
+        <div class="premium-pagination-wrapper" data-aos="fade-up" data-aos-duration="600">
+            <nav aria-label="Events pagination">
+                <ul class="pagination premium-pagination">
+                    {{ $events->withQueryString()->onEachSide(1)->links('vendor.pagination.bootstrap-5') }}
                 </ul>
             </nav>
         </div>
         @endif
     </div>
+
+    <!-- Premium Floating Action Button -->
+    <div class="premium-fab">
+        <button class="premium-fab-btn" id="premiumScrollToTopBtn" title="Scroll to top" style="display: none;">
+            <i class="fas fa-arrow-up"></i>
+        </button>
+    </div>
 </div>
-@endsection
 
-@push('scripts')
+<!-- Premium JavaScript -->
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Search functionality
-        const searchInput = document.getElementById('searchInput');
-        const searchBtn = document.getElementById('searchBtn');
-        
-        searchBtn.addEventListener('click', performSearch);
-        searchInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') performSearch();
-        });
-        
-        function performSearch() {
-            const params = new URLSearchParams(window.location.search);
-            if (searchInput.value.trim()) {
-                params.set('search', searchInput.value.trim());
-            } else {
-                params.delete('search');
-            }
-            params.delete('page');
-            window.location.href = window.location.pathname + '?' + params.toString();
-        }
-
-        // Add active class to filter chips
-        document.querySelectorAll('.filter-chip').forEach(chip => {
-            chip.addEventListener('click', function(e) {
-                if (!this.classList.contains('active')) {
-                    document.querySelectorAll('.filter-chip').forEach(c => {
-                        c.classList.remove('active');
-                    });
-                    this.classList.add('active');
-                }
-            });
-        });
-
-        // Ensure no overlapping in cards
-        function checkCardOverlap() {
-            const cards = document.querySelectorAll('.event-card-container');
-            cards.forEach(card => {
-                // Check if any content is overflowing
-                const body = card.querySelector('.card-body-content');
-                const footer = card.querySelector('.card-footer-section');
-                
-                // Reset for measurement
-                card.style.height = 'auto';
-                
-                // Calculate heights
-                const imageHeight = 130;
-                const bodyHeight = body.scrollHeight;
-                const footerHeight = 60;
-                const totalHeight = imageHeight + bodyHeight + footerHeight;
-                
-                // Set fixed height if needed
-                if (totalHeight > 400) {
-                    // Adjust description height
-                    const desc = card.querySelector('.event-description');
-                    desc.style.height = '36px';
-                    desc.style.webkitLineClamp = 2;
-                }
-                
-                // Set final height
-                card.style.height = '400px';
-            });
-        }
-        
-        // Run on load and resize
-        window.addEventListener('load', checkCardOverlap);
-        window.addEventListener('resize', checkCardOverlap);
-        
-        // Initial check
-        setTimeout(checkCardOverlap, 100);
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize AOS
+    AOS.init({
+        duration: 800,
+        once: true,
+        offset: 50,
+        easing: 'ease-in-out-cubic'
     });
+
+    // Scroll Progress Bar
+    const scrollProgress = document.getElementById('premiumScrollProgress');
+    window.addEventListener('scroll', function() {
+        const windowHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const scrolled = (window.scrollY / windowHeight) * 100;
+        scrollProgress.style.width = scrolled + '%';
+    });
+
+    // FIXED: Search Functionality
+    const searchInput = document.getElementById('premiumSearchInput');
+    const searchBtn = document.getElementById('premiumSearchBtn');
+    
+    function performPremiumSearch() {
+        const params = new URLSearchParams(window.location.search);
+        const searchTerm = searchInput.value.trim();
+        
+        if (searchTerm) {
+            params.set('search', searchTerm);
+        } else {
+            params.delete('search');
+        }
+        params.delete('page');
+        
+        window.location.href = window.location.pathname + '?' + params.toString();
+    }
+    
+    searchBtn.addEventListener('click', performPremiumSearch);
+    searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') performPremiumSearch();
+    });
+
+    // Sort Functionality
+    const sortSelect = document.getElementById('premiumSortSelect');
+    sortSelect.addEventListener('change', function() {
+        const params = new URLSearchParams(window.location.search);
+        params.set('sort', this.value);
+        params.delete('page');
+        window.location.href = window.location.pathname + '?' + params.toString();
+    });
+
+    // Scroll to Top Button
+    const scrollToTopBtn = document.getElementById('premiumScrollToTopBtn');
+    
+    window.addEventListener('scroll', function() {
+        if (window.pageYOffset > 300) {
+            scrollToTopBtn.style.display = 'flex';
+            scrollToTopBtn.style.animation = 'fadeInUp 0.5s ease';
+        } else {
+            scrollToTopBtn.style.display = 'none';
+        }
+    });
+    
+    scrollToTopBtn.addEventListener('click', function() {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
+});
 </script>
-@endpush
+
+<!-- Add AOS CSS -->
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+@endsection

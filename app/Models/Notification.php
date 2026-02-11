@@ -2,86 +2,118 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Str;
 
 class Notification extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
-        'type',
         'title',
         'message',
-        'data',
+        'type',
+        'created_by',
+        'action_url',
+        'action_text',
         'priority',
-        'event_id',
-        'sender_id',
-        'recipient_type',
-        'recipient_ids',
-        'scheduled_at',
-        'sent_at',
+        'data',
+        'is_public',
     ];
 
     protected $casts = [
         'data' => 'array',
-        'recipient_ids' => 'array',
-        'scheduled_at' => 'datetime',
-        'sent_at' => 'datetime',
+        'priority' => 'integer',
+        'is_public' => 'boolean',
+        'created_at' => 'datetime',
     ];
 
-    public function event(): BelongsTo
+    public function creator(): BelongsTo
     {
-        return $this->belongsTo(Event::class);
-    }
-
-    public function sender(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'sender_id');
+        return $this->belongsTo(User::class, 'created_by');
     }
 
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'user_notifications')
-            ->withPivot(['read', 'read_at', 'email_sent', 'email_sent_at'])
-            ->withTimestamps();
+                    ->withPivot('id', 'read_at', 'dismissed_at', 'email_sent', 'email_sent_at', 'created_at', 'updated_at')
+                    ->withTimestamps();
     }
 
-    // Scopes
-    public function scopePending($query)
+    public function userNotifications()
     {
-        return $query->whereNull('sent_at');
+        return $this->hasMany(UserNotification::class);
     }
 
-    public function scopeSent($query)
+    public function getExcerptAttribute(): string
     {
-        return $query->whereNotNull('sent_at');
+        return Str::limit($this->message, 150);
     }
 
-    public function scopeOfType($query, $type)
+    public function getTypeColorAttribute(): string
     {
-        return $query->where('type', $type);
+        $colors = [
+            'announcement' => 'primary',
+            'event' => 'info',
+            'system' => 'secondary',
+            'alert' => 'danger',
+            'info' => 'info',
+            'warning' => 'warning',
+            'success' => 'success',
+        ];
+
+        return $colors[$this->type] ?? 'secondary';
     }
 
-    public function scopeForEvent($query, $eventId)
+    public function getTypeIconAttribute(): string
     {
-        return $query->where('event_id', $eventId);
+        $icons = [
+            'announcement' => 'bullhorn',
+            'event' => 'calendar-alt',
+            'system' => 'cogs',
+            'alert' => 'exclamation-triangle',
+            'info' => 'info-circle',
+            'warning' => 'exclamation-circle',
+            'success' => 'check-circle',
+        ];
+
+        return $icons[$this->type] ?? 'bell';
     }
 
-    // Methods
-    public function markAsSent()
+    public function getIsReadAttribute(): bool
     {
-        $this->update(['sent_at' => now()]);
+        if (auth()->check() && $this->relationLoaded('users')) {
+            foreach ($this->users as $user) {
+                if ($user->id === auth()->id() && $user->pivot->read_at) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
-    public function isSent(): bool
+    public function scopeForUser($query, $userId)
     {
-        return !is_null($this->sent_at);
+        return $query->whereHas('users', function ($q) use ($userId) {
+            $q->where('user_id', $userId);
+        });
     }
 
-    public function getStatusAttribute(): string
+    public function scopeUnread($query, $userId = null)
     {
-        if ($this->isSent()) return 'sent';
-        if ($this->scheduled_at) return 'scheduled';
-        return 'pending';
+        $userId = $userId ?? auth()->id();
+        
+        return $query->whereHas('userNotifications', function ($q) use ($userId) {
+            $q->where('user_id', $userId)
+              ->whereNull('read_at');
+        });
+    }
+
+    public function scopeRecent($query, $days = 7)
+    {
+        return $query->where('created_at', '>=', now()->subDays($days));
     }
 }

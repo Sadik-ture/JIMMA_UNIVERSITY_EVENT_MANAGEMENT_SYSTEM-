@@ -7,6 +7,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Facades\Log;
 
 class User extends Authenticatable
 {
@@ -17,6 +18,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role_id',
+        'is_active',
     ];
 
     protected $hidden = [
@@ -27,7 +29,10 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'is_active' => 'boolean',
     ];
+
+    protected $appends = ['unread_notifications_count'];
 
     public function role()
     {
@@ -63,14 +68,24 @@ class User extends Authenticatable
     public function notifications()
     {
         return $this->belongsToMany(Notification::class, 'user_notifications')
-                    ->withPivot('id', 'read_at', 'email_sent', 'email_sent_at', 'created_at', 'updated_at')
+                    ->withPivot('id', 'read_at', 'dismissed_at', 'email_sent', 'email_sent_at', 'created_at', 'updated_at')
                     ->withTimestamps()
                     ->orderBy('user_notifications.created_at', 'desc');
     }
 
     public function getUnreadNotificationsCountAttribute()
     {
-        return $this->userNotifications()->whereNull('read_at')->count();
+        // First check if dismissed_at column exists
+        if (!\Schema::hasColumn('user_notifications', 'dismissed_at')) {
+            return $this->userNotifications()
+                ->whereNull('read_at')
+                ->count();
+        }
+        
+        return $this->userNotifications()
+            ->whereNull('read_at')
+            ->whereNull('dismissed_at')
+            ->count();
     }
 
     public function isAdmin()
@@ -82,24 +97,20 @@ class User extends Authenticatable
         return in_array($this->role->slug, ['super-admin', 'admin']);
     }
 
-    // FIXED PERMISSION CHECK METHOD
     public function hasPermission($permissionSlug)
     {
-        // If user doesn't have a role, return false
         if (!$this->role) {
-            \Log::warning("User has no role", ['user_id' => $this->id, 'permission' => $permissionSlug]);
+            Log::warning("User has no role", ['user_id' => $this->id, 'permission' => $permissionSlug]);
             return false;
         }
         
-        // If user is super admin, they have all permissions
         if ($this->role->slug === 'super-admin') {
             return true;
         }
         
-        // Check if role has the permission
         $hasPermission = $this->role->hasPermission($permissionSlug);
         
-        \Log::info("Permission check result", [
+        Log::info("Permission check result", [
             'user' => $this->name,
             'role' => $this->role->slug,
             'permission' => $permissionSlug,
@@ -115,17 +126,14 @@ class User extends Authenticatable
             $permissions = [$permissions];
         }
         
-        // If user doesn't have a role, return false
         if (!$this->role) {
             return false;
         }
         
-        // If user is super admin, they have all permissions
         if ($this->role->slug === 'super-admin') {
             return true;
         }
         
-        // Check each permission
         foreach ($permissions as $permission) {
             if ($this->hasPermission($permission)) {
                 return true;
@@ -154,7 +162,7 @@ class User extends Authenticatable
 
     public function getConfirmedRegistrationsCountAttribute()
     {
-        return $this->registrations()->confirmed()->count();
+        return $this->registrations()->where('status', 'confirmed')->count();
     }
 
     public function getActiveWaitlistsCountAttribute()
@@ -167,10 +175,41 @@ class User extends Authenticatable
         return $this->hasPermission($permission);
     }
 
-    // FIXED Laravel's can() method implementation
     public function can($ability, $arguments = [])
     {
-        // Check if it's a permission slug
         return $this->hasPermission($ability);
+    }
+    
+    public function sendNotification($notificationData, $markAsUnread = true)
+    {
+        $notification = Notification::create([
+            'title' => $notificationData['title'],
+            'message' => $notificationData['message'],
+            'type' => $notificationData['type'] ?? 'info',
+            'data' => $notificationData['data'] ?? [],
+            'created_by' => auth()->id() ?? null,
+            'action_url' => $notificationData['action_url'] ?? null,
+            'action_text' => $notificationData['action_text'] ?? null,
+            'priority' => $notificationData['priority'] ?? 0,
+            'is_public' => $notificationData['is_public'] ?? false,
+        ]);
+        
+        $this->notifications()->attach($notification->id, [
+            'read_at' => $markAsUnread ? null : now(),
+        ]);
+        
+        if ($notificationData['send_email'] ?? false) {
+            $this->sendEmailNotification($notification);
+        }
+        
+        return $notification;
+    }
+    
+    private function sendEmailNotification($notification)
+    {
+        Log::info('Email notification would be sent', [
+            'user' => $this->email,
+            'notification' => $notification->title
+        ]);
     }
 }

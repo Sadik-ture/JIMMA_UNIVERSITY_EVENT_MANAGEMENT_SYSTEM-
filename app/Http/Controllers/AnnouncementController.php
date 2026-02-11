@@ -4,10 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Announcement;
 use App\Models\User;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class AnnouncementController extends Controller
 {
@@ -121,6 +124,9 @@ class AnnouncementController extends Controller
             'target_ids.*' => 'exists:users,id',
             'expires_at' => 'nullable|date|after:now',
             'publish_now' => 'boolean',
+            'send_notification' => 'boolean',
+            'notification_priority' => 'nullable|in:normal,high,urgent',
+            'notification_type' => 'nullable|in:announcement,alert,info,warning',
         ]);
         
         $announcement = Announcement::create([
@@ -135,8 +141,17 @@ class AnnouncementController extends Controller
             'expires_at' => $request->expires_at,
         ]);
         
+        // Send notification if requested
+        if ($request->has('publish_now') && $request->boolean('send_notification', true)) {
+            $this->sendAnnouncementNotification($announcement, $request);
+            
+            return redirect()->route('announcements.show', $announcement->id)
+                ->with('success', 'Announcement created and notification sent successfully!');
+        }
+        
         return redirect()->route('announcements.show', $announcement->id)
-            ->with('success', 'Announcement created successfully!');
+            ->with('success', 'Announcement created successfully!')
+            ->with('info', 'Notification was not sent. You can send it later when publishing.');
     }
 
     public function show($id)
@@ -235,7 +250,12 @@ class AnnouncementController extends Controller
             'target_ids.*' => 'exists:users,id',
             'expires_at' => 'nullable|date',
             'is_published' => 'boolean',
+            'send_notification' => 'boolean',
+            'notification_priority' => 'nullable|in:normal,high,urgent',
+            'notification_type' => 'nullable|in:announcement,alert,info,warning',
         ]);
+        
+        $wasPublished = $announcement->is_published;
         
         $data = [
             'title' => $request->title,
@@ -253,6 +273,21 @@ class AnnouncementController extends Controller
         }
         
         $announcement->update($data);
+        
+        // Send notification if newly published or notification requested
+        if (($request->is_published && !$wasPublished) || $request->boolean('send_notification', false)) {
+            $this->sendAnnouncementNotification($announcement, $request);
+            
+            $message = 'Announcement updated successfully!';
+            if ($request->is_published && !$wasPublished) {
+                $message .= ' Notification sent to all target users.';
+            } elseif ($request->boolean('send_notification', false)) {
+                $message .= ' Notification re-sent to all target users.';
+            }
+            
+            return redirect()->route('announcements.show', $announcement->id)
+                ->with('success', $message);
+        }
         
         return redirect()->route('announcements.show', $announcement->id)
             ->with('success', 'Announcement updated successfully!');
@@ -274,15 +309,38 @@ class AnnouncementController extends Controller
         Log::info('AnnouncementController@togglePublish called', ['id' => $id]);
         
         $announcement = Announcement::findOrFail($id);
+        $wasPublished = $announcement->is_published;
         
         $announcement->update([
             'is_published' => !$announcement->is_published,
-            'published_at' => $announcement->is_published ? null : now(),
+            'published_at' => !$announcement->is_published ? now() : $announcement->published_at,
         ]);
         
         $message = $announcement->is_published ? 'published' : 'unpublished';
         
+        // Send notification if publishing for the first time
+        if ($announcement->is_published && !$wasPublished) {
+            $this->sendAnnouncementNotification($announcement);
+            
+            return back()->with('success', "Announcement published and notification sent successfully!");
+        }
+        
         return back()->with('success', "Announcement {$message} successfully!");
+    }
+    
+        public function sendNotification($id)
+    {
+        Log::info('AnnouncementController@sendNotification called', ['id' => $id]);
+        
+        $announcement = Announcement::findOrFail($id);
+        
+        if (!$announcement->is_published) {
+            return back()->with('error', 'Cannot send notification for unpublished announcement.');
+        }
+        
+        $this->sendAnnouncementNotification($announcement);
+        
+        return back()->with('success', 'Notification sent successfully to all target users!');
     }
 
     public function statistics()
@@ -349,6 +407,151 @@ class AnnouncementController extends Controller
             'recentAnnouncements',
             'monthlyTrend'
         ));
+    }
+
+    private function sendAnnouncementNotification($announcement, $request = null)
+    {
+        try {
+            // Get target users based on audience
+            $users = $this->getTargetUsersForAnnouncement($announcement);
+            
+            if ($users->isEmpty()) {
+                Log::warning('No target users found for announcement notification', [
+                    'announcement_id' => $announcement->id,
+                    'audience' => $announcement->audience
+                ]);
+                
+                // Still create notification but log warning
+                $this->createNotificationRecord($announcement, collect([]), $request);
+                return;
+            }
+            
+            // Determine notification priority and type from request or announcement type
+            $priority = $request->notification_priority ?? ($announcement->type == 'urgent' ? 'urgent' : 'normal');
+            $notificationType = $request->notification_type ?? 'announcement';
+            
+            // Map priority to numeric value
+            $priorityMap = [
+                'normal' => 0,
+                'high' => 1,
+                'urgent' => 2
+            ];
+            $priorityValue = $priorityMap[$priority] ?? 0;
+            
+            // Create notification record and attach to users
+            $this->createNotificationRecord($announcement, $users, $request, $priorityValue, $notificationType);
+            
+            Log::info('Announcement notification sent', [
+                'announcement_id' => $announcement->id,
+                'users_count' => $users->count(),
+                'priority' => $priority,
+                'type' => $notificationType,
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('Failed to send announcement notification', [
+                'announcement_id' => $announcement->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            throw $e; // Re-throw for controller to handle
+        }
+    }
+    
+   private function createNotificationRecord($announcement, $users, $request = null, $priority = 0, $notificationType = 'announcement')
+{
+    // Prepare notification data
+    $notificationData = [
+        'title' => "📢 " . ($announcement->type == 'urgent' ? 'URGENT: ' : '') . $announcement->title,
+        'message' => strip_tags(Str::limit($announcement->content, 200)),
+        'type' => $notificationType,
+        'action_url' => route('announcements.show', $announcement->id),
+        'action_text' => 'View Announcement',
+        'priority' => $priority,
+        'data' => [
+            'announcement_id' => $announcement->id,
+            'announcement_type' => $announcement->type,
+            'audience' => $announcement->audience,
+            'source' => 'announcement',
+            'published_at' => $announcement->published_at ? $announcement->published_at->toIso8601String() : null,
+        ],
+    ];
+    
+    // Only add created_by if the column exists
+    if (\Schema::hasColumn('notifications', 'created_by')) {
+        $notificationData['created_by'] = Auth::id();
+    }
+    
+    // Create the notification
+    $notification = Notification::create($notificationData);
+    
+    // Attach notification to users if there are any
+    if ($users->isNotEmpty()) {
+        $userNotificationsData = [];
+        foreach ($users as $user) {
+            $userNotificationsData[$user->id] = [
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+        
+        $notification->users()->attach($userNotificationsData);
+        
+        Log::info('Notification attached to users', [
+            'notification_id' => $notification->id,
+            'users_count' => $users->count()
+        ]);
+    }
+    
+    return $notification;
+}
+
+    private function getTargetUsersForAnnouncement($announcement)
+    {
+        $query = User::where(function($q) {
+            $q->where('is_active', true)
+              ->orWhereNull('is_active');
+        });
+        
+        switch ($announcement->audience) {
+            case 'all':
+                // All active users - no additional filter
+                break;
+                
+            case 'students':
+                $query->whereHas('role', function($q) {
+                    $q->where('slug', 'student');
+                });
+                break;
+                
+            case 'faculty':
+                $query->whereHas('role', function($q) {
+                    $q->where('slug', 'faculty');
+                });
+                break;
+                
+            case 'staff':
+                $query->whereHas('role', function($q) {
+                    $q->where('slug', 'staff');
+                });
+                break;
+                
+            case 'specific':
+                if ($announcement->target_ids && is_array($announcement->target_ids)) {
+                    $query->whereIn('id', $announcement->target_ids);
+                } else {
+                    // Return empty collection if no specific users selected
+                    return collect();
+                }
+                break;
+                
+            default:
+                // For any other audience type, return empty
+                return collect();
+        }
+        
+        return $query->get();
     }
 
     private function getAnnouncementStats()

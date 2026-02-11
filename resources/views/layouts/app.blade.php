@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="light">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>@yield('title', 'Jimma University | Event Management System')</title>
 
-    <!-- Meta Tags for Professional SEO -->
+    <!-- Meta Tags -->
     <meta name="description" content="Jimma University Event Management System - Professional platform for managing university events, registrations, and venue bookings.">
     <meta name="author" content="Jimma University">
     <meta name="keywords" content="Jimma University, Events, Management System, Ethiopia, Higher Education">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
@@ -18,11 +18,11 @@
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Font Awesome 6 Pro Icons -->
+    <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- Google Fonts - Inter & Poppins -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Google Fonts - Montserrat & Open Sans (JU Official Fonts) -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- DataTables CSS -->
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
@@ -32,2059 +32,1329 @@
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css">
 
-    <!-- Animate.css for smooth animations -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 
-    <!-- AOS (Animate on Scroll) -->
+    <!-- AOS (Animate On Scroll) -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
-    <!-- FullCalendar CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
-
-    <!-- CSRF Token for AJAX requests -->
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-
-    <!-- Perfect Layout Styles -->
+    <!-- OFFICIAL JIMMA UNIVERSITY DESIGN SYSTEM -->
     <style>
         /* ============================================
-           JIMMA UNIVERSITY ENHANCED DESIGN SYSTEM
+           OFFICIAL JIMMA UNIVERSITY DESIGN SYSTEM
+           Colors extracted from https://ju.edu.et
         ============================================ */
 
         :root {
-            /* Official Jimma University Color Palette - Enhanced */
-            --ju-primary: #006400;
-            /* Official Dark Green - Primary */
-            --ju-primary-dark: #004d00;
-            /* Darker Green for hover states */
-            --ju-primary-light: #228B22;
-            /* Forest Green for accents */
-            --ju-primary-lighter: #d4edda;
-            /* Light green for backgrounds */
-            --ju-secondary: #FFD700;
-            /* Gold - Secondary & Accents */
-            --ju-secondary-dark: #B8860B;
-            /* Dark Gold */
-            --ju-accent: #8B4513;
-            /* Saddle Brown - Traditional Accent */
-            --ju-accent-light: #F8F9FA;
-            /* Light accent */
-
-            /* Professional Neutral Palette */
-            --ju-white: #FFFFFF;
-            --ju-light: #F8F9FA;
-            --ju-gray-50: #F9FAFB;
-            --ju-gray-100: #F5F7FA;
-            --ju-gray-200: #E4E7EB;
-            --ju-gray-300: #CBD2D9;
-            --ju-gray-400: #9AA5B1;
-            --ju-gray-500: #7B8794;
-            --ju-gray-600: #616E7C;
-            --ju-gray-700: #3E4C59;
-            --ju-gray-800: #323F4B;
-            --ju-gray-900: #1F2933;
-            --ju-black: #000000;
-
-            /* Semantic Colors - Enhanced */
-            --ju-success: #10B981;
-            --ju-success-light: #D1FAE5;
-            --ju-info: #3B82F6;
-            --ju-info-light: #DBEAFE;
-            --ju-warning: #F59E0B;
-            --ju-warning-light: #FEF3C7;
-            --ju-danger: #EF4444;
-            --ju-danger-light: #FEE2E2;
-            --ju-purple: #8B5CF6;
-            --ju-pink: #EC4899;
-
-            /* Gradient Definitions - Enhanced */
-            --ju-gradient-primary: linear-gradient(135deg, var(--ju-primary) 0%, var(--ju-primary-dark) 100%);
-            --ju-gradient-secondary: linear-gradient(135deg, var(--ju-secondary) 0%, var(--ju-secondary-dark) 100%);
-            --ju-gradient-success: linear-gradient(135deg, var(--ju-success) 0%, #059669 100%);
-            --ju-gradient-info: linear-gradient(135deg, var(--ju-info) 0%, #1D4ED8 100%);
-            --ju-gradient-warning: linear-gradient(135deg, var(--ju-warning) 0%, #D97706 100%);
-            --ju-gradient-danger: linear-gradient(135deg, var(--ju-danger) 0%, #DC2626 100%);
-            --ju-gradient-light: linear-gradient(135deg, var(--ju-light) 0%, #E8F5E9 100%);
-            --ju-gradient-dark: linear-gradient(135deg, var(--ju-gray-800) 0%, var(--ju-gray-900) 100%);
-
-            /* Shadow System - Enhanced */
-            --ju-shadow-xs: 0 1px 2px 0 rgba(0, 100, 0, 0.05);
-            --ju-shadow-sm: 0 1px 3px 0 rgba(0, 100, 0, 0.1), 0 1px 2px -1px rgba(0, 100, 0, 0.1);
-            --ju-shadow-md: 0 4px 6px -1px rgba(0, 100, 0, 0.1), 0 2px 4px -2px rgba(0, 100, 0, 0.1);
-            --ju-shadow-lg: 0 10px 15px -3px rgba(0, 100, 0, 0.1), 0 4px 6px -4px rgba(0, 100, 0, 0.1);
-            --ju-shadow-xl: 0 20px 25px -5px rgba(0, 100, 0, 0.1), 0 8px 10px -6px rgba(0, 100, 0, 0.1);
-            --ju-shadow-2xl: 0 25px 50px -12px rgba(0, 100, 0, 0.25);
-
-            /* Spacing Scale */
-            --ju-spacing-xs: 0.25rem;
-            --ju-spacing-sm: 0.5rem;
-            --ju-spacing-md: 1rem;
-            --ju-spacing-lg: 1.5rem;
-            --ju-spacing-xl: 2rem;
-            --ju-spacing-2xl: 3rem;
-            --ju-spacing-3xl: 4rem;
-
-            /* Border Radius - Enhanced */
-            --ju-radius-sm: 0.375rem;
-            --ju-radius-md: 0.5rem;
-            --ju-radius-lg: 0.75rem;
-            --ju-radius-xl: 1rem;
-            --ju-radius-2xl: 1.5rem;
-            --ju-radius-full: 9999px;
-
-            /* Typography - Enhanced */
-            --ju-font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            --ju-font-secondary: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            --ju-font-mono: 'SF Mono', Monaco, 'Cascadia Mono', 'Segoe UI Mono', monospace;
-
-            /* Transitions - Enhanced */
-            --ju-transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-            --ju-transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
-            --ju-transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
-            --ju-transition-bounce: 500ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
-
-            /* Z-index System */
-            --ju-z-dropdown: 1000;
-            --ju-z-sticky: 1020;
-            --ju-z-fixed: 1030;
-            --ju-z-modal-backdrop: 1040;
-            --ju-z-modal: 1050;
-            --ju-z-popover: 1060;
-            --ju-z-tooltip: 1070;
-            --ju-z-toast: 1080;
+            /* OFFICIAL JIMMA UNIVERSITY PRIMARY COLORS */
+            --ju-blue: #0a2c6e;        /* Official JU Dark Blue - Header background */
+            --ju-blue-dark: #06204d;    /* Darker JU Blue - For hover states */
+            --ju-blue-light: #1e3a8a;   /* Lighter JU Blue - For accents */
+            --ju-blue-soft: #e6edf7;    /* Soft JU Blue - For backgrounds */
+            
+            /* OFFICIAL JIMMA UNIVERSITY SECONDARY COLORS */
+            --ju-green: #006838;        /* Official JU Green - From website */
+            --ju-green-dark: #004d2b;   /* Darker JU Green */
+            --ju-green-light: #1a8c4a;  /* Lighter JU Green */
+            --ju-green-soft: #e8f3e9;   /* Soft JU Green - For backgrounds */
+            
+            /* Neutral Colors */
+            --ju-white: #ffffff;        /* Pure White */
+            --ju-offwhite: #f9f9f9;     /* Off White */
+            --ju-gray: #f0f0f0;         /* Light Gray */
+            --ju-gray-dark: #333333;    /* Dark Gray - For text */
+            --ju-black: #1a1a1a;        /* Nearly Black */
+            
+            /* ACCENT COLORS */
+            --ju-gold: #c4a747;         /* Gold accent */
+            --ju-gold-light: #e5d6a6;   /* Light Gold */
+            --ju-gold-dark: #b8960f;    /* Dark Gold */
+            --ju-red: #dc3545;          /* Red for errors */
+            
+            /* SEMANTIC COLORS */
+            --success: #28a745;
+            --success-light: #d4edda;
+            --info: var(--ju-blue);
+            --info-light: var(--ju-blue-soft);
+            --warning: #ffc107;
+            --warning-light: #fff3cd;
+            --danger: #dc3545;
+            --danger-light: #f8d7da;
+            
+            /* Professional Gradients - JU Official */
+            --gradient-primary: linear-gradient(145deg, var(--ju-blue) 0%, var(--ju-blue-dark) 100%);
+            --gradient-primary-light: linear-gradient(145deg, var(--ju-blue-light) 0%, var(--ju-blue) 100%);
+            --gradient-green: linear-gradient(145deg, var(--ju-green) 0%, var(--ju-green-dark) 100%);
+            --gradient-gold: linear-gradient(145deg, var(--ju-gold) 0%, #b8960f 100%);
+            --gradient-sidebar: linear-gradient(180deg, #0a2c6e 0%, #041a3a 100%);
+            
+            /* Background Gradients */
+            --bg-gradient-light: linear-gradient(135deg, var(--ju-offwhite) 0%, #f5f5f5 50%, var(--ju-offwhite) 100%);
+            --bg-gradient-blue: linear-gradient(135deg, #e6edf7 0%, #d4e1f0 50%, #e6edf7 100%);
+            
+            /* Enhanced Shadows - JU Style */
+            --shadow-xs: 0 2px 4px rgba(10,44,110,0.02);
+            --shadow-sm: 0 4px 6px rgba(10,44,110,0.04);
+            --shadow: 0 6px 12px rgba(10,44,110,0.06);
+            --shadow-md: 0 8px 24px rgba(10,44,110,0.08);
+            --shadow-lg: 0 16px 32px rgba(10,44,110,0.1);
+            --shadow-xl: 0 24px 48px rgba(10,44,110,0.12);
+            --shadow-2xl: 0 32px 64px rgba(10,44,110,0.15);
+            --shadow-sidebar: 8px 0 25px rgba(0,0,0,0.15);
+            
+            /* Typography - JU Official Fonts */
+            --font-primary: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --font-secondary: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            
+            /* Spacing */
+            --space-1: 0.25rem;
+            --space-2: 0.5rem;
+            --space-3: 0.75rem;
+            --space-4: 1rem;
+            --space-5: 1.25rem;
+            --space-6: 1.5rem;
+            --space-8: 2rem;
+            --space-10: 2.5rem;
+            --space-12: 3rem;
+            --space-16: 4rem;
+            
+            /* Border Radius */
+            --radius-sm: 0.25rem;
+            --radius: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+            --radius-2xl: 1.25rem;
+            --radius-full: 9999px;
+            
+            /* Transitions - Smooth AF */
+            --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            --transition-elastic: 0.6s cubic-bezier(0.68, -0.6, 0.32, 1.6);
+            
+            /* Z-index layers */
+            --z-header: 1000;
+            --z-sidebar: 999;
+            --z-modal: 1050;
+            --z-dropdown: 1020;
+            --z-toast: 1060;
         }
 
         /* ============================================
-           BASE STYLES & RESET
+           BASE STYLES
         ============================================ */
-
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         html {
-            scroll-behavior: smooth;
             font-size: 16px;
+            scroll-behavior: smooth;
+            touch-action: manipulation;
             height: 100%;
         }
 
         body {
-            font-family: var(--ju-font-primary);
+            font-family: var(--font-primary);
             font-weight: 400;
             line-height: 1.6;
-            color: var(--ju-gray-800);
-            background: linear-gradient(135deg, var(--ju-gray-50) 0%, #E8F5E9 30%, var(--ju-gray-100) 100%);
-            background-attachment: fixed;
+            color: var(--ju-gray-dark);
+            background: var(--ju-offwhite);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
             overflow-x: hidden;
+            position: relative;
         }
 
         /* ============================================
-           PREMIUM GLASSMORPHISM HEADER
+           INHERITED HOVER ANIMATIONS SYSTEM
         ============================================ */
 
-        .ju-header {
-            background: rgba(0, 100, 0, 0.95);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            color: var(--ju-white);
-            padding: 0;
-            box-shadow: var(--ju-shadow-lg);
-            position: sticky;
-            top: 0;
-            z-index: var(--ju-z-sticky);
-            border-bottom: 3px solid var(--ju-secondary);
-            transition: all var(--ju-transition-normal);
-        }
-
-        .ju-header.scrolled {
-            background: rgba(0, 100, 0, 0.98);
-            backdrop-filter: blur(30px) saturate(200%);
-            -webkit-backdrop-filter: blur(30px) saturate(200%);
-            box-shadow: var(--ju-shadow-xl);
-        }
-
-        .header-container {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            max-width: 1600px;
-            margin: 0 auto;
-            padding: 0 var(--ju-spacing-xl);
-            height: 70px;
-            gap: var(--ju-spacing-lg);
-        }
-
-        .ju-brand {
-            display: flex;
-            align-items: center;
-            gap: var(--ju-spacing-md);
-            cursor: pointer;
-            transition: all var(--ju-transition-normal);
-            text-decoration: none;
-            flex-shrink: 0;
-        }
-
-        .ju-brand:hover {
-            transform: translateY(-2px);
-        }
-
-        .ju-logo {
-            width: 52px;
-            height: 52px;
-            background: var(--ju-white);
-            border-radius: var(--ju-radius-lg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 900;
-            color: var(--ju-primary);
-            font-size: 1.75rem;
-            box-shadow: var(--ju-shadow-md);
-            border: 3px solid var(--ju-secondary);
-            transition: all var(--ju-transition-bounce);
+        /* Base Hover Class */
+        .hover-effect {
+            transition: all var(--transition);
             position: relative;
             overflow: hidden;
         }
 
-        .ju-logo::before {
+        /* 1. Scale Up Animation */
+        .hover-scale {
+            transition: transform var(--transition-bounce), box-shadow var(--transition);
+        }
+        .hover-scale:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-lg);
+            z-index: 10;
+        }
+
+        /* 2. Lift Up Animation */
+        .hover-lift {
+            transition: transform var(--transition-bounce), box-shadow var(--transition);
+        }
+        .hover-lift:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        /* 3. Glow Animation */
+        .hover-glow {
+            transition: box-shadow var(--transition);
+        }
+        .hover-glow:hover {
+            box-shadow: 0 0 0 4px rgba(255,255,255,0.2), 0 0 20px rgba(255,255,255,0.3);
+        }
+
+        /* 4. Border Animation */
+        .hover-border {
+            position: relative;
+        }
+        .hover-border::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--ju-white);
+            transition: width var(--transition);
+        }
+        .hover-border:hover::after {
+            width: 100%;
+        }
+
+        /* 5. Pulse Animation */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .hover-pulse:hover {
+            animation: pulse 1.5s infinite;
+        }
+
+        /* 6. Shake Animation */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        .hover-shake:hover {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        /* 7. Rotate Animation */
+        .hover-rotate {
+            transition: transform var(--transition-elastic);
+        }
+        .hover-rotate:hover {
+            transform: rotate(8deg);
+        }
+
+        /* 8. Flip Animation */
+        .hover-flip {
+            transition: transform var(--transition-elastic);
+        }
+        .hover-flip:hover {
+            transform: perspective(400px) rotateY(10deg);
+        }
+
+        /* 9. Shine Animation */
+        .hover-shine {
+            position: relative;
+            overflow: hidden;
+        }
+        .hover-shine::before {
             content: '';
             position: absolute;
             top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            transform: translateX(-100%);
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.6s ease;
+        }
+        .hover-shine:hover::before {
+            left: 100%;
         }
 
+        /* 10. Bounce Animation */
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .hover-bounce:hover {
+            animation: bounce 0.8s ease;
+        }
+
+        /* 11. Shadow Pulse */
+        @keyframes shadowPulse {
+            0% { box-shadow: 0 4px 10px rgba(10,44,110,0.1); }
+            50% { box-shadow: 0 8px 25px rgba(10,44,110,0.3); }
+            100% { box-shadow: 0 4px 10px rgba(10,44,110,0.1); }
+        }
+        .hover-shadow-pulse:hover {
+            animation: shadowPulse 1.5s infinite;
+        }
+
+        /* 12. Slide Up */
+        .hover-slide-up {
+            transition: transform var(--transition-bounce);
+        }
+        .hover-slide-up:hover {
+            transform: translateY(-8px);
+        }
+
+        /* 13. Grow Shadow */
+        .hover-grow-shadow {
+            transition: transform var(--transition), box-shadow var(--transition);
+        }
+        .hover-grow-shadow:hover {
+            transform: scale(1.03);
+            box-shadow: 0 20px 40px rgba(10,44,110,0.15);
+        }
+
+        /* 14. Icon Spin */
+        .hover-icon-spin i {
+            transition: transform var(--transition-bounce);
+        }
+        .hover-icon-spin:hover i {
+            transform: rotate(360deg);
+        }
+
+        /* 15. Underline From Center */
+        .hover-underline-center {
+            position: relative;
+        }
+        .hover-underline-center::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: var(--ju-white);
+            transition: all var(--transition);
+            transform: translateX(-50%);
+        }
+        .hover-underline-center:hover::after {
+            width: 80%;
+        }
+
+        /* 16. Background Highlight */
+        .hover-bg-highlight {
+            transition: background-color var(--transition);
+        }
+        .hover-bg-highlight:hover {
+            background-color: var(--ju-blue-soft);
+        }
+
+        /* 17. Border Color */
+        .hover-border-color {
+            transition: border-color var(--transition);
+        }
+        .hover-border-color:hover {
+            border-color: var(--ju-blue);
+        }
+
+        /* 18. Text Color */
+        .hover-text-color {
+            transition: color var(--transition);
+        }
+        .hover-text-color:hover {
+            color: var(--ju-blue);
+        }
+
+        /* 19. Zoom In */
+        .hover-zoom {
+            transition: transform var(--transition-elastic);
+        }
+        .hover-zoom:hover {
+            transform: scale(1.1);
+        }
+
+        /* 20. Fade In */
+        .hover-fade {
+            transition: opacity var(--transition);
+            opacity: 0.9;
+        }
+        .hover-fade:hover {
+            opacity: 1;
+        }
+
+        /* ============================================
+           OFFICIAL JIMMA UNIVERSITY HEADER - COMPLETE BLUE BACKGROUND
+        ============================================ */
+        .ju-header {
+            background: var(--ju-blue);
+            border-bottom: 3px solid var(--ju-gold);
+            box-shadow: var(--shadow-lg);
+            position: sticky;
+            top: 0;
+            z-index: var(--z-header);
+            height: 80px;
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 var(--space-6);
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: var(--space-6);
+        }
+
+        /* Enhanced Brand - JU Official with White Text on Blue */
+        .ju-brand {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            text-decoration: none;
+            padding: var(--space-2);
+            border-radius: var(--radius);
+            min-height: 48px;
+        }
+        .ju-brand.hover-scale:hover {
+            transform: scale(1.02);
+        }
+
+        .ju-logo {
+            width: 50px;
+            height: 50px;
+            background: var(--ju-white);
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--ju-blue);
+            font-size: 1.6rem;
+            font-weight: 800;
+            box-shadow: var(--shadow);
+            transition: all var(--transition-bounce);
+        }
         .ju-brand:hover .ju-logo {
-            transform: rotate(5deg) scale(1.1);
-            box-shadow: var(--ju-shadow-lg);
-        }
-
-        .ju-brand:hover .ju-logo::before {
-            animation: shine 1.5s ease-out;
-        }
-
-        @keyframes shine {
-            100% {
-                transform: translateX(100%);
-            }
+            transform: rotate(-5deg) scale(1.1);
+            box-shadow: var(--shadow-xl);
         }
 
         .ju-title-container {
             display: flex;
             flex-direction: column;
+            line-height: 1.2;
         }
 
         .ju-main-title {
-            font-family: var(--ju-font-secondary);
-            font-size: 1.5rem;
+            font-family: var(--font-secondary);
+            font-size: 1.4rem;
             font-weight: 800;
             margin: 0;
-            line-height: 1.2;
-            letter-spacing: -0.3px;
-            background: linear-gradient(135deg, var(--ju-white) 0%, var(--ju-secondary) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            color: var(--ju-white);
+            letter-spacing: -0.5px;
         }
 
         .ju-subtitle {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
+            color: var(--ju-white);
             font-weight: 600;
-            margin: 0;
-            color: rgba(255, 255, 255, 0.9);
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
             text-transform: uppercase;
+            margin: 0;
             opacity: 0.9;
         }
 
-        /* Premium User Menu - Glassmorphism */
-        .user-menu-container {
-            display: flex;
-            align-items: center;
-            gap: var(--ju-spacing-md);
-        }
-
-        .user-profile {
-            display: flex;
-            align-items: center;
-            gap: var(--ju-spacing-md);
-            padding: var(--ju-spacing-sm) var(--ju-spacing-md);
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: var(--ju-radius-full);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: all var(--ju-transition-normal);
-            cursor: pointer;
-            position: relative;
-        }
-
-        .user-profile:hover {
-            background: rgba(255, 255, 255, 0.15);
-            transform: translateY(-1px);
-            box-shadow: var(--ju-shadow-md);
-            border-color: rgba(255, 255, 255, 0.3);
-        }
-
-        .user-avatar {
-            width: 42px;
-            height: 42px;
-            background: var(--ju-gradient-secondary);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--ju-primary);
-            font-weight: 700;
-            font-size: 1.1rem;
-            border: 2px solid var(--ju-white);
-            box-shadow: var(--ju-shadow-sm);
-            transition: all var(--ju-transition-bounce);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .user-avatar::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-            transform: translateX(-100%);
-        }
-
-        .user-profile:hover .user-avatar {
-            transform: scale(1.15) rotate(5deg);
-            box-shadow: var(--ju-shadow-md);
-        }
-
-        .user-profile:hover .user-avatar::before {
-            animation: shine 1.5s ease-out;
-        }
-
-        .user-details {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .user-name {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: var(--ju-white);
-            white-space: nowrap;
-            max-width: 150px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .user-role {
-            font-size: 0.7rem;
-            color: rgba(255, 255, 255, 0.8);
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .logout-btn {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            color: var(--ju-white);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            padding: 0.6rem 1.2rem;
-            border-radius: var(--ju-radius-full);
-            font-size: 0.85rem;
-            font-weight: 600;
-            transition: all var(--ju-transition-normal);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        .logout-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
-            box-shadow: var(--ju-shadow-md);
-            border-color: rgba(255, 255, 255, 0.4);
-            color: var(--ju-white);
-        }
-
-        /* Guest Navigation */
-        .guest-nav {
-            display: flex;
-            gap: var(--ju-spacing-md);
-        }
-
-        /* Header Search Bar - Enhanced */
+        /* Enhanced Search - On Blue Background */
         .header-search {
             flex: 1;
-            max-width: 400px;
+            max-width: 500px;
             position: relative;
         }
 
         .header-search input {
             width: 100%;
-            padding: 0.75rem 1rem 0.75rem 3rem;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: var(--ju-radius-full);
-            color: var(--ju-white);
+            padding: var(--space-3) var(--space-4) var(--space-3) var(--space-12);
+            border: none;
+            border-radius: 40px;
             font-size: 0.9rem;
-            transition: all var(--ju-transition-normal);
+            color: var(--ju-gray-dark);
+            background: var(--ju-white);
+            transition: all var(--transition);
+            box-shadow: var(--shadow-md);
+            min-height: 48px;
         }
-
-        .header-search input::placeholder {
-            color: rgba(255, 255, 255, 0.7);
-        }
-
         .header-search input:focus {
             outline: none;
-            background: rgba(255, 255, 255, 0.15);
-            border-color: rgba(255, 255, 255, 0.4);
-            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 0 4px rgba(255,255,255,0.3);
+            transform: translateY(-1px);
+        }
+        .header-search input.hover-glow:hover {
+            box-shadow: 0 0 0 4px rgba(255,255,255,0.2);
         }
 
         .header-search i {
             position: absolute;
-            left: 1rem;
+            left: var(--space-4);
             top: 50%;
             transform: translateY(-50%);
-            color: rgba(255, 255, 255, 0.8);
+            color: var(--ju-gray-dark);
+            font-size: 1.1rem;
+            transition: color var(--transition);
+            pointer-events: none;
+        }
+
+        /* User Menu - On Blue Background */
+        .user-menu-container {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+        }
+
+        /* Notification Bell - On Blue Background */
+        .notification-bell {
+            position: relative;
+            background: rgba(255,255,255,0.15);
+            border: none;
+            color: var(--ju-white);
+            font-size: 1.25rem;
+            cursor: pointer;
+            padding: var(--space-2);
+            border-radius: 50%;
+            transition: all var(--transition);
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+        .notification-bell.hover-rotate:hover {
+            transform: rotate(15deg);
+            background: rgba(255,255,255,0.25);
+            color: var(--ju-white);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: var(--danger);
+            color: var(--ju-white);
+            font-size: 0.65rem;
+            font-weight: 700;
+            min-width: 20px;
+            height: 20px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 5px;
+            border: 2px solid var(--ju-white);
+            box-shadow: var(--shadow-sm);
+            animation: pulse 2s infinite;
+        }
+
+        /* User Profile - On Blue Background */
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-2) var(--space-3);
+            border-radius: 40px;
+            transition: all var(--transition-bounce);
+            cursor: pointer;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.2);
+            min-height: 48px;
+            backdrop-filter: blur(5px);
+        }
+        .user-profile.hover-lift:hover {
+            background: rgba(255,255,255,0.25);
+            border-color: var(--ju-white);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            background: var(--ju-white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--ju-blue);
+            font-weight: 700;
+            font-size: 1rem;
+            box-shadow: var(--shadow-sm);
+            transition: all var(--transition);
+        }
+        .user-profile:hover .user-avatar {
+            transform: scale(1.15);
+            box-shadow: var(--shadow-md);
+        }
+
+        .user-name {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--ju-white);
+            white-space: nowrap;
+        }
+
+        .user-role {
+            font-size: 0.7rem;
+            color: var(--ju-white);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            opacity: 0.9;
+        }
+
+        /* Auth Buttons - On Blue Background */
+        .guest-nav {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+        }
+
+        .auth-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-2);
+            padding: var(--space-3) var(--space-6);
+            border-radius: 40px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all var(--transition-bounce);
+            border: none;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            min-height: 48px;
+            min-width: 120px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .auth-btn-login {
+            background: var(--ju-white);
+            color: var(--ju-blue);
+        }
+        .auth-btn-login.hover-shine:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .auth-btn-register {
+            background: transparent;
+            color: var(--ju-white);
+            border: 2px solid var(--ju-white);
+        }
+        .auth-btn-register.hover-scale:hover {
+            background: var(--ju-white);
+            color: var(--ju-blue);
+            transform: scale(1.05);
+        }
+
+        .logout-btn {
+            background: rgba(255,255,255,0.15);
+            color: var(--ju-white);
+            border: 2px solid rgba(255,255,255,0.3);
+            padding: var(--space-2) var(--space-5);
+            border-radius: 40px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            min-height: 44px;
+            transition: all var(--transition-bounce);
+            backdrop-filter: blur(5px);
+        }
+        .logout-btn.hover-shake:hover {
+            background: var(--danger);
+            border-color: var(--danger);
+            color: var(--ju-white);
+            animation: shake 0.5s ease-in-out;
         }
 
         /* ============================================
-           ENHANCED MAIN LAYOUT
+           DISTINCT SIDEBAR - DARK BLUE WITH GOLD ACCENTS
+           Complete differentiation from main content
         ============================================ */
-
         .main-layout {
             display: flex;
             flex: 1;
-            max-width: 1600px;
-            margin: var(--ju-spacing-xl) auto;
-            width: 100%;
-            padding: 0 var(--ju-spacing-xl);
-            gap: var(--ju-spacing-xl);
-            min-height: calc(100vh - 140px);
-        }
-
-        /* ============================================
-           PREMIUM GLASS SIDEBAR
-        ============================================ */
-
-        .ju-sidebar {
-            width: 280px;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border-radius: var(--ju-radius-2xl);
-            box-shadow: var(--ju-shadow-xl);
-            padding: var(--ju-spacing-lg) 0;
-            position: sticky;
-            top: 94px;
-            height: calc(100vh - 114px);
-            overflow-y: auto;
-            flex-shrink: 0;
-            border: 1px solid rgba(0, 100, 0, 0.1);
-            transition: all var(--ju-transition-normal);
-            animation: sidebarSlideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        @keyframes sidebarSlideIn {
-            from {
-                opacity: 0;
-                transform: translateX(-30px) scale(0.98);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateX(0) scale(1);
-            }
-        }
-
-        .ju-sidebar:hover {
-            box-shadow: var(--ju-shadow-2xl);
-            border-color: rgba(0, 100, 0, 0.2);
-            transform: translateY(-2px);
-        }
-
-        /* Premium Scrollbar */
-        .ju-sidebar::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .ju-sidebar::-webkit-scrollbar-track {
-            background: rgba(0, 100, 0, 0.05);
-            border-radius: var(--ju-radius-full);
-        }
-
-        .ju-sidebar::-webkit-scrollbar-thumb {
-            background: var(--ju-primary);
-            border-radius: var(--ju-radius-full);
-            transition: background var(--ju-transition-normal);
-        }
-
-        .ju-sidebar::-webkit-scrollbar-thumb:hover {
-            background: var(--ju-primary-dark);
-        }
-
-        /* Sidebar Menu System - Enhanced */
-        .sidebar-menu {
-            list-style: none;
-            padding: 0;
-        }
-
-        .menu-header {
-            padding: var(--ju-spacing-md) var(--ju-spacing-xl) var(--ju-spacing-xs);
-            color: var(--ju-gray-600);
-            font-size: 0.7rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-top: var(--ju-spacing-lg);
+            min-height: calc(100vh - 80px);
             position: relative;
-            background: linear-gradient(to right, transparent, rgba(0, 100, 0, 0.05), transparent);
-            border-radius: var(--ju-radius-md);
-            margin: var(--ju-spacing-md) var(--ju-spacing-xl);
-        }
-
-        .menu-header::before {
-            content: '';
-            position: absolute;
-            left: var(--ju-spacing-xl);
-            right: var(--ju-spacing-xl);
-            bottom: -1px;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--ju-primary), transparent);
-            border-radius: var(--ju-radius-full);
-        }
-
-        .menu-item {
-            padding: 0;
-            margin: 0;
-            position: relative;
-            opacity: 0;
-            animation: menuItemFadeIn 0.6s ease forwards;
-        }
-
-        @keyframes menuItemFadeIn {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Create staggered animation */
-        .menu-item:nth-child(1) {
-            animation-delay: 0.1s;
-            transform: translateY(10px);
-        }
-
-        .menu-item:nth-child(2) {
-            animation-delay: 0.2s;
-            transform: translateY(10px);
-        }
-
-        .menu-item:nth-child(3) {
-            animation-delay: 0.3s;
-            transform: translateY(10px);
-        }
-
-        .menu-item:nth-child(4) {
-            animation-delay: 0.4s;
-            transform: translateY(10px);
-        }
-
-        .menu-item:nth-child(5) {
-            animation-delay: 0.5s;
-            transform: translateY(10px);
-        }
-
-        .menu-item:nth-child(6) {
-            animation-delay: 0.6s;
-            transform: translateY(10px);
-        }
-
-        .menu-item:nth-child(7) {
-            animation-delay: 0.7s;
-            transform: translateY(10px);
-        }
-
-        .menu-item:nth-child(8) {
-            animation-delay: 0.8s;
-            transform: translateY(10px);
-        }
-
-        .menu-link {
-            display: flex;
-            align-items: center;
-            gap: var(--ju-spacing-md);
-            padding: var(--ju-spacing-md) var(--ju-spacing-xl);
-            color: var(--ju-gray-700);
-            text-decoration: none;
-            transition: all var(--ju-transition-normal);
-            border-left: 4px solid transparent;
-            font-weight: 500;
-            font-size: 0.9rem;
-            position: relative;
-            margin: 2px var(--ju-spacing-xl);
-            border-radius: var(--ju-radius-lg);
-            overflow: hidden;
-        }
-
-        .menu-link::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            height: 100%;
-            width: 0;
-            background: linear-gradient(90deg, rgba(0, 100, 0, 0.08) 0%, rgba(0, 100, 0, 0.02) 100%);
-            transition: width var(--ju-transition-normal);
-            z-index: 0;
-        }
-
-        .menu-link::after {
-            content: '';
-            position: absolute;
-            left: -10px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 6px;
-            height: 6px;
-            background: var(--ju-primary);
-            border-radius: 50%;
-            opacity: 0;
-            transition: all var(--ju-transition-bounce);
             z-index: 1;
         }
 
-        .menu-link:hover {
-            color: var(--ju-primary);
-            transform: translateX(6px);
-            background: linear-gradient(90deg, rgba(0, 100, 0, 0.05) 0%, rgba(0, 100, 0, 0.02) 100%);
-        }
-
-        .menu-link:hover::before {
-            width: 100%;
-        }
-
-        .menu-link:hover::after {
-            opacity: 1;
-            left: 10px;
-            transform: translateY(-50%) scale(1.2);
-        }
-
-        .menu-link.active {
-            background: linear-gradient(90deg, rgba(0, 100, 0, 0.1) 0%, rgba(0, 100, 0, 0.05) 100%);
-            color: var(--ju-primary);
-            border-left-color: var(--ju-primary);
-            font-weight: 600;
-            box-shadow: inset 4px 0 12px rgba(0, 100, 0, 0.1);
-            transform: translateX(4px);
-        }
-
-        .menu-link.active::before {
-            width: 100%;
-        }
-
-        .menu-link.active::after {
-            opacity: 1;
-            left: 10px;
-            background: var(--ju-secondary);
-            box-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
-            transform: translateY(-50%) scale(1.3);
-        }
-
-        .menu-icon {
-            width: 20px;
-            text-align: center;
-            font-size: 1.1rem;
-            color: var(--ju-gray-600);
-            transition: all var(--ju-transition-normal);
-            position: relative;
-            z-index: 2;
+        .ju-sidebar {
+            width: 300px;
+            background: linear-gradient(180deg, #0a2c6e 0%, #041a3a 100%);
+            border-right: 3px solid var(--ju-gold);
+            position: sticky;
+            top: 80px;
+            height: calc(100vh - 80px);
+            overflow-y: auto;
             flex-shrink: 0;
+            padding: var(--space-6) 0;
+            box-shadow: 8px 0 25px rgba(0,0,0,0.2);
+            z-index: var(--z-sidebar);
         }
 
-        .menu-link:hover .menu-icon,
-        .menu-link.active .menu-icon {
-            color: var(--ju-primary);
-            transform: scale(1.15);
+        /* Custom Scrollbar for Sidebar */
+        .ju-sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .ju-sidebar::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+        }
+        .ju-sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            transition: all var(--transition);
+        }
+        .ju-sidebar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255,255,255,0.4);
         }
 
-        .menu-title {
-            position: relative;
-            z-index: 2;
-            flex: 1;
-            font-weight: inherit;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .menu-badge {
-            background: var(--ju-gradient-danger);
-            color: var(--ju-white);
-            font-size: 0.65rem;
-            padding: 3px 9px;
-            border-radius: var(--ju-radius-full);
-            font-weight: 700;
-            position: relative;
-            z-index: 2;
-            box-shadow: var(--ju-shadow-sm);
-            animation: pulse 2s infinite;
-            flex-shrink: 0;
-        }
-
-        @keyframes pulse {
-
-            0%,
-            100% {
-                transform: scale(1);
-                box-shadow: var(--ju-shadow-sm);
-            }
-
-            50% {
-                transform: scale(1.05);
-                box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
-            }
-        }
-
-        /* Enhanced Collapsible Menu */
-        .menu-collapse {
-            cursor: pointer;
-            position: relative;
-        }
-
-        .menu-arrow {
-            position: absolute;
-            right: var(--ju-spacing-xl);
-            transition: transform var(--ju-transition-bounce);
-            font-size: 0.8rem;
-            color: var(--ju-gray-500);
-            z-index: 2;
-        }
-
-        .menu-collapse:hover .menu-arrow {
-            color: var(--ju-primary);
-        }
-
-        .menu-collapse[aria-expanded="true"] .menu-arrow {
-            transform: rotate(90deg);
-            color: var(--ju-primary);
-        }
-
-        /* Premium Sub-menu - Enhanced */
-        .sub-menu {
+        .sidebar-menu {
             list-style: none;
             padding: 0;
-            background: rgba(0, 100, 0, 0.03);
-            border-left: 3px solid var(--ju-primary-light);
-            margin-left: calc(var(--ju-spacing-xl) + 20px);
-            border-radius: 0 var(--ju-radius-lg) var(--ju-radius-lg) 0;
-            animation: subMenuSlideDown 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            margin: 0;
+        }
+
+        /* Menu Header - Gold text with gold accent bar */
+        .menu-header {
+            padding: var(--space-4) var(--space-6) var(--space-2);
+            color: var(--ju-gold);
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: var(--space-6);
+            position: relative;
+            display: flex;
+            align-items: center;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .menu-header::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 16px;
+            background: var(--ju-gold);
+            margin-right: var(--space-2);
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(196,167,71,0.4);
+        }
+
+        /* Menu Items */
+        .menu-item {
+            margin: 4px var(--space-3);
             position: relative;
         }
 
-        @keyframes subMenuSlideDown {
-            from {
-                opacity: 0;
-                max-height: 0;
-                transform: translateY(-10px);
-            }
-
-            to {
-                opacity: 1;
-                max-height: 500px;
-                transform: translateY(0);
-            }
+        /* Menu Links - White text on dark blue */
+        .menu-link {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-3) var(--space-4);
+            color: rgba(255,255,255,0.85);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.25s ease;
+            border-radius: var(--radius);
+            position: relative;
+            overflow: hidden;
+            min-height: 48px;
+            border-left: 3px solid transparent;
+            background: transparent;
         }
 
-        .sub-menu::before {
-            content: '';
+        /* Hover State - Light blue overlay */
+        .menu-link:hover {
+            color: var(--ju-white);
+            background: rgba(255,255,255,0.1);
+            border-left-color: var(--ju-gold);
+            transform: translateX(5px);
+        }
+
+        /* Active State - Gold accent */
+        .menu-link.active {
+            color: var(--ju-white);
+            background: rgba(196,167,71,0.15);
+            border-left: 3px solid var(--ju-gold);
+            font-weight: 600;
+            box-shadow: inset 0 0 20px rgba(196,167,71,0.1);
+        }
+
+        /* Menu Icons - Gold color */
+        .menu-icon {
+            width: 24px;
+            text-align: center;
+            font-size: 1.1rem;
+            color: var(--ju-gold);
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        }
+        .menu-link:hover .menu-icon,
+        .menu-link.active .menu-icon {
+            transform: scale(1.15);
+            color: var(--ju-gold-light);
+        }
+
+        /* Menu Title - White text */
+        .menu-title {
+            flex: 1;
+            position: relative;
+            z-index: 1;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+
+        /* Menu Badge - Enhanced for dark background */
+        .menu-badge {
+            background: var(--danger);
+            color: var(--ju-white);
+            font-size: 0.65rem;
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-weight: 700;
+            box-shadow: 0 4px 8px rgba(220,53,69,0.4);
+            position: relative;
+            z-index: 1;
+            border: 1px solid rgba(255,255,255,0.2);
+            letter-spacing: 0.5px;
+        }
+
+        /* Collapsible Menu Arrow */
+        .menu-arrow {
             position: absolute;
-            left: -3px;
-            top: 0;
-            bottom: 0;
-            width: 3px;
-            background: linear-gradient(to bottom, transparent, var(--ju-primary-light), transparent);
+            right: var(--space-4);
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.6);
+            transition: all 0.3s ease;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            z-index: 1;
+        }
+        .menu-link:hover .menu-arrow,
+        .menu-collapse[aria-expanded="true"] .menu-arrow {
+            transform: rotate(90deg);
+            color: var(--ju-gold);
+            background: rgba(255,255,255,0.1);
+        }
+
+        /* Sub-menu Container - Distinct dark background with gold border */
+        .sub-menu {
+            list-style: none;
+            padding: 0.5rem 0;
+            margin: 0.25rem 0 0.5rem calc(var(--space-6) + 10px);
+            background: rgba(0,0,0,0.25);
+            border-left: 2px solid var(--ju-gold);
+            border-radius: 0 var(--radius) var(--radius) 0;
+            position: relative;
+            backdrop-filter: blur(2px);
         }
 
         .sub-menu .nav-link {
-            padding: var(--ju-spacing-sm) var(--ju-spacing-xl) var(--ju-spacing-sm) calc(var(--ju-spacing-xl) + 20px);
-            color: var(--ju-gray-600);
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: 0.6rem var(--space-4) 0.6rem var(--space-6);
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
             font-size: 0.85rem;
             font-weight: 400;
+            transition: all 0.25s ease;
+            border-left: 2px solid transparent;
+            min-height: 40px;
             position: relative;
-            transition: all var(--ju-transition-normal);
-            border-radius: 0 var(--ju-radius-md) var(--ju-radius-md) 0;
         }
 
-        .sub-menu .nav-link::before {
-            content: '';
-            position: absolute;
-            left: calc(var(--ju-spacing-xl) - 6px);
-            top: 50%;
-            transform: translateY(-50%);
-            width: 8px;
-            height: 8px;
-            background: var(--ju-gray-400);
-            border-radius: 50%;
-            transition: all var(--ju-transition-normal);
+        .sub-menu .nav-link i {
+            color: var(--ju-gold);
+            font-size: 0.85rem;
+            width: 18px;
+            text-align: center;
+            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2));
         }
 
         .sub-menu .nav-link:hover {
-            color: var(--ju-primary);
-            background: rgba(0, 100, 0, 0.05);
-            padding-left: calc(var(--ju-spacing-xl) + 30px);
-            transform: translateX(4px);
-        }
-
-        .sub-menu .nav-link:hover::before {
-            background: var(--ju-primary);
-            transform: translateY(-50%) scale(1.3);
-            box-shadow: 0 0 8px rgba(0, 100, 0, 0.3);
+            color: var(--ju-white);
+            background: rgba(255,255,255,0.08);
+            border-left-color: var(--ju-gold);
+            transform: translateX(3px);
         }
 
         .sub-menu .nav-link.active {
-            color: var(--ju-primary);
-            font-weight: 500;
-            background: rgba(0, 100, 0, 0.08);
-            padding-left: calc(var(--ju-spacing-xl) + 30px);
+            color: var(--ju-white);
+            background: rgba(196,167,71,0.12);
+            border-left-color: var(--ju-gold);
+            font-weight: 600;
         }
 
-        .sub-menu .nav-link.active::before {
-            background: var(--ju-primary);
-            box-shadow: 0 0 10px rgba(0, 100, 0, 0.4);
-            transform: translateY(-50%) scale(1.5);
+        /* Sidebar overlay for mobile */
+        .ju-sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 998;
+            backdrop-filter: blur(3px);
         }
 
         /* ============================================
-           PREMIUM GLASS CARDS - ENHANCED
+           MAIN CONTENT AREA - LIGHT BACKGROUND
+           Clear visual separation from sidebar
         ============================================ */
+        .ju-main-content {
+            flex: 1;
+            padding: var(--space-8);
+            background: var(--ju-offwhite);
+            min-height: calc(100vh - 80px);
+            overflow-y: auto;
+            position: relative;
+            z-index: 1;
+        }
 
+        /* Content Header */
+        .content-header {
+            margin-bottom: var(--space-8);
+            padding-bottom: var(--space-6);
+            border-bottom: 2px solid var(--ju-blue);
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            gap: var(--space-4);
+            background: transparent;
+        }
+
+        .page-title {
+            font-family: var(--font-secondary);
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--ju-blue);
+            margin-bottom: var(--space-2);
+            letter-spacing: -1px;
+        }
+
+        .page-subtitle {
+            color: var(--ju-gray-dark);
+            font-size: 1.1rem;
+            font-weight: 400;
+            max-width: 700px;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb-nav {
+            padding: var(--space-2) var(--space-4);
+            background: var(--ju-white);
+            border-radius: 40px;
+            box-shadow: var(--shadow-sm);
+        }
+        .breadcrumb-item a {
+            color: var(--ju-blue);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all var(--transition);
+        }
+        .breadcrumb-item a.hover-underline-center:hover {
+            color: var(--ju-blue-dark);
+        }
+
+        /* ============================================
+           ULTRA-ENHANCED CARDS - JU OFFICIAL
+        ============================================ */
         .ju-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border-radius: var(--ju-radius-2xl);
-            box-shadow: var(--ju-shadow-lg);
-            border: 1px solid rgba(0, 100, 0, 0.1);
-            margin-bottom: var(--ju-spacing-xl);
-            transition: all var(--ju-transition-bounce);
-            position: relative;
+            background: var(--ju-white);
+            border: 1px solid var(--ju-gray);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            transition: all var(--transition-bounce);
             overflow: hidden;
-        }
-
-        .ju-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: var(--ju-gradient-primary);
-            opacity: 0;
-            transition: opacity var(--ju-transition-normal);
-        }
-
-        .ju-card:hover {
-            transform: translateY(-8px) scale(1.01);
-            box-shadow: var(--ju-shadow-2xl);
-            border-color: rgba(0, 100, 0, 0.2);
-        }
-
-        .ju-card:hover::before {
-            opacity: 1;
-        }
-
-        /* Card Header - Enhanced */
-        .ju-card-header {
-            background: linear-gradient(135deg, rgba(248, 249, 250, 0.8) 0%, rgba(255, 255, 255, 0.9) 100%);
-            color: var(--ju-primary);
-            padding: var(--ju-spacing-xl);
-            border-bottom: 1px solid rgba(0, 100, 0, 0.1);
             position: relative;
-            border-radius: var(--ju-radius-2xl) var(--ju-radius-2xl) 0 0;
+            margin-bottom: var(--space-6);
+        }
+        .ju-card.hover-lift:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-2xl);
+            border-color: var(--ju-blue);
         }
 
-        .ju-card-header::after {
-            content: '';
-            position: absolute;
-            bottom: -1px;
-            left: var(--ju-spacing-xl);
-            right: var(--ju-spacing-xl);
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--ju-primary), transparent);
-            border-radius: var(--ju-radius-full);
+        .ju-card-header {
+            padding: var(--space-6);
+            border-bottom: 1px solid var(--ju-gray);
+            background: linear-gradient(180deg, var(--ju-white) 0%, var(--ju-offwhite) 100%);
         }
 
         .ju-card-title {
-            margin: 0;
-            font-size: 1.5rem;
+            font-size: 1.25rem;
             font-weight: 700;
+            color: var(--ju-blue);
+            margin: 0;
             display: flex;
             align-items: center;
-            gap: var(--ju-spacing-sm);
-            color: var(--ju-primary);
-            line-height: 1.3;
+            gap: var(--space-2);
         }
 
-        .ju-card-title i {
-            font-size: 1.3rem;
-            color: var(--ju-primary-light);
-        }
-
-        /* Card Body - Enhanced */
         .ju-card-body {
-            padding: var(--ju-spacing-2xl);
-            position: relative;
+            padding: var(--space-6);
         }
 
-        .ju-card-body p {
-            color: var(--ju-gray-700);
-            margin-bottom: var(--ju-spacing-md);
-            line-height: 1.7;
-            font-size: 1rem;
-        }
-
-        .ju-card-body .lead {
-            font-size: 1.2rem;
-            color: var(--ju-gray-800);
-            font-weight: 500;
-            margin-bottom: var(--ju-spacing-xl);
-        }
-
-        .ju-card-body .text-muted {
-            color: var(--ju-gray-600) !important;
-            font-size: 0.95rem;
-        }
-
-        /* Card Footer - Enhanced */
-        .ju-card-footer {
-            background: rgba(248, 249, 250, 0.8);
-            padding: var(--ju-spacing-lg) var(--ju-spacing-xl);
-            border-top: 1px solid rgba(0, 100, 0, 0.1);
-            border-radius: 0 0 var(--ju-radius-2xl) var(--ju-radius-2xl);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        /* Enhanced Stat Cards */
+        /* Stat Cards - JU Official */
         .stat-card {
-            background: var(--ju-gradient-primary);
             color: var(--ju-white);
-            border-radius: var(--ju-radius-2xl);
-            padding: var(--ju-spacing-2xl);
+            border-radius: var(--radius-lg);
+            padding: var(--space-8);
             text-align: center;
-            transition: all var(--ju-transition-bounce);
+            transition: all var(--transition-bounce);
+            border: none;
+            box-shadow: var(--shadow-lg);
             position: relative;
             overflow: hidden;
-            box-shadow: var(--ju-shadow-lg);
-            border: none;
-            min-height: 180px;
+            min-height: 200px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
         }
-
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-            transform: translateX(-100%);
-        }
-
-        .stat-card:hover {
+        .stat-card.hover-grow-shadow:hover {
             transform: translateY(-10px) scale(1.03);
-            box-shadow: var(--ju-shadow-2xl);
+            box-shadow: var(--shadow-2xl);
         }
 
-        .stat-card:hover::before {
-            animation: shine 1.5s ease-out;
-        }
+        .stat-card-primary { background: var(--gradient-primary); }
+        .stat-card-green { background: var(--gradient-green); }
+        .stat-card-gold { background: var(--gradient-gold); }
+        .stat-card-success { background: var(--success); }
+        .stat-card-warning { background: var(--warning); color: var(--ju-black); }
+        .stat-card-danger { background: var(--danger); }
 
         .stat-icon {
-            font-size: 3.5rem;
-            margin-bottom: var(--ju-spacing-md);
+            font-size: 2.8rem;
+            margin-bottom: var(--space-4);
             opacity: 0.9;
-            position: relative;
-            z-index: 2;
-            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
+            filter: drop-shadow(0 8px 12px rgba(0,0,0,0.2));
+            transition: all var(--transition);
+        }
+        .stat-card:hover .stat-icon {
+            transform: scale(1.2) rotate(5deg);
         }
 
         .stat-number {
-            font-size: 3.5rem;
+            font-size: 3.2rem;
             font-weight: 800;
-            margin-bottom: var(--ju-spacing-xs);
-            position: relative;
-            z-index: 2;
-            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-            font-family: var(--ju-font-secondary);
+            margin-bottom: var(--space-2);
+            font-family: var(--font-secondary);
+            text-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
 
         .stat-label {
-            font-size: 1.1rem;
+            font-size: 1rem;
             opacity: 0.95;
             font-weight: 600;
-            position: relative;
-            z-index: 2;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
 
-        /* Alternative Stat Card Colors */
-        .stat-card-success {
-            background: var(--ju-gradient-success);
-        }
-
-        .stat-card-warning {
-            background: var(--ju-gradient-warning);
-        }
-
-        .stat-card-info {
-            background: var(--ju-gradient-info);
-        }
-
-        .stat-card-danger {
-            background: var(--ju-gradient-danger);
-        }
-
-        .stat-card-purple {
-            background: linear-gradient(135deg, var(--ju-purple) 0%, #7C3AED 100%);
-        }
-
-        .stat-card-pink {
-            background: linear-gradient(135deg, var(--ju-pink) 0%, #DB2777 100%);
-        }
-
-        /* Table Cards - Enhanced */
-        .table-card {
-            min-height: 500px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .table-card .ju-card-body {
-            padding: 0;
-            flex: 1;
-        }
-
-        .table-card .table-responsive {
-            padding: var(--ju-spacing-md);
-        }
-
-        .table-card table {
-            margin: 0;
-            width: 100%;
-        }
-
-        .table-card table th {
-            background: rgba(0, 100, 0, 0.05);
-            color: var(--ju-primary);
-            font-weight: 700;
-            padding: var(--ju-spacing-lg);
-            border-bottom: 3px solid var(--ju-primary-light);
-            white-space: nowrap;
+        /* ============================================
+           ENHANCED BUTTONS - JU OFFICIAL
+        ============================================ */
+        .ju-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-2);
+            padding: var(--space-3) var(--space-6);
+            border-radius: 40px;
             font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all var(--transition-bounce);
+            border: none;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            min-height: 44px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .ju-btn-primary {
+            background: var(--gradient-primary);
+            color: var(--ju-white);
+        }
+        .ju-btn-primary.hover-shine:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .ju-btn-outline {
+            background: transparent;
+            color: var(--ju-blue);
+            border: 2px solid var(--ju-blue);
+        }
+        .ju-btn-outline.hover-scale:hover {
+            background: var(--ju-blue);
+            color: var(--ju-white);
+            transform: scale(1.05);
+        }
+
+        .ju-btn-success {
+            background: var(--success);
+            color: var(--ju-white);
+        }
+        .ju-btn-warning {
+            background: var(--warning);
+            color: var(--ju-black);
+        }
+        .ju-btn-danger {
+            background: var(--danger);
+            color: var(--ju-white);
+        }
+
+        /* Action Buttons */
+        .action-btn {
+            width: 38px;
+            height: 38px;
+            border: none;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all var(--transition-bounce);
+            box-shadow: var(--shadow-sm);
+            color: var(--ju-white);
+            margin: 0 2px;
+        }
+        .action-btn-view { background: var(--ju-blue); }
+        .action-btn-edit { background: var(--warning); color: var(--ju-black); }
+        .action-btn-delete { background: var(--danger); }
+        .action-btn-approve { background: var(--success); }
+        .action-btn-reject { background: var(--danger); }
+        
+        .action-btn.hover-rotate:hover {
+            transform: rotate(15deg) scale(1.15);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* ============================================
+           ENHANCED TABLES
+        ============================================ */
+        .ju-table {
+            width: 100%;
+            margin-bottom: 0;
+        }
+        .ju-table thead th {
+            background: var(--ju-blue-soft);
+            color: var(--ju-blue-dark);
+            font-weight: 700;
+            padding: var(--space-4);
+            border-bottom: 2px solid var(--ju-blue);
+            font-size: 0.85rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-
-        .table-card table td {
-            padding: var(--ju-spacing-lg);
-            border-bottom: 1px solid rgba(0, 100, 0, 0.1);
+        .ju-table tbody td {
+            padding: var(--space-4);
+            border-bottom: 1px solid var(--ju-gray);
+            color: var(--ju-gray-dark);
             vertical-align: middle;
-            color: var(--ju-gray-700);
-            font-size: 0.95rem;
         }
-
-        .table-card table tr:hover td {
-            background: rgba(0, 100, 0, 0.03);
+        .ju-table tbody tr {
+            transition: all var(--transition);
         }
-
-        .table-card table tr:last-child td {
-            border-bottom: none;
-        }
-
-        /* ============================================
-           PREMIUM MAIN CONTENT AREA - GLASS EFFECT
-        ============================================ */
-
-        .ju-main-content {
-            flex: 1;
-            padding: var(--ju-spacing-2xl);
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border-radius: var(--ju-radius-2xl);
-            box-shadow: var(--ju-shadow-xl);
-            min-height: calc(100vh - 114px);
-            overflow-y: auto;
-            position: relative;
-            animation: contentFadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.2s both;
-            border: 1px solid rgba(0, 100, 0, 0.1);
-        }
-
-        @keyframes contentFadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(30px) scale(0.98);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-
-        /* Content Header - Enhanced */
-        .content-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: var(--ju-spacing-2xl);
-            padding-bottom: var(--ju-spacing-xl);
-            border-bottom: 2px solid rgba(0, 100, 0, 0.1);
-            position: relative;
-        }
-
-        .content-header::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            width: 100px;
-            height: 3px;
-            background: var(--ju-gradient-primary);
-            border-radius: var(--ju-radius-full);
-            animation: titleUnderline 1s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        @keyframes titleUnderline {
-            from {
-                width: 0;
-            }
-
-            to {
-                width: 100px;
-            }
-        }
-
-        .page-title-container {
-            flex: 1;
-        }
-
-        .page-title {
-            font-family: var(--ju-font-secondary);
-            font-size: 2.5rem;
-            font-weight: 800;
-            color: var(--ju-primary);
-            margin: 0;
-            line-height: 1.2;
-            position: relative;
-            display: inline-block;
-            background: linear-gradient(135deg, var(--ju-primary) 0%, var(--ju-primary-light) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .page-subtitle {
-            color: var(--ju-gray-600);
-            margin: var(--ju-spacing-sm) 0 0;
-            font-size: 1.1rem;
-            font-weight: 400;
-            max-width: 700px;
-            line-height: 1.6;
-        }
-
-        /* Breadcrumb - Enhanced */
-        .breadcrumb-nav {
-            background: rgba(0, 100, 0, 0.05);
-            backdrop-filter: blur(10px);
-            border-radius: var(--ju-radius-lg);
-            padding: var(--ju-spacing-md) var(--ju-spacing-lg);
-            box-shadow: var(--ju-shadow-sm);
-            border: 1px solid rgba(0, 100, 0, 0.1);
-        }
-
-        .breadcrumb {
-            margin: 0;
-            font-size: 0.9rem;
-        }
-
-        .breadcrumb-item a {
-            color: var(--ju-primary);
-            text-decoration: none;
-            font-weight: 600;
-            transition: all var(--ju-transition-fast);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .breadcrumb-item a:hover {
-            color: var(--ju-primary-dark);
+        .ju-table tbody tr:hover td {
+            background: var(--ju-blue-soft);
             transform: translateX(2px);
         }
 
-        .breadcrumb-item.active {
-            color: var(--ju-gray-700);
-            font-weight: 600;
-        }
-
-        .breadcrumb-item+.breadcrumb-item::before {
-            color: var(--ju-gray-400);
-            font-weight: bold;
-        }
-
         /* ============================================
-           PREMIUM TOAST NOTIFICATION SYSTEM
+           ENHANCED FOOTER - JU OFFICIAL BLUE
         ============================================ */
-
-        .toast-container {
-            position: fixed;
-            top: 90px;
-            right: var(--ju-spacing-xl);
-            z-index: var(--ju-z-toast);
-            max-width: 400px;
-            animation: toastSlideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        @keyframes toastSlideIn {
-            from {
-                opacity: 0;
-                transform: translateX(100%) scale(0.9);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateX(0) scale(1);
-            }
-        }
-
-        .ju-toast {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border: none;
-            border-radius: var(--ju-radius-xl);
-            padding: var(--ju-spacing-lg);
-            margin-bottom: var(--ju-spacing-md);
-            box-shadow: var(--ju-shadow-xl);
-            border-left: 4px solid;
-            animation: toastPulse 2s infinite;
-            position: relative;
-            overflow: hidden;
-            border: 1px solid rgba(0, 0, 0, 0.1);
-        }
-
-        @keyframes toastPulse {
-
-            0%,
-            100% {
-                box-shadow: var(--ju-shadow-xl);
-            }
-
-            50% {
-                box-shadow: 0 0 25px currentColor;
-            }
-        }
-
-        .ju-toast::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: currentColor;
-            opacity: 0.3;
-        }
-
-        .ju-toast-success {
-            border-left-color: var(--ju-success);
-            color: var(--ju-success);
-        }
-
-        .ju-toast-error {
-            border-left-color: var(--ju-danger);
-            color: var(--ju-danger);
-        }
-
-        .ju-toast-warning {
-            border-left-color: var(--ju-warning);
-            color: var(--ju-warning);
-        }
-
-        .ju-toast-info {
-            border-left-color: var(--ju-info);
-            color: var(--ju-info);
-        }
-
-        /* ============================================
-           PREMIUM FOOTER - GLASS EFFECT
-        ============================================ */
-
         .ju-footer {
-            background: rgba(0, 100, 0, 0.95);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            background: var(--ju-blue-dark);
             color: var(--ju-white);
-            padding: var(--ju-spacing-2xl) 0 var(--ju-spacing-xl);
+            padding: var(--space-8) 0;
             margin-top: auto;
-            border-top: 3px solid var(--ju-secondary);
             position: relative;
-        }
-
-        .ju-footer::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            border-top: 3px solid var(--ju-gold);
         }
 
         .footer-container {
-            max-width: 1600px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 0 var(--ju-spacing-xl);
+            padding: 0 var(--space-6);
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: var(--ju-spacing-xl);
+            gap: var(--space-6);
         }
 
         .footer-copyright {
-            color: rgba(255, 255, 255, 0.9);
+            color: var(--ju-white);
             font-size: 0.9rem;
             display: flex;
             align-items: center;
-            gap: var(--ju-spacing-sm);
+            gap: var(--space-2);
+            opacity: 0.9;
         }
 
         .footer-links {
             display: flex;
-            gap: var(--ju-spacing-xl);
+            gap: var(--space-6);
             flex-wrap: wrap;
         }
 
         .footer-link {
-            color: rgba(255, 255, 255, 0.9);
+            color: var(--ju-white);
             text-decoration: none;
             font-size: 0.9rem;
-            font-weight: 500;
-            transition: all var(--ju-transition-normal);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+            transition: all var(--transition);
             position: relative;
+            padding: var(--space-1) 0;
+            opacity: 0.9;
         }
-
-        .footer-link::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--ju-secondary);
-            transition: width var(--ju-transition-normal);
-            border-radius: var(--ju-radius-full);
+        .footer-link.hover-underline-center:hover {
+            color: var(--ju-gold);
+            opacity: 1;
         }
-
-        .footer-link:hover {
-            color: var(--ju-secondary);
-            transform: translateY(-2px);
-        }
-
-        .footer-link:hover::after {
-            width: 100%;
+        .footer-link.hover-underline-center:hover::after {
+            width: 80%;
+            background: var(--ju-gold);
         }
 
         /* ============================================
-           ENHANCED PREMIUM BUTTONS
+           NOTIFICATION TOASTS
         ============================================ */
-
-        .btn-ju {
-            background: var(--ju-gradient-primary);
-            color: var(--ju-white);
-            border: none;
-            padding: 0.875rem 1.75rem;
-            border-radius: var(--ju-radius-lg);
-            font-weight: 600;
-            font-size: 0.95rem;
-            transition: all var(--ju-transition-bounce);
-            box-shadow: var(--ju-shadow-md);
-            position: relative;
-            overflow: hidden;
-            letter-spacing: 0.5px;
-            cursor: pointer;
-        }
-
-        .btn-ju::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            transition: left var(--ju-transition-slow);
-        }
-
-        .btn-ju:hover {
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: var(--ju-shadow-lg);
-        }
-
-        .btn-ju:hover::before {
-            left: 100%;
-        }
-
-        .btn-ju-outline {
-            background: transparent;
-            color: var(--ju-primary);
-            border: 2px solid var(--ju-primary);
-            padding: 0.75rem 1.5rem;
-            transition: all var(--ju-transition-bounce);
-            position: relative;
-            overflow: hidden;
-            font-weight: 600;
-            border-radius: var(--ju-radius-lg);
-            cursor: pointer;
-        }
-
-        .btn-ju-outline::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 0;
-            height: 100%;
-            background: var(--ju-primary);
-            transition: width var(--ju-transition-normal);
-            z-index: 1;
-        }
-
-        .btn-ju-outline span {
-            position: relative;
-            z-index: 2;
-        }
-
-        .btn-ju-outline:hover {
-            color: var(--ju-white);
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: var(--ju-shadow-md);
-            border-color: transparent;
-        }
-
-        .btn-ju-outline:hover::before {
+        .toast-container {
+            position: fixed;
+            top: 90px;
+            right: var(--space-6);
+            z-index: var(--z-toast);
+            max-width: 400px;
             width: 100%;
         }
 
-        /* Button Variants */
-        .btn-ju-success {
-            background: var(--ju-gradient-success);
+        .ju-toast {
+            background: var(--ju-white);
+            border-left: 4px solid;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-xl);
+            padding: var(--space-4);
+            margin-bottom: var(--space-3);
+            animation: slideInRight 0.3s ease-out;
+            transition: all var(--transition);
         }
+        .ju-toast-success { border-left-color: var(--success); }
+        .ju-toast-error { border-left-color: var(--danger); }
+        .ju-toast-warning { border-left-color: var(--warning); }
+        .ju-toast-info { border-left-color: var(--ju-blue); }
 
-        .btn-ju-warning {
-            background: var(--ju-gradient-warning);
-        }
-
-        .btn-ju-danger {
-            background: var(--ju-gradient-danger);
-        }
-
-        .btn-ju-info {
-            background: var(--ju-gradient-info);
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
 
         /* ============================================
-           ENHANCED RESPONSIVE DESIGN SYSTEM
+           RESPONSIVE DESIGN
         ============================================ */
-
         @media (max-width: 1400px) {
-
-            .header-container,
-            .main-layout,
-            .footer-container {
-                padding: 0 var(--ju-spacing-lg);
-            }
-
-            .ju-main-content {
-                padding: var(--ju-spacing-xl);
-            }
-
-            .ju-card-body {
-                padding: var(--ju-spacing-xl);
-            }
-
-            .stat-card {
-                padding: var(--ju-spacing-xl);
-            }
+            .ju-sidebar { width: 280px; }
+            .page-title { font-size: 2rem; }
         }
 
         @media (max-width: 1200px) {
-            .main-layout {
-                gap: var(--ju-spacing-lg);
-            }
-
-            .ju-sidebar {
-                width: 260px;
-            }
-
-            .stat-number {
-                font-size: 3rem;
-            }
-
-            .page-title {
-                font-size: 2.25rem;
-            }
+            .ju-sidebar { width: 260px; }
+            .ju-main-content { padding: var(--space-6); }
+            .page-title { font-size: 1.8rem; }
         }
 
         @media (max-width: 992px) {
-            .main-layout {
-                flex-direction: column;
-                gap: var(--ju-spacing-lg);
-            }
-
+            .main-layout { flex-direction: column; }
             .ju-sidebar {
                 width: 100%;
                 height: auto;
+                max-height: 400px;
                 position: static;
-                min-height: auto;
-                max-height: 60vh;
+                border-right: none;
+                border-bottom: 3px solid var(--ju-gold);
+                padding: var(--space-4) 0;
+                box-shadow: 0 8px 25px rgba(0,0,0,0.15);
             }
-
             .sidebar-menu {
                 display: grid;
                 grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-                gap: var(--ju-spacing-sm);
+                gap: var(--space-2);
+                padding: 0 var(--space-4);
             }
-
-            .menu-header {
-                grid-column: 1 / -1;
-                margin: var(--ju-spacing-sm);
-            }
-
-            .menu-link {
-                margin: 2px var(--ju-spacing-sm);
-            }
-
-            .sub-menu {
-                position: static;
-                background: rgba(0, 100, 0, 0.05);
-                border-left: none;
-                margin-left: 0;
-                border-radius: var(--ju-radius-lg);
-                margin-top: var(--ju-spacing-xs);
-            }
-
-            .ju-main-content {
-                min-height: auto;
-            }
-
-            .stat-number {
-                font-size: 2.5rem;
-            }
-
-            .stat-icon {
-                font-size: 2.8rem;
-            }
-
-            .header-search {
-                max-width: 300px;
-            }
+            .menu-header { grid-column: 1 / -1; }
+            .menu-link { margin: 2px; border-left: none; border-bottom: 3px solid transparent; }
+            .menu-link.active { border-left: none; border-bottom-color: var(--ju-gold); }
+            .page-title { font-size: 1.6rem; }
+            .stat-number { font-size: 2.5rem; }
         }
 
         @media (max-width: 768px) {
-            html {
-                font-size: 15px;
-            }
-
-            .header-container {
-                flex-direction: column;
-                gap: var(--ju-spacing-md);
-                height: auto;
-                padding: var(--ju-spacing-md) var(--ju-spacing-lg);
-            }
-
-            .ju-brand {
-                width: 100%;
-                justify-content: center;
-            }
-
-            .user-menu-container {
-                width: 100%;
-                justify-content: center;
-                flex-wrap: wrap;
-            }
-
-            .content-header {
-                flex-direction: column;
-                gap: var(--ju-spacing-md);
-                text-align: center;
-            }
-
-            .page-title::after {
-                left: 50%;
-                transform: translateX(-50%);
-            }
-
-            .footer-container {
-                flex-direction: column;
-                gap: var(--ju-spacing-lg);
-                text-align: center;
-            }
-
-            .footer-links {
-                justify-content: center;
-            }
-
-            .ju-card-body {
-                padding: var(--ju-spacing-lg);
-            }
-
-            .stat-card {
-                padding: var(--ju-spacing-lg);
-            }
-
-            .stat-number {
-                font-size: 2.2rem;
-            }
-
-            .stat-icon {
-                font-size: 2.5rem;
-            }
-
-            .header-search {
-                max-width: 100%;
-                order: 3;
-                margin-top: var(--ju-spacing-md);
-            }
+            .ju-header { height: auto; padding: var(--space-3) 0; }
+            .header-container { flex-wrap: wrap; height: auto; padding: var(--space-3); }
+            .ju-brand { order: 1; }
+            .user-menu-container { order: 2; width: 100%; justify-content: flex-end; }
+            .header-search { order: 3; max-width: 100%; margin-top: var(--space-3); }
+            .ju-main-content { padding: var(--space-4); }
+            .page-title { font-size: 1.4rem; }
+            .guest-nav { flex-direction: column; width: 100%; }
+            .auth-btn { width: 100%; }
+            .user-profile .user-details { display: none; }
+            .footer-container { flex-direction: column; text-align: center; }
+            .stat-card { padding: var(--space-6); min-height: 160px; }
+            .stat-number { font-size: 2rem; }
         }
 
         @media (max-width: 576px) {
-            .sidebar-menu {
-                grid-template-columns: 1fr;
-            }
+            .page-title { font-size: 1.2rem; }
+            .ju-btn { padding: var(--space-2) var(--space-4); }
+            .action-btn { width: 34px; height: 34px; }
+        }
 
+        /* Print Styles */
+        @media print {
+            .ju-header, .ju-sidebar, .ju-footer, .toast-container {
+                display: none !important;
+            }
             .ju-main-content {
-                padding: var(--ju-spacing-lg);
+                padding: 0 !important;
+                margin: 0 !important;
             }
-
-            .ju-card-header {
-                padding: var(--ju-spacing-lg);
+            .ju-card {
+                box-shadow: none !important;
+                border: 1px solid #ddd !important;
             }
-
-            .stat-card {
-                min-height: 140px;
-                padding: var(--ju-spacing-md);
-            }
-
-            .stat-number {
-                font-size: 2rem;
-            }
-
-            .stat-icon {
-                font-size: 2.2rem;
-            }
-
-            .page-title {
-                font-size: 1.75rem;
-            }
-
-            .breadcrumb-nav {
-                padding: var(--ju-spacing-sm);
-            }
-        }
-
-        /* ============================================
-           ENHANCED UTILITY CLASSES
-        ============================================ */
-
-        .text-ju-primary {
-            color: var(--ju-primary);
-        }
-
-        .text-ju-secondary {
-            color: var(--ju-secondary);
-        }
-
-        .text-ju-success {
-            color: var(--ju-success);
-        }
-
-        .text-ju-danger {
-            color: var(--ju-danger);
-        }
-
-        .text-ju-warning {
-            color: var(--ju-warning);
-        }
-
-        .text-ju-info {
-            color: var(--ju-info);
-        }
-
-        .bg-ju-primary {
-            background: var(--ju-gradient-primary);
-        }
-
-        .bg-ju-light {
-            background: var(--ju-gradient-light);
-        }
-
-        .bg-ju-dark {
-            background: var(--ju-gradient-dark);
-        }
-
-        .border-ju-primary {
-            border-color: var(--ju-primary);
-        }
-
-        .border-ju-light {
-            border-color: var(--ju-gray-200);
-        }
-
-        .shadow-ju {
-            box-shadow: var(--ju-shadow-lg);
-        }
-
-        .shadow-ju-lg {
-            box-shadow: var(--ju-shadow-xl);
-        }
-
-        /* Loading Spinner - Enhanced */
-        .ju-spinner {
-            width: 3.5rem;
-            height: 3.5rem;
-            border: 4px solid rgba(0, 100, 0, 0.1);
-            border-top-color: var(--ju-primary);
-            border-radius: 50%;
-            animation: ju-spin 1s linear infinite;
-            position: relative;
-        }
-
-        .ju-spinner::after {
-            content: '';
-            position: absolute;
-            top: -4px;
-            left: -4px;
-            right: -4px;
-            bottom: -4px;
-            border: 4px solid transparent;
-            border-top-color: var(--ju-secondary);
-            border-radius: 50%;
-            animation: ju-spin 1.5s linear infinite reverse;
-        }
-
-        @keyframes ju-spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-
-        /* Add this to your style section */
-        .ju-sidebar {
-            animation: none !important;
-            transition: none !important;
-            opacity: 1 !important;
-            transform: none !important;
-            visibility: visible !important;
-        }
-
-        /* Disable AOS animations */
-        [data-aos] {
-            opacity: 1 !important;
-            transform: none !important;
-            transition: none !important;
-        }
-
-        /* Skeleton Loading - Enhanced */
-        .ju-skeleton {
-            background: linear-gradient(90deg,
-                    rgba(0, 100, 0, 0.1) 25%,
-                    rgba(0, 100, 0, 0.2) 50%,
-                    rgba(0, 100, 0, 0.1) 75%);
-            background-size: 200% 100%;
-            animation: skeleton-loading 1.5s ease-in-out infinite;
-            border-radius: var(--ju-radius-md);
-        }
-
-        @keyframes skeleton-loading {
-            0% {
-                background-position: 200% 0;
-            }
-
-            100% {
-                background-position: -200% 0;
-            }
-        }
-
-        /* Glass Morphism Utility */
-        .glass {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .glass-dark {
-            background: rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        /* Gradient Text */
-        .gradient-text {
-            background: var(--ju-gradient-primary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        /* Floating Animation */
-        .float-animation {
-            animation: float 3s ease-in-out infinite;
-        }
-
-        @keyframes float {
-
-            0%,
-            100% {
-                transform: translateY(0);
-            }
-
-            50% {
-                transform: translateY(-10px);
-            }
-        }
-
-        /* Pulse Animation */
-        .pulse-animation {
-            animation: pulse 2s infinite;
-        }
-
-        /* Shine Effect */
-        .shine-effect {
-            position: relative;
-            overflow: hidden;
-        }
-
-        .shine-effect::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s;
-        }
-
-        .shine-effect:hover::before {
-            left: 100%;
-        }
-
-        /* Card Hover Effects */
-        .card-hover-3d {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .card-hover-3d:hover {
-            transform: perspective(1000px) rotateX(5deg) rotateY(5deg) scale(1.02);
-            box-shadow: var(--ju-shadow-2xl);
-        }
-
-        /* Badge Styles */
-        .ju-badge {
-            padding: 0.35rem 0.75rem;
-            border-radius: var(--ju-radius-full);
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .ju-badge-primary {
-            background: var(--ju-gradient-primary);
-            color: white;
-        }
-
-        .ju-badge-success {
-            background: var(--ju-gradient-success);
-            color: white;
-        }
-
-        .ju-badge-warning {
-            background: var(--ju-gradient-warning);
-            color: white;
-        }
-
-        .ju-badge-danger {
-            background: var(--ju-gradient-danger);
-            color: white;
-        }
-
-        /* Avatar Styles */
-        .ju-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            color: white;
-            font-size: 1rem;
-            background: var(--ju-gradient-primary);
-        }
-
-        .ju-avatar-sm {
-            width: 32px;
-            height: 32px;
-            font-size: 0.85rem;
-        }
-
-        .ju-avatar-lg {
-            width: 56px;
-            height: 56px;
-            font-size: 1.25rem;
-        }
-
-        .ju-avatar-xl {
-            width: 80px;
-            height: 80px;
-            font-size: 1.5rem;
-        }
-
-        /* Timeline */
-        .ju-timeline {
-            position: relative;
-            padding-left: 30px;
-        }
-
-        .ju-timeline::before {
-            content: '';
-            position: absolute;
-            left: 10px;
-            top: 0;
-            bottom: 0;
-            width: 2px;
-            background: var(--ju-primary);
-        }
-
-        .ju-timeline-item {
-            position: relative;
-            margin-bottom: var(--ju-spacing-xl);
-        }
-
-        .ju-timeline-item::before {
-            content: '';
-            position: absolute;
-            left: -20px;
-            top: 0;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: var(--ju-primary);
-            border: 2px solid white;
-            box-shadow: 0 0 0 3px var(--ju-primary-light);
-        }
-
-        /* Progress Bar */
-        .ju-progress {
-            height: 8px;
-            background: rgba(0, 100, 0, 0.1);
-            border-radius: var(--ju-radius-full);
-            overflow: hidden;
-        }
-
-        .ju-progress-bar {
-            height: 100%;
-            background: var(--ju-gradient-primary);
-            border-radius: var(--ju-radius-full);
-            transition: width 0.6s ease;
-        }
-
-        /* Tooltip */
-        .ju-tooltip {
-            position: relative;
-            display: inline-block;
-        }
-
-        .ju-tooltip:hover::after {
-            content: attr(data-tooltip);
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: var(--ju-spacing-sm) var(--ju-spacing-md);
-            background: var(--ju-gray-800);
-            color: white;
-            font-size: 0.85rem;
-            border-radius: var(--ju-radius-md);
-            white-space: nowrap;
-            z-index: var(--ju-z-tooltip);
-            margin-bottom: 5px;
-            box-shadow: var(--ju-shadow-md);
-        }
-
-        .ju-tooltip:hover::before {
-            content: '';
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            border: 5px solid transparent;
-            border-top-color: var(--ju-gray-800);
-            margin-bottom: -5px;
-            z-index: var(--ju-z-tooltip);
-        }
-
-        /* Modal Fixes */
-        .modal-backdrop {
-            z-index: var(--ju-z-modal-backdrop);
-        }
-
-        .modal {
-            z-index: var(--ju-z-modal);
-        }
-
-        /* Fix for form buttons inside modals */
-        .modal-footer .btn {
-            margin: 0;
-        }
-
-        /* Fix for modal form submission */
-        .modal form {
-            margin: 0;
         }
     </style>
 
@@ -2092,10 +1362,10 @@
 </head>
 
 <body>
-    <!-- Premium Glassmorphism Header -->
-    <header class="ju-header" id="mainHeader">
+    <!-- Official Jimma University Header - COMPLETE BLUE BACKGROUND -->
+    <header class="ju-header">
         <div class="header-container">
-            <a href="{{ route('home') }}" class="ju-brand">
+            <a href="{{ route('home') }}" class="ju-brand hover-scale">
                 <div class="ju-logo">
                     <i class="fas fa-university"></i>
                 </div>
@@ -2105,16 +1375,55 @@
                 </div>
             </a>
 
-            <!-- Search Bar -->
+            <!-- Enhanced Search with Hover -->
             <div class="header-search d-none d-lg-block">
                 <i class="fas fa-search"></i>
-                <input type="text" placeholder="Search events, announcements, or users..." id="globalSearch">
+                <input type="text" placeholder="Search events, announcements, or users..." id="globalSearch" class="hover-glow">
             </div>
 
             <div class="user-menu-container">
                 @auth
-                <!-- Premium User Profile -->
-                <div class="user-profile" onclick="toggleUserMenu()">
+                <!-- Notification Bell -->
+                <div class="dropdown notification-dropdown-container">
+                    <button class="notification-bell hover-rotate dropdown-toggle" type="button"
+                        id="notificationDropdown" data-bs-toggle="dropdown"
+                        aria-expanded="false" onclick="loadNotifications()">
+                        <i class="fas fa-bell"></i>
+                        @php
+                        $unreadCount = auth()->user()->unreadNotificationsCount ?? 0;
+                        @endphp
+                        @if($unreadCount > 0)
+                        <span class="notification-badge">{{ $unreadCount }}</span>
+                        @endif
+                    </button>
+                    <div class="dropdown-menu notification-dropdown" aria-labelledby="notificationDropdown">
+                        <div class="notification-header" style="background: var(--gradient-primary);">
+                            <h6 class="notification-title mb-0 text-white">
+                                <i class="fas fa-bell me-2"></i>Notifications
+                            </h6>
+                            @if(auth()->user()->unreadNotificationsCount > 0)
+                            <button class="btn btn-sm btn-light" onclick="markAllAsRead()">
+                                <i class="fas fa-check-double me-1"></i>Mark all as read
+                            </button>
+                            @endif
+                        </div>
+                        <div class="notification-body" id="notificationList">
+                            <div class="text-center py-4">
+                                <div class="spinner-border text-white" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="notification-footer">
+                            <a href="{{ route('notifications.index') }}" class="btn btn-sm btn-outline-light w-100">
+                                <i class="fas fa-list me-1"></i>View All Notifications
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User Profile -->
+                <div class="user-profile hover-lift">
                     <div class="user-avatar">
                         {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
                     </div>
@@ -2128,85 +1437,76 @@
                             @endif
                         </div>
                     </div>
-                    <i class="fas fa-chevron-down ms-2" style="font-size: 0.8rem;"></i>
+                    <i class="fas fa-chevron-down ml-2" style="font-size: 0.75rem; color: var(--ju-white);"></i>
                 </div>
 
                 <form method="POST" action="{{ route('logout') }}" class="d-inline" id="logoutForm">
                     @csrf
-                    <button type="submit" class="btn logout-btn">
+                    <button type="submit" class="btn logout-btn hover-shake">
                         <i class="fas fa-sign-out-alt"></i>
                         <span>Logout</span>
                     </button>
                 </form>
                 @else
-                <!-- Guest Navigation -->
+                <!-- Auth Buttons -->
                 <div class="guest-nav">
-                    <a href="{{ route('login') }}" class="btn btn-ju">Login</a>
-                    <a href="{{ route('register') }}" class="btn btn-ju-outline">Register</a>
+                    <a href="{{ route('login') }}" class="auth-btn auth-btn-login hover-shine">
+                        <i class="fas fa-sign-in-alt"></i>
+                        <span>Login</span>
+                    </a>
+                    <a href="{{ route('register') }}" class="auth-btn auth-btn-register hover-scale">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Register</span>
+                    </a>
                 </div>
                 @endauth
             </div>
         </div>
     </header>
 
-    <!-- Floating Toast Container -->
+    <!-- Toast Container -->
     <div class="toast-container">
         @if(session('success'))
         <div class="ju-toast ju-toast-success animate__animated animate__fadeInRight" role="alert">
             <div class="d-flex align-items-center">
                 <div class="flex-shrink-0">
-                    <i class="fas fa-check-circle fa-2x"></i>
+                    <i class="fas fa-check-circle fa-lg text-success"></i>
                 </div>
                 <div class="flex-grow-1 ms-3">
                     <div class="fw-bold mb-1">Success!</div>
-                    <div class="toast-message">{{ session('success') }}</div>
+                    <div>{{ session('success') }}</div>
                 </div>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+                <button type="button" class="btn-close" onclick="this.closest('.ju-toast').remove()"></button>
             </div>
         </div>
         @endif
-
+        
         @if(session('error'))
         <div class="ju-toast ju-toast-error animate__animated animate__fadeInRight" role="alert">
             <div class="d-flex align-items-center">
                 <div class="flex-shrink-0">
-                    <i class="fas fa-exclamation-circle fa-2x"></i>
+                    <i class="fas fa-exclamation-circle fa-lg text-danger"></i>
                 </div>
                 <div class="flex-grow-1 ms-3">
                     <div class="fw-bold mb-1">Error!</div>
-                    <div class="toast-message">{{ session('error') }}</div>
+                    <div>{{ session('error') }}</div>
                 </div>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+                <button type="button" class="btn-close" onclick="this.closest('.ju-toast').remove()"></button>
             </div>
         </div>
         @endif
-
-        @if(session('warning'))
-        <div class="ju-toast ju-toast-warning animate__animated animate__fadeInRight" role="alert">
-            <div class="d-flex align-items-center">
-                <div class="flex-shrink-0">
-                    <i class="fas fa-exclamation-triangle fa-2x"></i>
-                </div>
-                <div class="flex-grow-1 ms-3">
-                    <div class="fw-bold mb-1">Warning!</div>
-                    <div class="toast-message">{{ session('warning') }}</div>
-                </div>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
-            </div>
-        </div>
-        @endif
-
+        
         @if(session('info'))
         <div class="ju-toast ju-toast-info animate__animated animate__fadeInRight" role="alert">
             <div class="d-flex align-items-center">
                 <div class="flex-shrink-0">
-                    <i class="fas fa-info-circle fa-2x"></i>
+                    <i class="fas fa-info-circle fa-lg text-info"></i>
                 </div>
                 <div class="flex-grow-1 ms-3">
-                    <div class="fw-bold mb-1">Info!</div>
-                    <div class="toast-message">{{ session('info') }}</div>
+                    <div class="fw-bold mb-1">Information</div>
+                    <div>{{ session('info') }}</div>
                 </div>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+                <button type="button" class="btn-close" onclick="this.closest('.ju-toast').remove()"></button>
             </div>
         </div>
         @endif
@@ -2215,15 +1515,14 @@
     <!-- Main Layout -->
     <div class="main-layout">
         @auth
-        <!-- Premium Glass Sidebar -->
+        <!-- DISTINCT SIDEBAR - Dark Blue with Gold Accents -->
         <nav class="ju-sidebar">
-
             <ul class="sidebar-menu">
                 <!-- DASHBOARD -->
                 @if(auth()->user()->hasPermission('view_dashboard'))
                 <li class="menu-header">Dashboard</li>
                 <li class="menu-item">
-                    <a href="{{ route('dashboard') }}" class="menu-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+                    <a href="{{ route('dashboard') }}" class="menu-link hover-slide-up {{ request()->routeIs('dashboard') ? 'active' : '' }}">
                         <i class="menu-icon fas fa-tachometer-alt"></i>
                         <span class="menu-title">Admin Dashboard</span>
                     </a>
@@ -2231,108 +1530,143 @@
                 @endif
 
                 <!-- EVENT MANAGEMENT -->
-                <li class="menu-header">Event Management</li>
+                <li class="menu-header">Events</li>
 
+                <!-- Browse Events -->
                 <li class="menu-item">
-                    <a href="{{ route('home') }}" class="menu-link {{ request()->routeIs('home') ? 'active' : '' }}">
+                    <a href="{{ route('home') }}" class="menu-link hover-slide-up {{ request()->routeIs('home') || request()->routeIs('events.guest.*') ? 'active' : '' }}">
                         <i class="menu-icon fas fa-calendar-alt"></i>
                         <span class="menu-title">Browse Events</span>
                     </a>
                 </li>
 
+                <!-- Register for Events -->
                 <li class="menu-item">
-                    <a href="{{ route('my-events.index') }}" class="menu-link {{ request()->routeIs('my-events.*') ? 'active' : '' }}">
+                    <a href="{{ route('event-registration.index') }}" class="menu-link hover-slide-up {{ request()->routeIs('event-registration.*') ? 'active' : '' }}">
+                        <i class="menu-icon fas fa-user-plus"></i>
+                        <span class="menu-title">Register for Events</span>
+                    </a>
+                </li>
+
+                <!-- My Registrations -->
+                <li class="menu-item">
+                    <a href="{{ route('my-events.index') }}" class="menu-link hover-slide-up {{ request()->routeIs('my-events.*') ? 'active' : '' }}">
                         <i class="menu-icon fas fa-calendar-check"></i>
                         <span class="menu-title">My Registrations</span>
+                        @php
+                        $myRegistrationsCount = auth()->user()
+                        ? \App\Models\EventRegistration::where('user_id', auth()->id())
+                        ->whereIn('status', ['confirmed', 'pending'])
+                        ->count()
+                        : 0;
+                        @endphp
+                        @if($myRegistrationsCount > 0)
+                        <span class="menu-badge hover-pulse">{{ $myRegistrationsCount }}</span>
+                        @endif
                     </a>
                 </li>
 
+                <!-- Create Event Request -->
                 <li class="menu-item">
-                    <a href="{{ route('event-registration.index') }}" class="menu-link {{ request()->routeIs('event-registration.*') ? 'active' : '' }}">
-                        <i class="menu-icon fas fa-user-plus"></i>
-                        <span class="menu-title">Event Registration</span>
+                    <a href="{{ route('event-requests.create') }}" class="menu-link hover-slide-up {{ request()->routeIs('event-requests.create') ? 'active' : '' }}">
+                        <i class="menu-icon fas fa-plus-circle"></i>
+                        <span class="menu-title">Create Event Request</span>
                     </a>
                 </li>
 
-
-                <!-- Feedback -->
+                <!-- My Event Requests -->
                 <li class="menu-item">
-                    <a href="{{ route('feedback.create') }}"
-                        class="menu-link {{ request()->routeIs('feedback.create') || request()->routeIs('feedback.store') || request()->routeIs('feedback.thankyou') ? 'active' : '' }}">
+                    <a href="{{ route('event-requests.my-requests') }}" class="menu-link hover-slide-up {{ request()->routeIs('event-requests.my-requests') ? 'active' : '' }}">
+                        <i class="menu-icon fas fa-clipboard-list"></i>
+                        <span class="menu-title">My Event Requests</span>
+                        @php
+                        $myPendingRequestsCount = auth()->user()
+                        ? \App\Models\EventRequest::where('user_id', auth()->id())
+                        ->where('status', 'pending')
+                        ->count()
+                        : 0;
+                        @endphp
+                        @if($myPendingRequestsCount > 0)
+                        <span class="menu-badge hover-pulse">{{ $myPendingRequestsCount }}</span>
+                        @endif
+                    </a>
+                </li>
+
+                <!-- FEEDBACK SECTION -->
+                <li class="menu-header">Feedback</li>
+
+                <!-- Submit Feedback -->
+                <li class="menu-item">
+                    <a href="{{ route('feedback.create') }}" class="menu-link hover-slide-up {{ request()->routeIs('feedback.create') || request()->routeIs('feedback.store') || request()->routeIs('feedback.thankyou') ? 'active' : '' }}">
                         <i class="menu-icon fas fa-comment-dots"></i>
                         <span class="menu-title">Submit Feedback</span>
                     </a>
                 </li>
 
+                <!-- View Testimonials -->
                 <li class="menu-item">
-                    <a href="{{ route('feedback.testimonials') }}"
-                        class="menu-link {{ request()->routeIs('feedback.testimonials') ? 'active' : '' }}">
+                    <a href="{{ route('feedback.testimonials') }}" class="menu-link hover-slide-up {{ request()->routeIs('feedback.testimonials') ? 'active' : '' }}">
                         <i class="menu-icon fas fa-star"></i>
                         <span class="menu-title">View Testimonials</span>
                     </a>
                 </li>
 
-                <!-- Event Requests -->
+                <!-- NOTIFICATIONS -->
+                <li class="menu-header">Notifications</li>
                 <li class="menu-item">
-                    <a href="{{ route('event-requests.create') }}"
-                        class="menu-link {{ request()->routeIs('event-requests.create') ? 'active' : '' }}">
-                        <i class="menu-icon fas fa-plus-circle"></i>
-                        <span class="menu-title">Create Request</span>
+                    <a href="{{ route('notifications.index') }}" class="menu-link hover-slide-up {{ request()->routeIs('notifications.*') ? 'active' : '' }}">
+                        <i class="menu-icon fas fa-bell"></i>
+                        <span class="menu-title">My Notifications</span>
+                        @php
+                        $unreadCount = auth()->user()->unread_notifications_count ?? 0;
+                        @endphp
+                        @if($unreadCount > 0)
+                        <span class="menu-badge hover-pulse">{{ $unreadCount }}</span>
+                        @endif
                     </a>
                 </li>
 
-
-                <!-- Announcements -->
+                <!-- ANNOUNCEMENTS -->
+                <li class="menu-header">Announcements</li>
                 <li class="menu-item">
-                    <a href="{{ route('announcements.index') }}"
-                        class="menu-link {{ request()->routeIs('announcements.*') && !request()->routeIs('announcements.create') && !request()->routeIs('announcements.edit') && !request()->routeIs('announcements.statistics') ? 'active' : '' }}">
+                    <a href="{{ route('announcements.index') }}" class="menu-link hover-slide-up {{ request()->routeIs('announcements.index') && !request()->routeIs('announcements.create') && !request()->routeIs('announcements.edit') && !request()->routeIs('announcements.statistics') ? 'active' : '' }}">
                         <i class="menu-icon fas fa-bullhorn"></i>
                         <span class="menu-title">Announcements</span>
                     </a>
                 </li>
 
-                <!-- Create Announcement (for all authenticated users) -->
-                <!-- @auth
-<li class="menu-item">
-    <a href="{{ route('announcements.create') }}" 
-       class="menu-link {{ request()->routeIs('announcements.create') ? 'active' : '' }}">
-        <i class="menu-icon fas fa-plus-square"></i>
-        <span class="menu-title">Create Announcement</span>
-    </a>
-</li>
-@endauth -->
-
-
-                <!-- ADMINISTRATION -->
-                @if(auth()->user()->hasAnyPermission(['manage_events', 'manage_venues', 'manage_users']))
+                <!-- ADMINISTRATION SECTION -->
+                @if(auth()->user()->hasAnyPermission(['manage_events', 'manage_venues', 'manage_users', 'view_event_requests', 'manage_feedback', 'manage_announcements']))
                 <li class="menu-header">Administration</li>
 
-                <!-- Venue Management -->
+                <!-- VENUE MANAGEMENT -->
                 @if(auth()->user()->hasPermission('manage_venues'))
                 <li class="menu-item">
-                    <a class="menu-link menu-collapse" data-bs-toggle="collapse" href="#venueManagement" role="button">
+                    <a class="menu-link menu-collapse hover-slide-up {{ request()->routeIs('admin.campuses.*') || request()->routeIs('admin.buildings.*') || request()->routeIs('admin.venues.*') ? '' : 'collapsed' }}"
+                        data-bs-toggle="collapse" href="#venueManagement" role="button" aria-expanded="{{ request()->routeIs('admin.campuses.*') || request()->routeIs('admin.buildings.*') || request()->routeIs('admin.venues.*') ? 'true' : 'false' }}">
                         <i class="menu-icon fas fa-map-marked-alt"></i>
                         <span class="menu-title">Venue Management</span>
                         <i class="menu-arrow fas fa-chevron-right"></i>
                     </a>
-                    <div class="collapse" id="venueManagement">
+                    <div class="collapse {{ request()->routeIs('admin.campuses.*') || request()->routeIs('admin.buildings.*') || request()->routeIs('admin.venues.*') ? 'show' : '' }}" id="venueManagement">
                         <ul class="nav flex-column sub-menu">
                             <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('admin.campuses.*') ? 'active' : '' }}" href="{{ route('admin.campuses.index') }}">
+                                <a class="nav-link hover-border {{ request()->routeIs('admin.campuses.*') ? 'active' : '' }}"
+                                    href="{{ route('admin.campuses.index') }}">
                                     <i class="fas fa-university me-2"></i>
                                     <span>Campuses</span>
                                 </a>
                             </li>
-
                             <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('admin.buildings.*') ? 'active' : '' }}" href="{{ route('admin.buildings.index') }}">
+                                <a class="nav-link hover-border {{ request()->routeIs('admin.buildings.*') ? 'active' : '' }}"
+                                    href="{{ route('admin.buildings.index') }}">
                                     <i class="fas fa-building me-2"></i>
                                     <span>Buildings</span>
                                 </a>
                             </li>
-
                             <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('admin.venues.*') ? 'active' : '' }}" href="{{ route('admin.venues.index') }}">
+                                <a class="nav-link hover-border {{ request()->routeIs('admin.venues.*') ? 'active' : '' }}"
+                                    href="{{ route('admin.venues.index') }}">
                                     <i class="fas fa-door-closed me-2"></i>
                                     <span>Venues & Halls</span>
                                 </a>
@@ -2342,35 +1676,41 @@
                 </li>
                 @endif
 
-                <!-- Event Administration -->
-                @if(auth()->user()->hasPermission('manage_events'))
+                <!-- EVENT ADMINISTRATION -->
+                @if(auth()->user()->hasPermission('manage_events') || auth()->user()->hasPermission('view_event_requests'))
                 <li class="menu-item">
-                    <a class="menu-link menu-collapse" data-bs-toggle="collapse" href="#eventAdmin" role="button">
+                    <a class="menu-link menu-collapse hover-slide-up {{ request()->routeIs('admin.events.*') || request()->routeIs('event-requests.index') || request()->routeIs('speakers.*') ? '' : 'collapsed' }}"
+                        data-bs-toggle="collapse" href="#eventAdmin" role="button" aria-expanded="{{ request()->routeIs('admin.events.*') || request()->routeIs('event-requests.index') || request()->routeIs('speakers.*') ? 'true' : 'false' }}">
                         <i class="menu-icon fas fa-calendar-plus"></i>
                         <span class="menu-title">Event Administration</span>
                         <i class="menu-arrow fas fa-chevron-right"></i>
                     </a>
-                    <div class="collapse" id="eventAdmin">
+                    <div class="collapse {{ request()->routeIs('admin.events.*') || request()->routeIs('event-requests.index') || request()->routeIs('speakers.*') ? 'show' : '' }}" id="eventAdmin">
                         <ul class="nav flex-column sub-menu">
+                            @if(auth()->user()->hasPermission('manage_events'))
                             <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('admin.events.*') ? 'active' : '' }}" href="{{ route('admin.events.index') }}">
+                                <a class="nav-link hover-border {{ request()->routeIs('admin.events.index') ? 'active' : '' }}"
+                                    href="{{ route('admin.events.index') }}">
                                     <i class="fas fa-calendar me-2"></i>
                                     <span>All Events</span>
                                 </a>
                             </li>
+                            @endif
 
                             @if(auth()->user()->hasPermission('create_events'))
                             <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('admin.events.create') ? 'active' : '' }}" href="{{ route('admin.events.create') }}">
+                                <a class="nav-link hover-border {{ request()->routeIs('admin.events.create') ? 'active' : '' }}"
+                                    href="{{ route('admin.events.create') }}">
                                     <i class="fas fa-plus-circle me-2"></i>
                                     <span>Create Event</span>
                                 </a>
                             </li>
                             @endif
 
-                            @if(class_exists('App\Models\Speaker'))
+                            @if(class_exists('App\Models\Speaker') && auth()->user()->hasPermission('manage_speakers'))
                             <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('speakers.*') ? 'active' : '' }}" href="{{ route('speakers.index') }}">
+                                <a class="nav-link hover-border {{ request()->routeIs('speakers.*') ? 'active' : '' }}"
+                                    href="{{ route('speakers.index') }}">
                                     <i class="fas fa-microphone-alt me-2"></i>
                                     <span>Speakers</span>
                                 </a>
@@ -2379,23 +1719,15 @@
 
                             @if(auth()->user()->hasPermission('view_event_requests'))
                             <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('event-requests.*') ? 'active' : '' }}" href="{{ route('event-requests.index') }}">
+                                <a class="nav-link hover-border {{ request()->routeIs('event-requests.index') ? 'active' : '' }}"
+                                    href="{{ route('event-requests.index') }}">
                                     <i class="fas fa-clipboard-list me-2"></i>
-                                    <span>Event Requests</span>
+                                    <span>All Event Requests</span>
                                     @php
-                                    $pendingRequests = 0;
-                                    if (auth()->check() && auth()->user()->hasPermission('approve_event_requests')) {
-                                    try {
-                                    if (class_exists('App\Models\EventRequest')) {
                                     $pendingRequests = \App\Models\EventRequest::where('status', 'pending')->count();
-                                    }
-                                    } catch (\Exception $e) {
-                                    $pendingRequests = 0;
-                                    }
-                                    }
                                     @endphp
                                     @if($pendingRequests > 0)
-                                    <span class="menu-badge">{{ $pendingRequests }}</span>
+                                    <span class="menu-badge hover-pulse">{{ $pendingRequests }}</span>
                                     @endif
                                 </a>
                             </li>
@@ -2405,19 +1737,21 @@
                 </li>
                 @endif
 
-                <!-- User Administration -->
+                <!-- USER ADMINISTRATION -->
                 @if(auth()->user()->hasAnyPermission(['view_users', 'create_users', 'view_roles', 'view_permissions']))
                 <li class="menu-item">
-                    <a class="menu-link menu-collapse" data-bs-toggle="collapse" href="#userAdmin" role="button">
+                    <a class="menu-link menu-collapse hover-slide-up {{ request()->routeIs('users.*') || request()->routeIs('roles.*') || request()->routeIs('permissions.*') ? '' : 'collapsed' }}"
+                        data-bs-toggle="collapse" href="#userAdmin" role="button" aria-expanded="{{ request()->routeIs('users.*') || request()->routeIs('roles.*') || request()->routeIs('permissions.*') ? 'true' : 'false' }}">
                         <i class="menu-icon fas fa-users-cog"></i>
                         <span class="menu-title">User Administration</span>
                         <i class="menu-arrow fas fa-chevron-right"></i>
                     </a>
-                    <div class="collapse" id="userAdmin">
+                    <div class="collapse {{ request()->routeIs('users.*') || request()->routeIs('roles.*') || request()->routeIs('permissions.*') ? 'show' : '' }}" id="userAdmin">
                         <ul class="nav flex-column sub-menu">
                             @if(auth()->user()->hasPermission('view_users'))
                             <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('users.index') ? 'active' : '' }}" href="{{ route('users.index') }}">
+                                <a class="nav-link hover-border {{ request()->routeIs('users.index') ? 'active' : '' }}"
+                                    href="{{ route('users.index') }}">
                                     <i class="fas fa-users me-2"></i>
                                     <span>All Users</span>
                                 </a>
@@ -2426,7 +1760,8 @@
 
                             @if(auth()->user()->hasPermission('create_users'))
                             <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('users.create') ? 'active' : '' }}" href="{{ route('users.create') }}">
+                                <a class="nav-link hover-border {{ request()->routeIs('users.create') ? 'active' : '' }}"
+                                    href="{{ route('users.create') }}">
                                     <i class="fas fa-user-plus me-2"></i>
                                     <span>Add User</span>
                                 </a>
@@ -2435,7 +1770,8 @@
 
                             @if(auth()->user()->hasPermission('view_roles'))
                             <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('roles.*') ? 'active' : '' }}" href="{{ route('roles.index') }}">
+                                <a class="nav-link hover-border {{ request()->routeIs('roles.*') ? 'active' : '' }}"
+                                    href="{{ route('roles.index') }}">
                                     <i class="fas fa-user-tag me-2"></i>
                                     <span>Roles</span>
                                 </a>
@@ -2444,7 +1780,8 @@
 
                             @if(auth()->user()->hasPermission('view_permissions'))
                             <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('permissions.*') ? 'active' : '' }}" href="{{ route('permissions.index') }}">
+                                <a class="nav-link hover-border {{ request()->routeIs('permissions.*') ? 'active' : '' }}"
+                                    href="{{ route('permissions.index') }}">
                                     <i class="fas fa-key me-2"></i>
                                     <span>Permissions</span>
                                 </a>
@@ -2454,86 +1791,27 @@
                     </div>
                 </li>
                 @endif
-                @endif
 
-                <!-- FEEDBACK & NOTIFICATIONS ADMIN -->
-                @if(auth()->user()->hasAnyPermission(['manage_notifications', 'manage_feedback']))
-                <li class="menu-header">Feedback & Notifications</li>
-
-                 <!-- Notifications -->
-                @if(auth()->user()->hasPermission('view_notifications'))
-                <li class="menu-item">
-                    <a class="menu-link menu-collapse" data-bs-toggle="collapse" href="#notificationMenu" role="button">
-                        <i class="menu-icon fas fa-bell"></i>
-                        <span class="menu-title">Notifications</span>
-                        @php
-                        $unreadCount = 0;
-                        if (class_exists('App\Models\UserNotification')) {
-                        $unreadCount = \App\Models\UserNotification::where('user_id', auth()->id())
-                        ->where('read', false)
-                        ->count();
-                        }
-                        @endphp
-                        @if($unreadCount > 0)
-                        <span class="menu-badge notification-badge">{{ $unreadCount }}</span>
-                        @endif
-                        <i class="menu-arrow fas fa-chevron-right"></i>
-                    </a>
-                    <div class="collapse" id="notificationMenu">
-                        <ul class="nav flex-column sub-menu">
-                            <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('notifications.index') ? 'active' : '' }}"
-                                    href="{{ route('notifications.index') }}">
-                                    <i class="fas fa-inbox me-2"></i>
-                                    <span>My Notifications</span>
-                                    @if($unreadCount > 0)
-                                    <span class="badge bg-danger rounded-pill float-end">{{ $unreadCount }}</span>
-                                    @endif
-                                </a>
-                            </li>
-
-                            @if(auth()->user()->can('send_notifications'))
-                            <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('notifications.send-custom') ? 'active' : '' }}"
-                                    href="{{ route('notifications.send-custom') }}">
-                                    <i class="fas fa-paper-plane me-2"></i>
-                                    <span>Send Notification</span>
-                                </a>
-                            </li>
-                            @endif
-
-                            @if(auth()->user()->can('manage_notifications'))
-                            <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('notifications.statistics') ? 'active' : '' }}"
-                                    href="{{ route('notifications.statistics') }}">
-                                    <i class="fas fa-chart-bar me-2"></i>
-                                    <span>Statistics</span>
-                                </a>
-                            </li>
-                            @endif
-                        </ul>
-                    </div>
-                </li>
-                @endif
-
+                <!-- FEEDBACK ADMINISTRATION -->
                 @if(auth()->user()->hasPermission('manage_feedback'))
                 <li class="menu-item">
-                    <a class="menu-link menu-collapse" data-bs-toggle="collapse" href="#feedbackAdmin" role="button">
+                    <a class="menu-link menu-collapse hover-slide-up {{ request()->routeIs('feedback.index') || request()->routeIs('feedback.analytics') || request()->routeIs('feedback.admin.*') ? '' : 'collapsed' }}"
+                        data-bs-toggle="collapse" href="#feedbackAdmin" role="button" aria-expanded="{{ request()->routeIs('feedback.index') || request()->routeIs('feedback.analytics') || request()->routeIs('feedback.admin.*') ? 'true' : 'false' }}">
                         <i class="menu-icon fas fa-comments"></i>
                         <span class="menu-title">Feedback Management</span>
                         <i class="menu-arrow fas fa-chevron-right"></i>
                     </a>
-                    <div class="collapse" id="feedbackAdmin">
+                    <div class="collapse {{ request()->routeIs('feedback.index') || request()->routeIs('feedback.analytics') || request()->routeIs('feedback.admin.*') ? 'show' : '' }}" id="feedbackAdmin">
                         <ul class="nav flex-column sub-menu">
                             <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('feedback.index') ? 'active' : '' }}"
+                                <a class="nav-link hover-border {{ request()->routeIs('feedback.index') || request()->routeIs('feedback.admin.index') ? 'active' : '' }}"
                                     href="{{ route('feedback.index') }}">
                                     <i class="fas fa-list me-2"></i>
                                     <span>All Feedback</span>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('feedback.analytics') ? 'active' : '' }}"
+                                <a class="nav-link hover-border {{ request()->routeIs('feedback.analytics') || request()->routeIs('feedback.admin.analytics') ? 'active' : '' }}"
                                     href="{{ route('feedback.analytics') }}">
                                     <i class="fas fa-chart-pie me-2"></i>
                                     <span>Analytics</span>
@@ -2543,22 +1821,21 @@
                     </div>
                 </li>
                 @endif
-                @endif
 
-                <!-- Announcement Administration --><!-- Announcement Administration -->
+                <!-- ANNOUNCEMENT ADMINISTRATION -->
                 @if(auth()->user()->hasAnyPermission(['manage_announcements', 'create_announcements', 'view_announcement_stats']))
                 <li class="menu-item">
-                    <a class="menu-link menu-collapse" data-bs-toggle="collapse" href="#announcementAdmin" role="button">
+                    <a class="menu-link menu-collapse hover-slide-up {{ request()->routeIs('announcements.create') || request()->routeIs('announcements.edit') || request()->routeIs('announcements.statistics') ? '' : 'collapsed' }}"
+                        data-bs-toggle="collapse" href="#announcementAdmin" role="button" aria-expanded="{{ request()->routeIs('announcements.create') || request()->routeIs('announcements.edit') || request()->routeIs('announcements.statistics') ? 'true' : 'false' }}">
                         <i class="menu-icon fas fa-bullhorn"></i>
                         <span class="menu-title">Announcement Admin</span>
                         <i class="menu-arrow fas fa-chevron-right"></i>
                     </a>
-                    <div class="collapse" id="announcementAdmin">
+                    <div class="collapse {{ request()->routeIs('announcements.create') || request()->routeIs('announcements.edit') || request()->routeIs('announcements.statistics') ? 'show' : '' }}" id="announcementAdmin">
                         <ul class="nav flex-column sub-menu">
-                            <!-- View All Announcements -->
                             @if(auth()->user()->hasPermission('view_announcements'))
                             <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('announcements.index') && !request()->routeIs('announcements.create') && !request()->routeIs('announcements.edit') && !request()->routeIs('announcements.statistics') ? 'active' : '' }}"
+                                <a class="nav-link hover-border {{ request()->routeIs('announcements.index') && !request()->routeIs('announcements.create') && !request()->routeIs('announcements.edit') && !request()->routeIs('announcements.statistics') ? 'active' : '' }}"
                                     href="{{ route('announcements.index') }}">
                                     <i class="fas fa-list me-2"></i>
                                     <span>All Announcements</span>
@@ -2566,20 +1843,19 @@
                             </li>
                             @endif
 
-                            <!-- Create Announcement -->
-                            <!-- FIXED: Allow all authenticated users to create announcements -->
+                            @if(auth()->user()->hasPermission('create_announcements'))
                             <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('announcements.create') ? 'active' : '' }}"
+                                <a class="nav-link hover-border {{ request()->routeIs('announcements.create') ? 'active' : '' }}"
                                     href="{{ route('announcements.create') }}">
                                     <i class="fas fa-plus-circle me-2"></i>
                                     <span>Create New</span>
                                 </a>
                             </li>
+                            @endif
 
-                            <!-- Announcement Statistics -->
                             @if(auth()->user()->hasPermission('view_announcement_stats'))
                             <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('announcements.statistics') ? 'active' : '' }}"
+                                <a class="nav-link hover-border {{ request()->routeIs('announcements.statistics') ? 'active' : '' }}"
                                     href="{{ route('announcements.statistics') }}">
                                     <i class="fas fa-chart-bar me-2"></i>
                                     <span>Statistics</span>
@@ -2590,23 +1866,24 @@
                     </div>
                 </li>
                 @endif
+                @endif
 
-                <!-- SYSTEM -->
+                <!-- SYSTEM SECTION -->
                 <li class="menu-header">System</li>
                 <li class="menu-item">
-                    <a href="#" class="menu-link">
+                    <a href="#" class="menu-link hover-slide-up">
                         <i class="menu-icon fas fa-cog"></i>
                         <span class="menu-title">System Settings</span>
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a href="#" class="menu-link">
+                    <a href="#" class="menu-link hover-slide-up">
                         <i class="menu-icon fas fa-question-circle"></i>
                         <span class="menu-title">Help Center</span>
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a href="#" class="menu-link">
+                    <a href="#" class="menu-link hover-slide-up">
                         <i class="menu-icon fas fa-book"></i>
                         <span class="menu-title">Documentation</span>
                     </a>
@@ -2615,20 +1892,20 @@
         </nav>
         @endauth
 
-        <!-- Main Content Area -->
-        <main class="ju-main-content" data-aos="fade-up" data-aos-duration="800">
+        <!-- Main Content Area - Light Background -->
+        <main class="ju-main-content">
             <!-- Content Header -->
             <div class="content-header">
-                <div class="page-title-container">
+                <div>
                     <h1 class="page-title">@yield('page-title', 'Jimma University Events')</h1>
-                    <p class="page-subtitle">@yield('page-subtitle', 'Professional Event Management Platform')</p>
+                    <p class="page-subtitle">@yield('page-subtitle', 'We are in the Community!')</p>
                 </div>
 
                 @auth
-                <!-- Premium Breadcrumb -->
+                <!-- Breadcrumb -->
                 <nav class="breadcrumb-nav">
                     <ol class="breadcrumb mb-0">
-                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}"><i class="fas fa-home me-1"></i>Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}" class="hover-underline-center"><i class="fas fa-home me-1"></i>Dashboard</a></li>
                         @yield('breadcrumb-items')
                     </ol>
                 </nav>
@@ -2642,69 +1919,65 @@
         </main>
     </div>
 
-    <!-- Premium Glass Footer -->
-    <footer class="ju-footer" data-aos="fade-up" data-aos-duration="800">
+    <!-- Official Jimma University Footer - BLUE THEME -->
+    <footer class="ju-footer">
         <div class="footer-container">
             <div class="footer-copyright">
-                <i class="fas fa-copyright"></i> {{ date('Y') }} Jimma University. All Rights Reserved.
-                <span class="ms-2">v2.0.0</span>
+                <i class="fas fa-copyright me-1"></i> {{ date('Y') }} Jimma University. All rights reserved.
+                <span class="mx-2 d-none d-sm-inline">|</span>
+                <span class="d-block d-sm-inline mt-2 mt-sm-0 fw-bold">"We are in the Community!"</span>
             </div>
             <div class="footer-links">
-                <a href="#" class="footer-link"><i class="fas fa-info-circle"></i> About</a>
-                <a href="#" class="footer-link"><i class="fas fa-envelope"></i> Contact</a>
-                <a href="#" class="footer-link"><i class="fas fa-shield-alt"></i> Privacy</a>
-                <a href="#" class="footer-link"><i class="fas fa-file-contract"></i> Terms</a>
-                <a href="#" class="footer-link"><i class="fas fa-question-circle"></i> Support</a>
+                <a href="#" class="footer-link hover-underline-center">About</a>
+                <a href="#" class="footer-link hover-underline-center">Contact</a>
+                <a href="#" class="footer-link hover-underline-center">Privacy</a>
+                <a href="#" class="footer-link hover-underline-center">Terms</a>
+                <a href="#" class="footer-link hover-underline-center">Support</a>
             </div>
         </div>
     </footer>
 
-    <!-- Approve/Reject Modal (Added Here) -->
+    <!-- Approve/Reject Modal -->
     <div class="modal fade" id="approveRejectModal" tabindex="-1" aria-labelledby="approveRejectModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content ju-card">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header" style="background: var(--gradient-primary); color: white;">
+                    <h5 class="modal-title" id="approveRejectModalLabel">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <span id="modalActionText">Approve Request</span>
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
                 <form id="approveRejectForm" method="POST">
                     @csrf
                     @method('PUT')
-
-                    <div class="modal-header ju-card-header">
-                        <h5 class="modal-title" id="approveRejectModalLabel">
-                            <i class="fas fa-check-circle me-2"></i>
-                            <span id="modalActionText">Approve Request</span>
-                        </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-
-                    <div class="modal-body ju-card-body">
-                        <div class="mb-3">
-                            <label for="requestTitle" class="form-label fw-bold">Event Request:</label>
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Event Request:</label>
                             <div id="requestTitle" class="p-3 bg-light rounded">
                                 <strong id="modalEventTitle">Loading...</strong>
                             </div>
                         </div>
-
                         <div class="mb-3">
-                            <label for="reviewNotes" class="form-label">
-                                <i class="fas fa-edit me-1"></i>Review Notes (Optional)
+                            <label for="reviewNotes" class="form-label fw-bold">
+                                <i class="fas fa-edit me-1"></i>Review Notes
                             </label>
                             <textarea
-                                class="form-control ju-input"
+                                class="form-control"
                                 id="reviewNotes"
                                 name="review_notes"
                                 rows="4"
                                 placeholder="Add any comments or notes about this decision..."></textarea>
+                            <div class="form-text">These notes will be visible to the requester.</div>
                         </div>
-
-                        <!-- Hidden fields -->
                         <input type="hidden" id="modalRequestId" name="request_id">
                         <input type="hidden" id="modalAction" name="action" value="approve">
                     </div>
-
-                    <div class="modal-footer ju-card-footer">
-                        <button type="button" class="btn btn-ju-outline" data-bs-dismiss="modal">
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
                             <i class="fas fa-times me-1"></i>Cancel
                         </button>
-                        <button type="submit" class="btn btn-ju" id="modalSubmitBtn">
+                        <button type="submit" class="btn btn-success" id="modalSubmitBtn">
                             <i class="fas fa-check me-1"></i>
                             <span id="submitBtnText">Approve Request</span>
                         </button>
@@ -2714,25 +1987,26 @@
         </div>
     </div>
 
-    <!-- JavaScript Libraries -->
-    <!-- jQuery must come first -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- Bootstrap Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- DataTables -->
-    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
-    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
-    <!-- Select2 -->
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <!-- AOS -->
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <!-- FullCalendar -->
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+    <!-- Sidebar Overlay for Mobile -->
+    <div class="ju-sidebar-overlay" onclick="document.querySelector('.ju-sidebar').classList.remove('mobile-open')"></div>
 
-    <!-- Premium Custom Scripts -->
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
     <script>
+        // Initialize AOS (Animate On Scroll)
+        AOS.init({
+            duration: 800,
+            once: true,
+            offset: 100
+        });
+
         // Set CSRF token for AJAX requests
         $.ajaxSetup({
             headers: {
@@ -2741,640 +2015,257 @@
         });
 
         document.addEventListener('DOMContentLoaded', function() {
-
-            setTimeout(function() {
-                const sidebar = document.querySelector('.ju-sidebar');
-                if (sidebar) {
-                    sidebar.style.opacity = '1';
-                    sidebar.style.visibility = 'visible';
-                    sidebar.style.transform = 'translateX(0)';
-
-                    // Remove AOS attributes
-                    sidebar.removeAttribute('data-aos');
-                    sidebar.removeAttribute('data-aos-duration');
-                    sidebar.removeAttribute('data-aos-delay');
-                }
-            }, 100); // 100ms delay
-
-            // Initialize AOS
-            AOS.init({
-                duration: 800,
-                once: true,
-                offset: 100
-            });
-
-            // Initialize Bootstrap components
-            initBootstrapComponents();
-
-            // Auto-dismiss toasts after 5 seconds
-            setTimeout(() => {
-                document.querySelectorAll('.ju-toast').forEach(toast => {
-                    const bsToast = bootstrap.Toast.getOrCreateInstance(toast);
-                    bsToast.hide();
-                });
-            }, 5000);
-
-            // Add active state to current menu item
-            highlightCurrentMenuItem();
-
-            // Fix text visibility on cards
-            fixTextVisibility();
-
-            // Header scroll effect
-            window.addEventListener('scroll', handleHeaderScroll);
-
-            // Global search functionality
-            initGlobalSearch();
-
-            // Initialize tooltips
+            initNotificationSystem();
+            initSidebar();
+            initSearch();
             initTooltips();
-
-            // Initialize DataTables
-            initDataTables();
-
-            // Initialize Select2
             initSelect2();
-
-            // Initialize FullCalendar
-            initFullCalendar();
-
-            // Initialize Approve/Reject Modal
-            initApproveRejectModal();
+            initDataTables();
+            initModals();
+            initMobileSidebar();
         });
 
-        function initBootstrapComponents() {
-            // Initialize tooltips
-            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+        // Notification System
+        function initNotificationSystem() {
+            if (document.querySelector('.notification-bell')) {
+                setTimeout(() => {
+                    if (!document.querySelector('#notificationDropdown').classList.contains('show')) {
+                        checkNewNotifications();
+                    }
+                }, 1000);
+                setInterval(checkNewNotifications, 30000);
+            }
+        }
+
+        function loadNotifications() {
+            const notificationList = document.getElementById('notificationList');
+            if (!notificationList) return;
+
+            notificationList.innerHTML = `
+                <div class="text-center py-5">
+                    <div class="spinner-border text-white" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2 text-white">Loading notifications...</p>
+                </div>
+            `;
+
+            $.ajax({
+                url: '{{ route("notifications.index") }}?ajax=1',
+                method: 'GET',
+                success: function(response) {
+                    notificationList.innerHTML = response;
+                    initNotificationActions();
+                },
+                error: function() {
+                    notificationList.innerHTML = `
+                        <div class="empty-notifications text-center py-5">
+                            <i class="fas fa-exclamation-circle text-white fa-3x mb-3"></i>
+                            <h6 class="fw-bold text-white">Failed to load notifications</h6>
+                            <button class="btn btn-sm btn-outline-light mt-2" onclick="loadNotifications()">
+                                <i class="fas fa-sync-alt me-1"></i> Retry
+                            </button>
+                        </div>
+                    `;
+                }
+            });
+        }
+
+        function checkNewNotifications() {
+            $.ajax({
+                url: '{{ route("notifications.unread-count") }}',
+                method: 'GET',
+                success: function(response) {
+                    const badge = document.querySelector('.notification-badge');
+                    if (response.count > 0) {
+                        if (!badge) {
+                            const bell = document.querySelector('.notification-bell');
+                            if (bell) {
+                                const newBadge = document.createElement('span');
+                                newBadge.className = 'notification-badge';
+                                newBadge.textContent = response.count;
+                                bell.appendChild(newBadge);
+                                bell.classList.add('new');
+                            }
+                        } else {
+                            badge.textContent = response.count;
+                        }
+                    } else {
+                        if (badge) badge.remove();
+                    }
+                }
+            });
+        }
+
+        function markAsRead(notificationId) {
+            $.ajax({
+                url: `{{ url('notifications') }}/${notificationId}/read`,
+                method: 'PATCH',
+                success: function() {
+                    const item = document.querySelector(`.notification-item[data-id="${notificationId}"]`);
+                    if (item) {
+                        item.classList.remove('unread');
+                        item.classList.add('read');
+                    }
+                    checkNewNotifications();
+                }
+            });
+        }
+
+        function markAllAsRead() {
+            $.ajax({
+                url: '{{ route("notifications.mark-all-read") }}',
+                method: 'PATCH',
+                success: function() {
+                    document.querySelectorAll('.notification-item.unread').forEach(item => {
+                        item.classList.remove('unread');
+                        item.classList.add('read');
+                    });
+                    const badge = document.querySelector('.notification-badge');
+                    if (badge) badge.remove();
+                }
+            });
+        }
+
+        function viewNotification(notificationId) {
+            markAsRead(notificationId);
+            window.location.href = `{{ url('notifications') }}/${notificationId}`;
+        }
+
+        function initNotificationActions() {
+            document.querySelectorAll('.notification-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    if (!e.target.closest('.notification-actions') && !e.target.closest('button')) {
+                        const notificationId = this.dataset.id;
+                        markAsRead(notificationId);
+                    }
+                });
+            });
+        }
+
+        // Sidebar
+        function initSidebar() {
+            document.querySelectorAll('.menu-link.active').forEach(link => {
+                const collapse = link.closest('.collapse');
+                if (collapse) {
+                    const parentMenu = document.querySelector(`[href="#${collapse.id}"]`);
+                    if (parentMenu) {
+                        parentMenu.classList.remove('collapsed');
+                        parentMenu.setAttribute('aria-expanded', 'true');
+                        collapse.classList.add('show');
+                    }
+                }
+            });
+        }
+
+        // Mobile Sidebar
+        function initMobileSidebar() {
+            // You can add a hamburger menu button here if needed
+            const sidebar = document.querySelector('.ju-sidebar');
+            if (window.innerWidth <= 992) {
+                sidebar.classList.add('mobile-closed');
+            }
+        }
+
+        // Search
+        function initSearch() {
+            const searchInput = document.getElementById('globalSearch');
+            if (searchInput) {
+                searchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        const query = this.value.trim();
+                        if (query) {
+                            window.location.href = `{{ route('home') }}?search=${encodeURIComponent(query)}`;
+                        }
+                    }
+                });
+            }
+        }
+
+        // Tooltips
+        function initTooltips() {
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function(tooltipTriggerEl) {
                 return new bootstrap.Tooltip(tooltipTriggerEl);
             });
-
-            // Initialize popovers
-            var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
-            var popoverList = popoverTriggerList.map(function(popoverTriggerEl) {
-                return new bootstrap.Popover(popoverTriggerEl);
-            });
-
-            // Initialize collapse components
-            var collapseElementList = [].slice.call(document.querySelectorAll('.collapse'));
-            var collapseList = collapseElementList.map(function(collapseEl) {
-                return new bootstrap.Collapse(collapseEl, {
-                    toggle: false
-                });
-            });
-
-            // Initialize modals that are already in the DOM
-            var modalElements = document.querySelectorAll('.modal');
-            modalElements.forEach(function(modalEl) {
-                // Bootstrap automatically initializes modals when shown
-                console.log('Modal element available:', modalEl.id || 'unnamed');
-            });
-
-            // Initialize toast notifications
-            var toastElList = [].slice.call(document.querySelectorAll('.ju-toast'));
-            var toastList = toastElList.map(function(toastEl) {
-                return new bootstrap.Toast(toastEl, {
-                    autohide: true,
-                    delay: 5000
-                });
-            });
-
-            // Show all toasts
-            toastList.forEach(toast => toast.show());
         }
 
-        // ============================================
-        // APPROVE/REJECT MODAL FUNCTIONALITY - FIXED
-        // ============================================
-
-        let approveRejectModal = null;
-
-        function initApproveRejectModal() {
-            const modalElement = document.getElementById('approveRejectModal');
-            if (modalElement) {
-                approveRejectModal = new bootstrap.Modal(modalElement);
-
-                // Initialize form submission
-                const form = document.getElementById('approveRejectForm');
-                if (form) {
-                    form.addEventListener('submit', handleApproveRejectSubmit);
-                }
-
-                console.log('Approve/Reject modal initialized');
-            }
-        }
-
-        // Function to open modal for approval
-        function openApproveModal(requestId, eventTitle) {
-            document.getElementById('modalActionText').textContent = 'Approve Request';
-            document.getElementById('submitBtnText').textContent = 'Approve Request';
-            document.getElementById('modalAction').value = 'approve';
-            document.getElementById('modalSubmitBtn').className = 'btn btn-ju-success';
-            document.getElementById('modalEventTitle').textContent = eventTitle;
-            document.getElementById('modalRequestId').value = requestId;
-            document.getElementById('reviewNotes').value = '';
-
-            // Set form action
-            const form = document.getElementById('approveRejectForm');
-            form.action = `/event-requests/${requestId}/approve`;
-
-            // Show modal
-            if (approveRejectModal) {
-                approveRejectModal.show();
-            }
-        }
-
-        // Function to open modal for rejection
-        function openRejectModal(requestId, eventTitle) {
-            document.getElementById('modalActionText').textContent = 'Reject Request';
-            document.getElementById('submitBtnText').textContent = 'Reject Request';
-            document.getElementById('modalAction').value = 'reject';
-            document.getElementById('modalSubmitBtn').className = 'btn btn-ju-danger';
-            document.getElementById('modalEventTitle').textContent = eventTitle;
-            document.getElementById('modalRequestId').value = requestId;
-            document.getElementById('reviewNotes').value = '';
-
-            // Set form action
-            const form = document.getElementById('approveRejectForm');
-            form.action = `/event-requests/${requestId}/reject`;
-
-            // Show modal
-            if (approveRejectModal) {
-                approveRejectModal.show();
-            }
-        }
-
-        // Function to open modal for cancellation
-        function openCancelModal(requestId, eventTitle) {
-            document.getElementById('modalActionText').textContent = 'Cancel Request';
-            document.getElementById('submitBtnText').textContent = 'Cancel Request';
-            document.getElementById('modalAction').value = 'cancel';
-            document.getElementById('modalSubmitBtn').className = 'btn btn-ju-warning';
-            document.getElementById('modalEventTitle').textContent = eventTitle;
-            document.getElementById('modalRequestId').value = requestId;
-            document.getElementById('reviewNotes').value = '';
-
-            // Set form action
-            const form = document.getElementById('approveRejectForm');
-            form.action = `/event-requests/${requestId}/cancel`;
-
-            // Show modal
-            if (approveRejectModal) {
-                approveRejectModal.show();
-            }
-        }
-
-        // Handle form submission with AJAX
-        async function handleApproveRejectSubmit(event) {
-            event.preventDefault();
-
-            const form = event.target;
-            const formData = new FormData(form);
-            const submitBtn = document.getElementById('modalSubmitBtn');
-            const originalBtnText = submitBtn.innerHTML;
-
-            // Show loading state
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Processing...';
-
-            try {
-                const response = await fetch(form.action, {
-                    method: 'PUT',
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    },
-                    body: formData
-                });
-
-                const result = await response.json();
-
-                if (response.ok) {
-                    // Show success message
-                    showToast(result.message || 'Request processed successfully!', 'success');
-
-                    // Close modal
-                    if (approveRejectModal) {
-                        approveRejectModal.hide();
-                    }
-
-                    // Reload page after a short delay
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 1500);
-
-                } else {
-                    throw new Error(result.message || 'An error occurred');
-                }
-
-            } catch (error) {
-                // Show error message
-                showToast(error.message || 'Failed to process request. Please try again.', 'error');
-
-                // Restore button
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalBtnText;
-            }
-        }
-
-        // Function to approve/reject request directly (without modal)
-        function quickAction(requestId, action) {
-            showConfirm(
-                `Are you sure you want to ${action} this request?`,
-                async function() {
-                    try {
-                        const response = await fetch(`/event-requests/${requestId}/${action}`, {
-                            method: 'PUT',
-                            headers: {
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                                'Accept': 'application/json'
-                            }
-                        });
-
-                        const result = await response.json();
-
-                        if (response.ok) {
-                            showToast(result.message || `Request ${action}d successfully!`, 'success');
-                            setTimeout(() => window.location.reload(), 1000);
-                        } else {
-                            throw new Error(result.message || `Failed to ${action} request`);
-                        }
-                    } catch (error) {
-                        showToast(error.message, 'error');
-                    }
-                }
-            );
-        }
-
-        // Add click handlers for approve/reject buttons
-        document.addEventListener('click', function(e) {
-            // Check if it's an approve button
-            if (e.target.closest('[data-action="approve"]')) {
-                const btn = e.target.closest('[data-action="approve"]');
-                const requestId = btn.dataset.requestId;
-                const eventTitle = btn.dataset.eventTitle;
-                openApproveModal(requestId, eventTitle);
-                e.preventDefault();
-            }
-
-            // Check if it's a reject button
-            if (e.target.closest('[data-action="reject"]')) {
-                const btn = e.target.closest('[data-action="reject"]');
-                const requestId = btn.dataset.requestId;
-                const eventTitle = btn.dataset.eventTitle;
-                openRejectModal(requestId, eventTitle);
-                e.preventDefault();
-            }
-
-            // Check if it's a cancel button
-            if (e.target.closest('[data-action="cancel"]')) {
-                const btn = e.target.closest('[data-action="cancel"]');
-                const requestId = btn.dataset.requestId;
-                const eventTitle = btn.dataset.eventTitle;
-                openCancelModal(requestId, eventTitle);
-                e.preventDefault();
-            }
-        });
-
-        // ============================================
-        // END OF APPROVE/REJECT MODAL FUNCTIONALITY
-        // ============================================
-
-        function initDataTables() {
-            if ($.fn.DataTable) {
-                $('.data-table').DataTable({
-                    "pageLength": 25,
-                    "responsive": true,
-                    "language": {
-                        "search": "<i class='fas fa-search me-2'></i>Search:",
-                        "lengthMenu": "<i class='fas fa-list me-2'></i>Show _MENU_ entries",
-                        "info": "Showing _START_ to _END_ of _TOTAL_ entries",
-                        "infoEmpty": "No entries available",
-                        "infoFiltered": "(filtered from _MAX_ total entries)",
-                        "zeroRecords": "No matching records found",
-                        "paginate": {
-                            "first": "<i class='fas fa-angle-double-left'></i>",
-                            "last": "<i class='fas fa-angle-double-right'></i>",
-                            "next": "<i class='fas fa-angle-right'></i>",
-                            "previous": "<i class='fas fa-angle-left'></i>"
-                        },
-                        "loadingRecords": "<div class='ju-spinner mx-auto'></div>",
-                        "processing": "<div class='ju-spinner'></div> Processing..."
-                    },
-                    "dom": '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6 d-flex justify-content-end"f>>' +
-                        '<"row"<"col-sm-12"tr>>' +
-                        '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>'
-                });
-            }
-        }
-
+        // Select2
         function initSelect2() {
             if ($.fn.select2) {
                 $('.select2').select2({
                     theme: 'bootstrap-5',
                     width: '100%',
                     placeholder: 'Select an option',
-                    allowClear: true,
-                    dropdownParent: $('body')
+                    allowClear: true
                 });
             }
         }
 
-        function initFullCalendar() {
-            if (typeof FullCalendar !== 'undefined') {
-                const calendarEl = document.getElementById('calendar');
-                if (calendarEl) {
-                    const calendar = new FullCalendar.Calendar(calendarEl, {
-                        initialView: 'dayGridMonth',
-                        headerToolbar: {
-                            left: 'prev,next today',
-                            center: 'title',
-                            right: 'dayGridMonth,timeGridWeek,timeGridDay'
-                        },
-                        events: '/api/events',
-                        eventClick: function(info) {
-                            window.location.href = '/events/' + info.event.id;
+        // DataTables
+        function initDataTables() {
+            if ($.fn.DataTable) {
+                $('.data-table').DataTable({
+                    responsive: true,
+                    language: {
+                        search: "_INPUT_",
+                        searchPlaceholder: "Search...",
+                        lengthMenu: "Show _MENU_ entries",
+                        info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                        paginate: {
+                            first: '<i class="fas fa-angle-double-left"></i>',
+                            last: '<i class="fas fa-angle-double-right"></i>',
+                            next: '<i class="fas fa-chevron-right"></i>',
+                            previous: '<i class="fas fa-chevron-left"></i>'
                         }
-                    });
-                    calendar.render();
-                }
+                    }
+                });
             }
         }
 
-        function createRippleEffect(element, event) {
-            const rect = element.getBoundingClientRect();
-            const x = event.clientX - rect.left;
-            const y = event.clientY - rect.top;
-
-            const ripple = document.createElement('span');
-            ripple.style.position = 'absolute';
-            ripple.style.borderRadius = '50%';
-            ripple.style.background = 'rgba(255, 255, 255, 0.6)';
-            ripple.style.transform = 'scale(0)';
-            ripple.style.animation = 'ripple 0.6s linear';
-            ripple.style.left = x + 'px';
-            ripple.style.top = y + 'px';
-
-            element.appendChild(ripple);
-
-            setTimeout(() => ripple.remove(), 600);
+        // Modals
+        function initModals() {
+            window.openApproveModal = function(requestId, title) {
+                document.getElementById('modalRequestId').value = requestId;
+                document.getElementById('modalEventTitle').textContent = title;
+                document.getElementById('modalActionText').textContent = 'Approve Request';
+                document.getElementById('submitBtnText').textContent = 'Approve Request';
+                document.getElementById('modalSubmitBtn').className = 'btn btn-success';
+                document.getElementById('modalAction').value = 'approve';
+                const modal = new bootstrap.Modal(document.getElementById('approveRejectModal'));
+                modal.show();
+            };
+            
+            window.openRejectModal = function(requestId, title) {
+                document.getElementById('modalRequestId').value = requestId;
+                document.getElementById('modalEventTitle').textContent = title;
+                document.getElementById('modalActionText').textContent = 'Reject Request';
+                document.getElementById('submitBtnText').textContent = 'Reject Request';
+                document.getElementById('modalSubmitBtn').className = 'btn btn-danger';
+                document.getElementById('modalAction').value = 'reject';
+                const modal = new bootstrap.Modal(document.getElementById('approveRejectModal'));
+                modal.show();
+            };
         }
 
-        function highlightCurrentMenuItem() {
-            const currentPath = window.location.pathname;
-            let activeFound = false;
-
-            document.querySelectorAll('.menu-link').forEach(link => {
-                if (link.href) {
-                    const linkPath = new URL(link.href).pathname;
-                    const isActive = currentPath === linkPath ||
-                        (currentPath.startsWith(linkPath) && linkPath !== '/');
-
-                    if (isActive) {
-                        link.classList.add('active');
-                        activeFound = true;
-
-                        // Expand parent collapse if in sub-menu
-                        const collapse = link.closest('.collapse');
-                        if (collapse) {
-                            const collapseBtn = document.querySelector('[href="#' + collapse.id + '"]');
-                            if (collapseBtn) {
-                                const bsCollapse = bootstrap.Collapse.getOrCreateInstance(collapse);
-                                bsCollapse.show();
-                            }
-                        }
-                    } else {
-                        link.classList.remove('active');
-                    }
-                }
+        // Auto-hide toasts
+        setTimeout(function() {
+            document.querySelectorAll('.ju-toast').forEach(toast => {
+                toast.style.transition = 'opacity 0.5s ease';
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 500);
             });
+        }, 5000);
 
-            // If no active found, check for dashboard
-            if (!activeFound && currentPath === '/dashboard') {
-                // Check if route exists before using it
-                const dashboardLink = document.querySelector('a[href*="dashboard"]');
-                if (dashboardLink) {
-                    dashboardLink.classList.add('active');
-                }
+        // Window resize handler
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 992) {
+                const sidebar = document.querySelector('.ju-sidebar');
+                if (sidebar) sidebar.classList.remove('mobile-closed');
             }
-
-            function fixTextVisibility() {
-                // Ensure all text elements are visible
-                document.querySelectorAll('.ju-card, .menu-link, .nav-link, .page-title, .page-subtitle, .ju-card-title, .ju-card-body p, .breadcrumb-item').forEach(el => {
-                    el.style.overflow = 'visible';
-                    el.style.textOverflow = 'clip';
-                    el.style.whiteSpace = 'normal';
-                });
-            }
-
-            function handleHeaderScroll() {
-                const header = document.getElementById('mainHeader');
-                if (window.scrollY > 50) {
-                    header.classList.add('scrolled');
-                } else {
-                    header.classList.remove('scrolled');
-                }
-            }
-
-            function initGlobalSearch() {
-                const searchInput = document.getElementById('globalSearch');
-                if (searchInput) {
-                    searchInput.addEventListener('keypress', function(e) {
-                        if (e.key === 'Enter') {
-                            const query = this.value.trim();
-                            if (query) {
-                                // Implement global search functionality
-                                window.location.href = '/search?q=' + encodeURIComponent(query);
-                            }
-                        }
-                    });
-                }
-            }
-
-            function initTooltips() {
-                // Already initialized in initBootstrapComponents
-            }
-
-            function toggleUserMenu() {
-                // Implement user dropdown menu
-                console.log('User menu clicked');
-            }
-
-            // Utility functions for modals
-            window.showModal = function(modalId) {
-                const modalElement = document.getElementById(modalId);
-                if (modalElement) {
-                    const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
-                    modal.show();
-                }
-            };
-
-            window.hideModal = function(modalId) {
-                const modalElement = document.getElementById(modalId);
-                if (modalElement) {
-                    const modal = bootstrap.Modal.getInstance(modalElement);
-                    if (modal) {
-                        modal.hide();
-                    }
-                }
-            };
-
-            window.showToast = function(message, type = 'success') {
-                const toastContainer = document.querySelector('.toast-container');
-                const toast = document.createElement('div');
-                toast.className = `ju-toast ju-toast-${type} animate__animated animate__fadeInRight`;
-                toast.setAttribute('role', 'alert');
-
-                const icon = type === 'success' ? 'fa-check-circle' :
-                    type === 'error' ? 'fa-exclamation-circle' :
-                    type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle';
-
-                toast.innerHTML = `
-                <div class="d-flex align-items-center">
-                    <div class="flex-shrink-0">
-                        <i class="fas ${icon} fa-2x"></i>
-                    </div>
-                    <div class="flex-grow-1 ms-3">
-                        <div class="fw-bold mb-1">${type.charAt(0).toUpperCase() + type.slice(1)}!</div>
-                        <div class="toast-message">${message}</div>
-                    </div>
-                    <button type="button" class="btn-close btn-close-white" onclick="this.closest('.ju-toast').remove()"></button>
-                </div>
-            `;
-
-                toastContainer.appendChild(toast);
-
-                // Initialize and show the toast
-                const bsToast = new bootstrap.Toast(toast, {
-                    autohide: true,
-                    delay: 5000
-                });
-                bsToast.show();
-
-                // Auto remove after 5 seconds
-                setTimeout(() => {
-                    if (toast.parentNode) {
-                        toast.remove();
-                    }
-                }, 5000);
-            };
-
-            window.showConfirm = function(message, callback) {
-                const modalId = 'confirmModal' + Date.now();
-                const modal = document.createElement('div');
-                modal.className = 'modal fade';
-                modal.id = modalId;
-                modal.innerHTML = `
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content ju-card">
-                        <div class="modal-header ju-card-header">
-                            <h5 class="modal-title">Confirmation</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                        </div>
-                        <div class="modal-body ju-card-body">
-                            <p>${message}</p>
-                        </div>
-                        <div class="modal-footer ju-card-footer">
-                            <button type="button" class="btn btn-ju-outline" data-bs-dismiss="modal">Cancel</button>
-                            <button type="button" class="btn btn-ju" id="confirmBtn">Confirm</button>
-                        </div>
-                    </div>
-                </div>
-            `;
-
-                document.body.appendChild(modal);
-                const modalInstance = new bootstrap.Modal(modal);
-                modalInstance.show();
-
-                document.getElementById('confirmBtn').onclick = function() {
-                    callback();
-                    modalInstance.hide();
-                };
-
-                modal.addEventListener('hidden.bs.modal', function() {
-                    modal.remove();
-                });
-            };
-
-            // Add ripple effect to buttons on click
-            document.addEventListener('click', function(e) {
-                if (e.target.classList.contains('btn-ju') || e.target.classList.contains('btn-ju-outline')) {
-                    createRippleEffect(e.target, e);
-                }
-            });
-
-            // Add CSS for ripple effect
-            const style = document.createElement('style');
-            style.textContent = `
-            @keyframes ripple {
-                to {
-                    transform: scale(4);
-                    opacity: 0;
-                }
-            }
-            
-            /* Ensure text stays visible on hover */
-            .ju-card:hover .ju-card-body * {
-                color: inherit !important;
-                opacity: 1 !important;
-            }
-            
-            /* Floating animation for elements with class float-animation */
-            .float-animation {
-                animation: float 3s ease-in-out infinite;
-            }
-            
-            @keyframes float {
-                0%, 100% { transform: translateY(0); }
-                50% { transform: translateY(-10px); }
-            }
-            
-            /* Pulse animation for notifications */
-            .pulse-animation {
-                animation: pulse 2s infinite;
-            }
-            
-            @keyframes pulse {
-                0%, 100% { 
-                    transform: scale(1); 
-                    box-shadow: var(--ju-shadow-sm);
-                }
-                50% { 
-                    transform: scale(1.05); 
-                    box-shadow: 0 0 20px currentColor;
-                }
-            }
-            
-            /* Shine effect for buttons and cards */
-            .shine-effect:hover::before {
-                left: 100%;
-                transition: left 0.5s;
-            }
-            
-            /* 3D card hover effect */
-            .card-hover-3d {
-                transition: transform 0.3s ease, box-shadow 0.3s ease;
-            }
-            
-            .card-hover-3d:hover {
-                transform: perspective(1000px) rotateX(5deg) rotateY(5deg) scale(1.02);
-                box-shadow: var(--ju-shadow-2xl);
-            }
-            
-            /* Fix modal backdrop */
-            .modal-backdrop.show {
-                opacity: 0.5;
-            }
-            
-            /* Fix for form buttons */
-            form .btn {
-                cursor: pointer;
-            }
-        `;
-            document.head.appendChild(style);
+        });
     </script>
 
     @stack('scripts')
 </body>
-
 </html>

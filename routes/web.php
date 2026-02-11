@@ -18,44 +18,30 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\FeedbackController;
 
-
-// Debug: List all announcement-related routes
-Route::get('/debug-routes', function() {
-    $routes = collect(\Illuminate\Support\Facades\Route::getRoutes()->getRoutes())
-        ->filter(function($route) {
-            return str_contains($route->uri, 'announcement');
-        })
-        ->map(function($route) {
-            return [
-                'uri' => $route->uri,
-                'name' => $route->getName(),
-                'action' => $route->getActionName(),
-                'methods' => $route->methods()
-            ];
-        });
-    
-    return response()->json($routes);
-});
-
-// Test if controller works
-Route::get('/test-controller', [App\Http\Controllers\AnnouncementController::class, 'index']);
-
-// Add this at the top of your web.php
-Route::get('/test-announcement', function() {
-    return 'Test route works!';
-});
-
 // =============== PUBLIC ROUTES ===============
 // Homepage - Guest Event Dashboard (NO login required)
-Route::get('/', [GuestEventController::class, 'dashboard'])->name('home');
 
 // Guest Event Routes (Public - No authentication required)
 Route::prefix('events')->name('events.guest.')->group(function () {
     Route::get('/', [GuestEventController::class, 'dashboard'])->name('dashboard');
-    Route::get('/{event}', [GuestEventController::class, 'show'])->name('show');
-    Route::get('/{event}/share', [GuestEventController::class, 'share'])->name('share');
-    Route::get('/{event}/export-ics', [GuestEventController::class, 'exportICS'])->name('export-ics');
+    Route::get('/browse', [GuestEventController::class, 'browse'])->name('browse');
+    Route::get('/{slug}', [GuestEventController::class, 'show'])->name('show');
+    Route::get('/{slug}/share', [GuestEventController::class, 'share'])->name('share');
+    Route::get('/{slug}/export/ics', [GuestEventController::class, 'exportIcs'])->name('export-ics');
 });
+
+// Update the homepage route
+Route::get('/', [GuestEventController::class, 'dashboard'])->name('home');
+
+// Dashboard route - admin only
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->name('dashboard')
+    ->middleware(['auth', 'can:view_dashboard']);
+
+// Dashboard stats API - admin only
+Route::get('/dashboard/stats', [DashboardController::class, 'getDashboardStats'])
+    ->name('dashboard.stats')
+    ->middleware(['auth', 'can:view_dashboard']);
 
 // Authentication Routes (separate pages)
 Route::middleware('guest')->group(function () {
@@ -115,6 +101,11 @@ Route::middleware('auth')->group(function () {
         ->name('speakers.toggle-featured');
 
     // =============== EVENT REQUEST MANAGEMENT ===============
+    // My Event Requests - USER'S OWN REQUESTS (ADD THIS ROUTE FIRST)
+    Route::get('/my-event-requests', [EventRequestController::class, 'myRequests'])
+        ->name('event-requests.my-requests');
+    
+    // Resource route for event requests
     Route::resource('event-requests', EventRequestController::class);
 
     // Regular form submission routes (POST)
@@ -156,122 +147,93 @@ Route::middleware('auth')->group(function () {
         ->name('registrations.check-in');
     Route::post('/registrations/{registration}/update-status', [EventRegistrationController::class, 'updateStatus'])
         ->name('registrations.update-status');
-});
 
-// =============== NOTIFICATION ROUTES ===============
-Route::prefix('notifications')->name('notifications.')->middleware(['auth'])->group(function () {
-    // All authenticated users can view their own notifications
-    Route::get('/', [NotificationController::class, 'index'])->name('index');
-    Route::patch('/{id}/read', [NotificationController::class, 'markAsRead'])->name('mark-as-read');
-    Route::patch('/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('mark-all-read');
-    
-    // Admin notification management
-    Route::get('/sent', [NotificationController::class, 'sent'])->name('sent');
-    Route::get('/send-custom', [NotificationController::class, 'sendCustom'])->name('send-custom');
-    Route::post('/send-custom', [NotificationController::class, 'sendCustomStore'])->name('send-custom.store');
-    Route::get('/statistics', [NotificationController::class, 'statistics'])->name('statistics');
-    Route::delete('/{id}', [NotificationController::class, 'destroy'])->name('destroy');
+    // =============== NOTIFICATION ROUTES ===============
+    Route::prefix('notifications')->name('notifications.')->middleware(['auth'])->group(function () {
+        Route::get('/', [NotificationController::class, 'index'])->name('index');
+        Route::get('/recent', [NotificationController::class, 'recent'])->name('recent');
+        Route::get('/unread-count', [NotificationController::class, 'getUnreadCount'])->name('unread-count');
+        Route::patch('/{id}/read', [NotificationController::class, 'markAsRead'])->name('mark-as-read');
+        Route::patch('/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('mark-all-read');
+        Route::patch('/{id}/dismiss', [NotificationController::class, 'dismiss'])->name('dismiss');
+        Route::delete('/clear-all', [NotificationController::class, 'clearAll'])->name('clear-all');
+        Route::get('/sent', [NotificationController::class, 'sent'])->name('sent');
+        Route::get('/send-custom', [NotificationController::class, 'sendCustom'])->name('send-custom');
+        Route::post('/send-custom', [NotificationController::class, 'sendCustomStore'])->name('send-custom.store');
+        Route::get('/statistics', [NotificationController::class, 'statistics'])->name('statistics');
+        Route::delete('/{id}', [NotificationController::class, 'destroy'])->name('destroy');
+    });
 });
-
 
 // =============== ANNOUNCEMENT ROUTES ===============
-// IMPORTANT: Specific routes MUST come before parameterized routes
-
 // 1. Index (list all) - PUBLIC
-Route::get('/announcements', [App\Http\Controllers\AnnouncementController::class, 'index'])->name('announcements.index');
-
-// 2. Create form - PROTECTED (specific route comes before {id})
-Route::get('/announcements/create', [App\Http\Controllers\AnnouncementController::class, 'create'])
+Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
+// 2. Create form - PROTECTED
+Route::get('/announcements/create', [AnnouncementController::class, 'create'])
     ->name('announcements.create')
     ->middleware('auth');
-
-// 3. Statistics - PROTECTED (specific route comes before {id})
-Route::get('/announcements/statistics', [App\Http\Controllers\AnnouncementController::class, 'statistics'])
+// 3. Statistics - PROTECTED
+Route::get('/announcements/statistics', [AnnouncementController::class, 'statistics'])
     ->name('announcements.statistics')
     ->middleware('auth');
-
 // 4. Store new announcement - PROTECTED
-Route::post('/announcements', [App\Http\Controllers\AnnouncementController::class, 'store'])
+Route::post('/announcements', [AnnouncementController::class, 'store'])
     ->name('announcements.store')
     ->middleware('auth');
-
-// 5. Show single announcement - PUBLIC (parameterized - comes after specifics)
-Route::get('/announcements/{id}', [App\Http\Controllers\AnnouncementController::class, 'show'])
+// 5. Show single announcement - PUBLIC
+Route::get('/announcements/{id}', [AnnouncementController::class, 'show'])
     ->name('announcements.show');
-
 // 6. Edit form - PROTECTED
-Route::get('/announcements/{id}/edit', [App\Http\Controllers\AnnouncementController::class, 'edit'])
+Route::get('/announcements/{id}/edit', [AnnouncementController::class, 'edit'])
     ->name('announcements.edit')
     ->middleware('auth');
-
 // 7. Update announcement - PROTECTED
-Route::put('/announcements/{id}', [App\Http\Controllers\AnnouncementController::class, 'update'])
+Route::put('/announcements/{id}', [AnnouncementController::class, 'update'])
     ->name('announcements.update')
     ->middleware('auth');
-
 // 8. Delete announcement - PROTECTED
-Route::delete('/announcements/{id}', [App\Http\Controllers\AnnouncementController::class, 'destroy'])
+Route::delete('/announcements/{id}', [AnnouncementController::class, 'destroy'])
     ->name('announcements.destroy')
     ->middleware('auth');
-
 // 9. Toggle publish - PROTECTED
-Route::post('/announcements/{id}/toggle-publish', [App\Http\Controllers\AnnouncementController::class, 'togglePublish'])
+Route::post('/announcements/{id}/toggle-publish', [AnnouncementController::class, 'togglePublish'])
     ->name('announcements.toggle-publish')
     ->middleware('auth');
+// 10. Send notification for existing announcement - PROTECTED
+Route::post('/announcements/{id}/send-notification', [AnnouncementController::class, 'sendNotification'])
+    ->name('announcements.send-notification')
+    ->middleware('auth');
+
 // =============== FEEDBACK ROUTES ===============
 Route::prefix('feedback')->name('feedback.')->group(function () {
-    // =============== PUBLIC FEEDBACK ROUTES (No auth required) ===============
-    // Submit Feedback
+    // =============== PUBLIC FEEDBACK ROUTES ===============
     Route::get('/create', [FeedbackController::class, 'create'])->name('create');
     Route::post('/', [FeedbackController::class, 'store'])->name('store');
-
-    // Thank You Page
     Route::get('/thankyou', [FeedbackController::class, 'thankyou'])->name('thankyou');
-
-    // Public Testimonials
     Route::get('/testimonials', [FeedbackController::class, 'testimonials'])->name('testimonials');
 
-    // =============== ADMIN FEEDBACK ROUTES (Auth required) ===============
+    // =============== ADMIN FEEDBACK ROUTES ===============
     Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
-        // Feedback List (Admin)
         Route::get('/', [FeedbackController::class, 'index'])->name('index');
-
-        // View Feedback Details
         Route::get('/{feedback}', [FeedbackController::class, 'show'])->name('show');
-
-        // Update Feedback Status
         Route::post('/{feedback}/update-status', [FeedbackController::class, 'updateStatus'])
             ->name('update-status');
-
-        // Add Response to Feedback
         Route::post('/{feedback}/add-response', [FeedbackController::class, 'addResponse'])
             ->name('add-response');
-
-        // Toggle Feedback Visibility
         Route::post('/{feedback}/toggle-public', [FeedbackController::class, 'togglePublic'])
             ->name('toggle-public');
-
-        // Toggle Featured Status
         Route::post('/{feedback}/toggle-featured', [FeedbackController::class, 'toggleFeatured'])
             ->name('toggle-featured');
-
-        // Export Feedback
         Route::get('/export/feedback', [FeedbackController::class, 'export'])->name('export');
-
-        // Feedback Analytics
         Route::get('/analytics', [FeedbackController::class, 'analytics'])->name('analytics');
     });
 });
 
 // =============== BACKWARD COMPATIBILITY ROUTES ===============
-// These maintain the old route names for your layout and views
 Route::middleware(['auth'])->group(function () {
-    // Old feedback routes for backward compatibility
     Route::get('/feedback/index', [FeedbackController::class, 'index'])->name('feedback.index');
     Route::get('/feedback/analytics', [FeedbackController::class, 'analytics'])->name('feedback.analytics');
     Route::get('/feedback/export', [FeedbackController::class, 'export'])->name('feedback.export');
-
-    // Old individual feedback routes
     Route::get('/feedback/{feedback}', [FeedbackController::class, 'show'])->name('feedback.show');
     Route::post('/feedback/{feedback}/update-status', [FeedbackController::class, 'updateStatus'])
         ->name('feedback.update-status');
@@ -286,17 +248,12 @@ Route::middleware(['auth'])->group(function () {
 // =============== PUBLIC API ROUTES ===============
 Route::get('/admin/buildings/by-campus/{campusId}', [BuildingController::class, 'getBuildingsByCampus'])
     ->name('admin.buildings.by-campus');
-
 Route::get('/admin/events/get-venues/{buildingId}', [EventController::class, 'getVenues'])
     ->name('events.get-venues');
-
-// Dynamic dropdown routes for events
 Route::get('/admin/events/get-buildings/{campusId}', [EventController::class, 'getBuildings'])
     ->name('events.get-buildings');
-
 Route::get('/admin/events/get-venue-details/{venueId}', [EventController::class, 'getVenueDetails'])
     ->name('events.get-venue-details');
-
 Route::get('/admin/buildings/get-by-campus/{campusId}', [BuildingController::class, 'getBuildingsByCampus'])
     ->name('buildings.get-by-campus');
 

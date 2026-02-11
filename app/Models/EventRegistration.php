@@ -1,4 +1,5 @@
 <?php
+// app/Models/EventRegistration.php - COMPLETE FIXED VERSION
 
 namespace App\Models;
 
@@ -9,10 +10,19 @@ use Illuminate\Support\Str;
 class EventRegistration extends Model
 {
     protected $fillable = [
-        'event_id', 'user_id', 'registration_number', 'status',
-        'guest_count', 'additional_info', 'registration_date',
-        'confirmed_at', 'cancelled_at', 'cancellation_reason',
-        'attended', 'check_in_time', 'notes'
+        'event_id', 
+        'user_id', 
+        'registration_number', 
+        'status',
+        'guest_count', 
+        'additional_info', 
+        'registration_date',
+        'confirmed_at', 
+        'cancelled_at', 
+        'cancellation_reason',
+        'attended', 
+        'check_in_time', 
+        'notes'
     ];
 
     protected $casts = [
@@ -105,27 +115,29 @@ class EventRegistration extends Model
 
     public function getStatusBadgeAttribute()
     {
-        return '<span class="badge badge-' . $this->status_color . '">' . ucfirst($this->status) . '</span>';
+        return '<span class="badge bg-' . $this->status_color . '">' . ucfirst($this->status) . '</span>';
     }
 
-    // Generate registration number
+    /**
+     * Generate a unique registration number.
+     */
+    protected static function generateRegistrationNumber()
+    {
+        return 'REG-' . date('Ymd') . '-' . strtoupper(Str::random(8));
+    }
+
+    // Boot method
     protected static function boot()
     {
         parent::boot();
 
         static::creating(function ($registration) {
             if (!$registration->registration_number) {
-                $registration->registration_number = 'REG-' . date('Ymd') . '-' . strtoupper(Str::random(8));
+                $registration->registration_number = self::generateRegistrationNumber();
             }
             
-            // Set registration date if not set
             if (!$registration->registration_date) {
                 $registration->registration_date = now();
-            }
-            
-            // Set joined_at for waitlists if applicable
-            if (!$registration->joined_at && method_exists($registration, 'waitlist')) {
-                $registration->joined_at = now();
             }
         });
     }

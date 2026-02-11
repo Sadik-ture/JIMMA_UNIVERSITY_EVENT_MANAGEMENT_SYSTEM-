@@ -1,5 +1,5 @@
 <?php
-
+// app/Http/Controllers/EventController.php - UPDATED VERSION
 namespace App\Http\Controllers;
 
 use App\Models\Event;
@@ -34,21 +34,6 @@ class EventController extends Controller
             $query->where('campus_id', $request->campus_id);
         }
         
-        // Filter by building
-        if ($request->filled('building_id')) {
-            $query->where('building_id', $request->building_id);
-        }
-        
-        // Filter by venue
-        if ($request->filled('venue_id')) {
-            $query->where('venue_id', $request->venue_id);
-        }
-        
-        // Filter by featured
-        if ($request->filled('featured') && $request->featured == '1') {
-            $query->featured();
-        }
-        
         // Filter by status
         if ($request->filled('status')) {
             if ($request->status == 'upcoming') {
@@ -60,13 +45,9 @@ class EventController extends Controller
             }
         }
         
-        // Filter by visibility
-        if ($request->filled('visibility')) {
-            if ($request->visibility == 'public') {
-                $query->where('is_public', true);
-            } elseif ($request->visibility == 'private') {
-                $query->where('is_public', false);
-            }
+        // Filter by featured
+        if ($request->filled('featured') && $request->featured == '1') {
+            $query->featured();
         }
         
         // Default: show upcoming and ongoing events
@@ -173,12 +154,6 @@ class EventController extends Controller
             $validated['tags'] = array_slice($tags, 0, 10);
         }
 
-        // Handle image upload
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('events', 'public');
-            $validated['image'] = $imagePath;
-        }
-
         // Get names for string fields if IDs are provided
         if ($request->filled('campus_id') && empty($validated['campus'])) {
             $campus = Campus::find($request->campus_id);
@@ -195,8 +170,15 @@ class EventController extends Controller
             $validated['venue'] = $venue ? $venue->name : null;
         }
 
-        // Create event
+        // Create event first
         $event = Event::create($validated);
+
+        // Handle image upload after event is created
+        if ($request->hasFile('image')) {
+            $event->uploadImage($request->file('image'));
+            $path = $request->file('image')->store('events', 'public');
+    $validated['image'] = $path;
+        }
 
         return redirect()->route('admin.events.show', $event)
             ->with('success', 'Event created successfully!');
@@ -262,6 +244,7 @@ class EventController extends Controller
             'tags' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
             'additional_venue_info' => 'nullable|array',
+            'remove_image' => 'nullable|boolean',
         ]);
 
         // Update slug if title changed
@@ -283,14 +266,16 @@ class EventController extends Controller
             $validated['tags'] = null;
         }
 
-        // Handle image upload
+        // Handle image removal
+        if ($request->has('remove_image') && $request->remove_image) {
+            $event->deleteImage();
+            $validated['image'] = null;
+        }
+
+        // Handle new image upload
         if ($request->hasFile('image')) {
-            // Delete old image if exists
-            if ($event->image) {
-                Storage::disk('public')->delete($event->image);
-            }
-            $imagePath = $request->file('image')->store('events', 'public');
-            $validated['image'] = $imagePath;
+            $event->uploadImage($request->file('image'));
+            unset($validated['image']); // Remove from validation as it's already handled
         }
 
         // Get names for string fields if IDs are provided
@@ -321,9 +306,7 @@ class EventController extends Controller
     public function destroy(Event $event)
     {
         // Delete image if exists
-        if ($event->image) {
-            Storage::disk('public')->delete($event->image);
-        }
+        $event->deleteImage();
         
         $event->delete();
 
@@ -392,7 +375,8 @@ class EventController extends Controller
             'name' => $venue->name,
             'type' => $venue->type,
             'capacity' => $venue->capacity,
-            'description' => $venue->description
+            'description' => $venue->description,
+            'amenities' => $venue->amenities ?? []
         ]);
     }
 
@@ -406,8 +390,10 @@ class EventController extends Controller
         $newEvent->slug = Str::slug($newEvent->title);
         $newEvent->is_featured = false;
         $newEvent->registered_attendees = 0;
-        $newEvent->created_at = now();
-        $newEvent->updated_at = now();
+        
+        // Don't copy the image
+        $newEvent->image = null;
+        
         $newEvent->save();
 
         return redirect()->route('admin.events.edit', $newEvent)
