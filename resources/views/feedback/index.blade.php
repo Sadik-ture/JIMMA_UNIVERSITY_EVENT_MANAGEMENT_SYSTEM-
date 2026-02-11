@@ -3,711 +3,1063 @@
 
 @section('title', 'Feedback Management | Jimma University')
 @section('page-title', 'Feedback Management')
+@section('page-subtitle', 'Monitor and manage all user feedback and testimonials')
+
+@section('breadcrumb-items')
+<li class="breadcrumb-item active" aria-current="page">Feedback Management</li>
+@endsection
 
 @section('content')
 <style>
-    /* Enhanced Color Scheme - Jimma University Colors */
+    /* ============================================
+       JIMMA UNIVERSITY OFFICIAL BLUE SCHEME
+       Matching the main layout exactly
+    ============================================ */
     :root {
-        --ju-primary: #006747; /* Jimma University Green */
-        --ju-secondary: #FFC72C; /* Jimma University Gold */
-        --ju-accent: #00573D;
-        --ju-light: #E8F4EA;
-        --ju-dark: #003D28;
+        --ju-blue: #0a2c6e;
+        --ju-blue-dark: #06204d;
+        --ju-blue-light: #1e3a8a;
+        --ju-blue-soft: #e6edf7;
+        --ju-gold: #c4a747;
+        --ju-gold-light: #e5d6a6;
+        --ju-gold-dark: #b8960f;
+        --ju-white: #ffffff;
+        --ju-offwhite: #f9f9f9;
+        --ju-gray: #f0f0f0;
+        --ju-gray-dark: #333333;
+        
+        --gradient-primary: linear-gradient(145deg, #0a2c6e 0%, #06204d 100%);
+        --gradient-gold: linear-gradient(145deg, #c4a747 0%, #b8960f 100%);
+        --shadow-sm: 0 4px 6px rgba(10,44,110,0.04);
+        --shadow: 0 6px 12px rgba(10,44,110,0.06);
+        --shadow-md: 0 8px 24px rgba(10,44,110,0.08);
+        --shadow-lg: 0 16px 32px rgba(10,44,110,0.1);
+        --shadow-xl: 0 24px 48px rgba(10,44,110,0.12);
     }
-    
-    /* Modern Card Design */
-    .stat-card {
-        border-radius: 12px;
-        border: none;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+    /* ============================================
+       ENHANCED STAT CARDS - JU BLUE THEME
+    ============================================ */
+    .ju-stat-card {
+        background: var(--ju-white);
+        border: 1px solid var(--ju-gray);
+        border-radius: 1rem;
+        box-shadow: var(--shadow);
+        transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        position: relative;
         overflow: hidden;
+        height: 100%;
     }
-    
-    .stat-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-    }
-    
-    .stat-card::before {
+
+    .ju-stat-card::before {
         content: '';
         position: absolute;
         top: 0;
         left: 0;
-        width: 100%;
+        right: 0;
         height: 4px;
+        background: var(--gradient-primary);
     }
-    
-    .stat-card-primary::before { background: linear-gradient(90deg, var(--ju-primary), var(--ju-accent)); }
-    .stat-card-warning::before { background: linear-gradient(90deg, #FFC72C, #FFAA00); }
-    .stat-card-info::before { background: linear-gradient(90deg, #3498db, #2980b9); }
-    .stat-card-success::before { background: linear-gradient(90deg, #27ae60, #219653); }
-    
-    /* Enhanced Status Badges */
-    .status-badge {
-        padding: 6px 16px;
-        border-radius: 20px;
+
+    .ju-stat-card:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--shadow-xl);
+        border-color: var(--ju-blue);
+    }
+
+    .ju-stat-card .stat-icon {
+        width: 60px;
+        height: 60px;
+        background: var(--ju-blue-soft);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--ju-blue);
+        font-size: 1.8rem;
+        transition: all 0.3s ease;
+    }
+
+    .ju-stat-card:hover .stat-icon {
+        background: var(--ju-blue);
+        color: var(--ju-white);
+        transform: rotate(8deg) scale(1.1);
+    }
+
+    .ju-stat-card .stat-number {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: var(--ju-blue);
+        line-height: 1;
+        margin-bottom: 0.25rem;
+        font-family: 'Montserrat', sans-serif;
+    }
+
+    .ju-stat-card .stat-label {
         font-size: 0.85rem;
         font-weight: 600;
+        color: var(--ju-gray-dark);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 0.5rem;
+    }
+
+    .ju-stat-card .stat-trend {
+        font-size: 0.8rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        background: var(--ju-blue-soft);
+        color: var(--ju-blue);
         display: inline-flex;
         align-items: center;
-        gap: 5px;
+        gap: 0.25rem;
     }
-    
-    .status-badge i {
-        font-size: 0.8rem;
-    }
-    
-    .status-pending {
-        background: linear-gradient(135deg, #fff3cd, #ffeaa7);
-        color: #856404;
-        border: 1px solid #ffeaa7;
-    }
-    
-    .status-reviewed {
-        background: linear-gradient(135deg, #cce5ff, #a8d0fe);
-        color: #004085;
-        border: 1px solid #a8d0fe;
-    }
-    
-    .status-resolved {
-        background: linear-gradient(135deg, #d4edda, #b8e0c2);
-        color: #155724;
-        border: 1px solid #b8e0c2;
-    }
-    
-    .status-closed {
-        background: linear-gradient(135deg, #e2e3e5, #d5d6d8);
-        color: #383d41;
-        border: 1px solid #d5d6d8;
-    }
-    
-    /* Enhanced Feedback Cards */
-    .feedback-row {
-        transition: all 0.3s ease;
-        border-left: 4px solid transparent;
-    }
-    
-    .feedback-row:hover {
-        background: linear-gradient(90deg, rgba(0, 103, 71, 0.03), rgba(255, 199, 44, 0.02));
-        transform: translateX(5px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        border-left-color: var(--ju-primary);
-    }
-    
-    /* Type Badges Enhancement */
-    .type-badge {
-        padding: 6px 12px;
-        border-radius: 20px;
+
+    /* ============================================
+       ENHANCED STATUS BADGES - JU BLUE SCHEME
+    ============================================ */
+    .ju-status-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 40px;
         font-size: 0.8rem;
         font-weight: 600;
         display: inline-flex;
         align-items: center;
-        gap: 5px;
+        gap: 0.5rem;
+        border: 1px solid transparent;
+        transition: all 0.3s ease;
+        letter-spacing: 0.3px;
+    }
+
+    .ju-status-badge i {
+        font-size: 0.75rem;
+    }
+
+    .ju-status-pending {
+        background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+        color: #856404;
+        border-color: #ffeaa7;
+    }
+
+    .ju-status-reviewed {
+        background: linear-gradient(135deg, #e6edf7, #d4e1f0);
+        color: var(--ju-blue);
+        border-color: var(--ju-blue-soft);
+    }
+
+    .ju-status-resolved {
+        background: linear-gradient(135deg, #d4edda, #c3e6cb);
+        color: #155724;
+        border-color: #c3e6cb;
+    }
+
+    .ju-status-closed {
+        background: linear-gradient(135deg, #e2e3e5, #d6d8d9);
+        color: #383d41;
+        border-color: #d6d8d9;
+    }
+
+    /* ============================================
+       ENHANCED TYPE BADGES - JU BLUE SCHEME
+    ============================================ */
+    .ju-type-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 40px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        border: 1px solid transparent;
+        transition: all 0.3s ease;
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
-    
-    .type-badge i {
-        font-size: 0.7rem;
+
+    .ju-type-event {
+        background: linear-gradient(135deg, #e6edf7, #d4e1f0);
+        color: var(--ju-blue);
+        border-color: var(--ju-blue-soft);
     }
-    
-    .type-event { 
-        background: linear-gradient(135deg, #e3f2fd, #bbdefb);
-        color: #1565c0;
-        border: 1px solid #bbdefb;
+
+    .ju-type-system {
+        background: linear-gradient(135deg, #e8eaf6, #c5cae9);
+        color: #3949ab;
+        border-color: #c5cae9;
     }
-    
-    .type-system { 
-        background: linear-gradient(135deg, #f3e5f5, #e1bee7);
-        color: #7b1fa2;
-        border: 1px solid #e1bee7;
-    }
-    
-    .type-general { 
+
+    .ju-type-general {
         background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
         color: #2e7d32;
-        border: 1px solid #c8e6c9;
+        border-color: #c8e6c9;
     }
-    
-    .type-suggestion { 
+
+    .ju-type-suggestion {
         background: linear-gradient(135deg, #fff3e0, #ffe0b2);
         color: #ef6c00;
-        border: 1px solid #ffe0b2;
+        border-color: #ffe0b2;
     }
-    
-    .type-complaint { 
+
+    .ju-type-complaint {
         background: linear-gradient(135deg, #ffebee, #ffcdd2);
         color: #c62828;
-        border: 1px solid #ffcdd2;
+        border-color: #ffcdd2;
     }
-    
-    /* Enhanced Rating Stars */
-    .rating-stars {
+
+    /* ============================================
+       RATING STARS - JU GOLD
+    ============================================ */
+    .ju-rating {
         display: inline-flex;
         align-items: center;
-        gap: 3px;
+        gap: 0.25rem;
     }
-    
-    .rating-stars .fas.fa-star {
-        color: #FFC72C;
-        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+
+    .ju-rating .fa-star,
+    .ju-rating .fas.fa-star {
+        color: var(--ju-gold);
+        filter: drop-shadow(0 2px 4px rgba(196, 167, 71, 0.2));
     }
-    
-    /* Enhanced Filter Section */
-    .filter-section {
-        background: linear-gradient(135deg, #ffffff, #f8f9fa);
-        border-radius: 12px;
-        border: 1px solid #e9ecef;
-        padding: 20px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+    .ju-rating .far.fa-star {
+        color: #ddd;
     }
-    
-    .filter-select {
-        border: 2px solid #e9ecef;
-        border-radius: 8px;
+
+    .ju-rating-score {
+        background: var(--ju-gold-light);
+        color: var(--ju-blue-dark);
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        margin-left: 0.5rem;
+    }
+
+    /* ============================================
+       FILTER SECTION - JU BLUE THEME
+    ============================================ */
+    .ju-filter-section {
+        background: var(--ju-white);
+        border: 1px solid var(--ju-gray);
+        border-radius: 1rem;
+        box-shadow: var(--shadow);
+        padding: 1.5rem;
+    }
+
+    .ju-filter-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: var(--ju-blue);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 0.5rem;
+    }
+
+    .ju-filter-select {
+        border: 2px solid var(--ju-gray);
+        border-radius: 40px;
+        padding: 0.6rem 1.2rem;
+        font-size: 0.9rem;
+        color: var(--ju-gray-dark);
+        background: var(--ju-white);
         transition: all 0.3s ease;
-        background: white;
-        padding: 10px;
+        cursor: pointer;
     }
-    
-    .filter-select:focus {
-        border-color: var(--ju-primary);
-        box-shadow: 0 0 0 3px rgba(0, 103, 71, 0.1);
+
+    .ju-filter-select:hover {
+        border-color: var(--ju-blue);
     }
-    
-    /* Enhanced Action Buttons */
-    .action-btn {
-        padding: 8px 16px;
-        border-radius: 8px;
-        font-weight: 500;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        transition: all 0.3s ease;
+
+    .ju-filter-select:focus {
+        border-color: var(--ju-blue);
+        box-shadow: 0 0 0 4px rgba(10, 44, 110, 0.1);
+        outline: none;
     }
-    
-    .action-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-    
-    /* Enhanced Table Design */
-    .enhanced-table {
-        border-collapse: separate;
-        border-spacing: 0;
-    }
-    
-    .enhanced-table thead th {
-        background: linear-gradient(135deg, var(--ju-primary), var(--ju-accent));
-        color: white;
-        font-weight: 600;
-        border: none;
-        padding: 16px 12px;
+
+    .ju-search-group {
         position: relative;
     }
-    
-    .enhanced-table thead th:first-child {
-        border-radius: 12px 0 0 0;
-    }
-    
-    .enhanced-table thead th:last-child {
-        border-radius: 0 12px 0 0;
-    }
-    
-    .enhanced-table tbody td {
-        padding: 16px 12px;
-        border-bottom: 1px solid #e9ecef;
-        vertical-align: middle;
-    }
-    
-    /* Empty State Design */
-    .empty-state {
-        padding: 60px 20px;
-        text-align: center;
-        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-        border-radius: 12px;
-        border: 2px dashed #dee2e6;
-    }
-    
-    .empty-state-icon {
-        font-size: 4rem;
-        color: var(--ju-primary);
-        opacity: 0.3;
-        margin-bottom: 20px;
-    }
-    
-    /* Enhanced Pagination */
-    .enhanced-pagination .page-link {
-        border: none;
-        color: var(--ju-primary);
-        border-radius: 8px;
-        margin: 0 4px;
+
+    .ju-search-input {
+        border: 2px solid var(--ju-gray);
+        border-radius: 40px;
+        padding: 0.6rem 1.2rem 0.6rem 2.8rem;
+        font-size: 0.9rem;
+        width: 100%;
         transition: all 0.3s ease;
     }
-    
-    .enhanced-pagination .page-item.active .page-link {
-        background: linear-gradient(135deg, var(--ju-primary), var(--ju-accent));
-        color: white;
+
+    .ju-search-input:focus {
+        border-color: var(--ju-blue);
+        box-shadow: 0 0 0 4px rgba(10, 44, 110, 0.1);
+        outline: none;
     }
-    
-    .enhanced-pagination .page-link:hover {
-        background: linear-gradient(135deg, var(--ju-light), #d4edda);
+
+    .ju-search-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--ju-blue);
+        font-size: 0.9rem;
     }
-    
-    /* Quick Action Buttons */
-    .quick-action-btn {
+
+    /* ============================================
+       ENHANCED TABLE - JU BLUE THEME
+    ============================================ */
+    .ju-table-container {
+        background: var(--ju-white);
+        border: 1px solid var(--ju-gray);
+        border-radius: 1rem;
+        overflow: hidden;
+        box-shadow: var(--shadow);
+    }
+
+    .ju-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .ju-table thead th {
+        background: var(--gradient-primary);
+        color: var(--ju-white);
+        font-weight: 600;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        padding: 1.2rem 1rem;
+        border: none;
+        white-space: nowrap;
+    }
+
+    .ju-table thead th:first-child {
+        border-radius: 1rem 0 0 0;
+    }
+
+    .ju-table thead th:last-child {
+        border-radius: 0 1rem 0 0;
+    }
+
+    .ju-table tbody tr {
+        transition: all 0.3s ease;
+        border-bottom: 1px solid var(--ju-gray);
+    }
+
+    .ju-table tbody tr:hover {
+        background: linear-gradient(90deg, var(--ju-blue-soft), rgba(230, 237, 247, 0.3));
+        transform: translateX(5px);
+        box-shadow: var(--shadow);
+    }
+
+    .ju-table tbody td {
+        padding: 1.2rem 1rem;
+        vertical-align: middle;
+        color: var(--ju-gray-dark);
+        font-size: 0.9rem;
+    }
+
+    /* ============================================
+       FEEDBACK ROW - INTERACTIVE
+    ============================================ */
+    .ju-feedback-row {
+        cursor: pointer;
+        position: relative;
+    }
+
+    .ju-feedback-row::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 3px;
+        background: var(--ju-gold);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .ju-feedback-row:hover::before {
+        opacity: 1;
+    }
+
+    /* ============================================
+       QUICK ACTION BUTTONS
+    ============================================ */
+    .ju-action-btn {
         width: 36px;
         height: 36px;
-        border-radius: 50%;
+        border-radius: 10px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
+        border: 1px solid var(--ju-gray);
+        background: var(--ju-white);
+        color: var(--ju-gray-dark);
+        transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        margin: 0 2px;
+    }
+
+    .ju-action-btn:hover {
+        transform: scale(1.15) rotate(8deg);
+        box-shadow: var(--shadow-md);
+        border-color: transparent;
+    }
+
+    .ju-action-btn.btn-view:hover {
+        background: var(--ju-blue);
+        color: var(--ju-white);
+    }
+
+    .ju-action-btn.btn-public:hover {
+        background: var(--ju-gold);
+        color: var(--ju-white);
+        border-color: var(--ju-gold);
+    }
+
+    .ju-action-btn.btn-featured:hover {
+        background: #f39c12;
+        color: var(--ju-white);
+        border-color: #f39c12;
+    }
+
+    .ju-action-btn.btn-delete:hover {
+        background: #dc3545;
+        color: var(--ju-white);
+        border-color: #dc3545;
+    }
+
+    /* ============================================
+       ENHANCED PAGINATION
+    ============================================ */
+    .ju-pagination {
+        display: flex;
+        gap: 0.25rem;
+    }
+
+    .ju-pagination .page-link {
+        border: none;
+        background: transparent;
+        color: var(--ju-gray-dark);
+        border-radius: 10px;
+        padding: 0.6rem 1rem;
+        font-weight: 500;
         transition: all 0.3s ease;
-        border: 1px solid #dee2e6;
-        background: white;
     }
-    
-    .quick-action-btn:hover {
-        transform: scale(1.1);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+    .ju-pagination .page-item.active .page-link {
+        background: var(--gradient-primary);
+        color: var(--ju-white);
+        box-shadow: var(--shadow);
     }
-    
-    /* Responsive Design Improvements */
+
+    .ju-pagination .page-link:hover {
+        background: var(--ju-blue-soft);
+        color: var(--ju-blue);
+        transform: translateY(-2px);
+    }
+
+    /* ============================================
+       EMPTY STATE - JU BLUE THEME
+    ============================================ */
+    .ju-empty-state {
+        padding: 4rem 2rem;
+        text-align: center;
+        background: linear-gradient(135deg, var(--ju-white), var(--ju-offwhite));
+        border-radius: 1rem;
+        border: 2px dashed var(--ju-blue-soft);
+    }
+
+    .ju-empty-state-icon {
+        width: 100px;
+        height: 100px;
+        background: var(--ju-blue-soft);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        color: var(--ju-blue);
+        font-size: 2.5rem;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+
+    /* ============================================
+       NOTIFICATION TOASTS
+    ============================================ */
+    .ju-notification {
+        position: fixed;
+        top: 90px;
+        right: 20px;
+        z-index: 9999;
+        min-width: 350px;
+        background: var(--ju-white);
+        border-left: 4px solid;
+        border-radius: 12px;
+        box-shadow: var(--shadow-xl);
+        padding: 1rem 1.25rem;
+        animation: slideInRight 0.3s ease-out;
+    }
+
+    .ju-notification-success { border-left-color: #28a745; }
+    .ju-notification-error { border-left-color: #dc3545; }
+    .ju-notification-warning { border-left-color: #ffc107; }
+    .ju-notification-info { border-left-color: var(--ju-blue); }
+
+    @keyframes slideInRight {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+
+    /* ============================================
+       RESPONSIVE DESIGN
+    ============================================ */
     @media (max-width: 768px) {
-        .stat-card .icon {
-            display: none;
+        .ju-stat-card .stat-number {
+            font-size: 1.8rem;
         }
         
-        .enhanced-table {
-            display: block;
-            overflow-x: auto;
+        .ju-table {
+            min-width: 800px;
         }
         
-        .filter-section .row > div {
-            margin-bottom: 15px;
+        .ju-action-btn {
+            width: 32px;
+            height: 32px;
+        }
+        
+        .ju-filter-section .col-md-6,
+        .ju-filter-section .col-lg-3 {
+            margin-bottom: 1rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .ju-stat-card {
+            margin-bottom: 1rem;
+        }
+        
+        .ju-notification {
+            min-width: calc(100% - 40px);
+            right: 20px;
+            left: 20px;
+        }
+        
+        .ju-status-badge,
+        .ju-type-badge {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.75rem;
         }
     }
 </style>
 
-<div class="container-fluid">
-    <!-- Page Header with University Branding -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <h1 class="h3 mb-0" style="color: var(--ju-primary);">
-                        <i class="fas fa-comments me-2"></i>Feedback Management
-                    </h1>
-                    <p class="text-muted mb-0">Monitor and manage all user feedback for Jimma University</p>
-                </div>
-                <div class="ju-badge" style="
-                    background: linear-gradient(135deg, var(--ju-primary), var(--ju-accent));
-                    color: white;
-                    padding: 8px 20px;
-                    border-radius: 20px;
-                    font-weight: 600;
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                ">
-                    <i class="fas fa-university"></i>
-                    Jimma University
-                </div>
-            </div>
-            <hr style="border-color: rgba(0, 103, 71, 0.2);">
+<div class="container-fluid px-0">
+    <!-- ============================================
+         PAGE HEADER WITH JU BRANDING
+    ============================================ -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="page-title mb-1" style="color: var(--ju-blue);">
+                <i class="fas fa-comments me-2" style="color: var(--ju-gold);"></i>Feedback Management
+            </h1>
+            <p class="page-subtitle mb-0">
+                Monitor and manage all user feedback for Jimma University
+            </p>
         </div>
-    </div>
-
-    <!-- Enhanced Statistics Cards -->
-    <div class="row mb-4">
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card stat-card stat-card-primary position-relative">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="text-muted text-uppercase mb-1" style="font-size: 0.85rem;">TOTAL FEEDBACK</h6>
-                            <h2 class="mb-0" style="color: var(--ju-primary);">{{ $statistics['total'] }}</h2>
-                            <p class="text-muted mb-0 mt-1" style="font-size: 0.85rem;">
-                                <i class="fas fa-arrow-up text-success me-1"></i>
-                                Last 30 days: +{{ $statistics['last_month'] ?? 0 }}
-                            </p>
-                        </div>
-                        <div class="icon" style="color: rgba(0, 103, 71, 0.2);">
-                            <i class="fas fa-comments fa-3x"></i>
-                        </div>
-                    </div>
-                </div>
+        <div class="d-none d-md-flex align-items-center gap-3">
+            <div class="text-end">
+                <span class="d-block fw-bold" style="color: var(--ju-blue);">Last Updated</span>
+                <small class="text-muted">{{ now()->format('F d, Y - h:i A') }}</small>
             </div>
-        </div>
-        
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card stat-card stat-card-warning position-relative">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="text-muted text-uppercase mb-1" style="font-size: 0.85rem;">PENDING REVIEW</h6>
-                            <h2 class="mb-0" style="color: #FFC72C;">{{ $statistics['pending'] }}</h2>
-                            <p class="text-muted mb-0 mt-1" style="font-size: 0.85rem;">
-                                <i class="fas fa-clock me-1"></i>
-                                Requires attention
-                            </p>
-                        </div>
-                        <div class="icon" style="color: rgba(255, 199, 44, 0.2);">
-                            <i class="fas fa-clock fa-3x"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card stat-card stat-card-info position-relative">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="text-muted text-uppercase mb-1" style="font-size: 0.85rem;">UNDER REVIEW</h6>
-                            <h2 class="mb-0" style="color: #3498db;">{{ $statistics['reviewed'] }}</h2>
-                            <p class="text-muted mb-0 mt-1" style="font-size: 0.85rem;">
-                                <i class="fas fa-eye me-1"></i>
-                                Currently reviewing
-                            </p>
-                        </div>
-                        <div class="icon" style="color: rgba(52, 152, 219, 0.2);">
-                            <i class="fas fa-eye fa-3x"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card stat-card stat-card-success position-relative">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="text-muted text-uppercase mb-1" style="font-size: 0.85rem;">RESOLVED</h6>
-                            <h2 class="mb-0" style="color: #27ae60;">{{ $statistics['resolved'] }}</h2>
-                            <p class="text-muted mb-0 mt-1" style="font-size: 0.85rem;">
-                                <i class="fas fa-check me-1"></i>
-                               {{ $statistics['total'] > 0 ? round(($statistics['resolved']/$statistics['total'])*100, 1) : 0 }}% resolved
-                            </p>
-                        </div>
-                        <div class="icon" style="color: rgba(39, 174, 96, 0.2);">
-                            <i class="fas fa-check-circle fa-3x"></i>
-                        </div>
-                    </div>
-                </div>
+            <div style="width: 1px; height: 40px; background: var(--ju-gray);"></div>
+            <div style="background: var(--ju-blue-soft); padding: 0.5rem 1.2rem; border-radius: 40px;">
+                <i class="fas fa-university me-2" style="color: var(--ju-blue);"></i>
+                <span style="color: var(--ju-blue); font-weight: 600;">Jimma University</span>
             </div>
         </div>
     </div>
 
-    <!-- Enhanced Filters and Actions -->
-    <div class="card mb-4 filter-section">
-        <div class="card-body">
-            <div class="row align-items-center">
-                <div class="col-md-8">
-                    <h5 class="mb-3" style="color: var(--ju-primary);">
-                        <i class="fas fa-filter me-2"></i>Filter Feedback
-                    </h5>
-                    <form action="{{ route('feedback.index') }}" method="GET" class="row g-3">
-                        <div class="col-lg-3 col-md-6">
-                            <label class="form-label small text-muted mb-1">Status</label>
-                            <select name="status" class="form-select filter-select" onchange="this.form.submit()">
-                                <option value="">All Status</option>
-                                <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>
-                                    <i class="fas fa-clock me-1"></i> Pending
-                                </option>
-                                <option value="reviewed" {{ request('status') == 'reviewed' ? 'selected' : '' }}>
-                                    <i class="fas fa-eye me-1"></i> Reviewed
-                                </option>
-                                <option value="resolved" {{ request('status') == 'resolved' ? 'selected' : '' }}>
-                                    <i class="fas fa-check me-1"></i> Resolved
-                                </option>
-                                <option value="closed" {{ request('status') == 'closed' ? 'selected' : '' }}>
-                                    <i class="fas fa-times me-1"></i> Closed
-                                </option>
-                            </select>
-                        </div>
-                        <div class="col-lg-3 col-md-6">
-                            <label class="form-label small text-muted mb-1">Feedback Type</label>
-                            <select name="type" class="form-select filter-select" onchange="this.form.submit()">
-                                <option value="">All Types</option>
-                                <option value="event" {{ request('type') == 'event' ? 'selected' : '' }}>
-                                    <i class="fas fa-calendar-alt me-1"></i> Event
-                                </option>
-                                <option value="system" {{ request('type') == 'system' ? 'selected' : '' }}>
-                                    <i class="fas fa-desktop me-1"></i> System
-                                </option>
-                                <option value="general" {{ request('type') == 'general' ? 'selected' : '' }}>
-                                    <i class="fas fa-comment me-1"></i> General
-                                </option>
-                                <option value="suggestion" {{ request('type') == 'suggestion' ? 'selected' : '' }}>
-                                    <i class="fas fa-lightbulb me-1"></i> Suggestion
-                                </option>
-                                <option value="complaint" {{ request('type') == 'complaint' ? 'selected' : '' }}>
-                                    <i class="fas fa-exclamation-circle me-1"></i> Complaint
-                                </option>
-                            </select>
-                        </div>
-                        <div class="col-lg-3 col-md-6">
-                            <label class="form-label small text-muted mb-1">Rating</label>
-                            <select name="rating" class="form-select filter-select" onchange="this.form.submit()">
-                                <option value="">All Ratings</option>
-                                <option value="5" {{ request('rating') == '5' ? 'selected' : '' }}>
-                                    <i class="fas fa-star text-warning me-1"></i> 5 Stars
-                                </option>
-                                <option value="4" {{ request('rating') == '4' ? 'selected' : '' }}>
-                                    <i class="fas fa-star text-warning me-1"></i> 4+ Stars
-                                </option>
-                                <option value="3" {{ request('rating') == '3' ? 'selected' : '' }}>
-                                    <i class="fas fa-star text-warning me-1"></i> 3+ Stars
-                                </option>
-                            </select>
-                        </div>
-                        <div class="col-lg-3 col-md-6">
-                            <label class="form-label small text-muted mb-1">Search</label>
-                            <div class="input-group">
-                                <input type="text" name="search" class="form-control filter-select" 
-                                       placeholder="Search feedback..." value="{{ request('search') }}">
-                                <button class="btn btn-primary" type="submit" style="
-                                    background: linear-gradient(135deg, var(--ju-primary), var(--ju-accent));
-                                    border: none;
-                                    border-radius: 0 8px 8px 0;
-                                ">
-                                    <i class="fas fa-search"></i>
-                                </button>
+    <!-- ============================================
+         STATISTICS CARDS - JU BLUE THEME
+    ============================================ -->
+    <div class="row g-4 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="ju-stat-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="p-4">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="stat-label">TOTAL FEEDBACK</div>
+                            <div class="stat-number">{{ $statistics['total'] }}</div>
+                            <div class="stat-trend mt-2">
+                                <i class="fas fa-arrow-up"></i>
+                                +{{ $statistics['last_month'] ?? 0 }} this month
                             </div>
                         </div>
-                    </form>
+                        <div class="stat-icon">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-md-4 mt-3 mt-md-0">
-                    <h5 class="mb-3" style="color: var(--ju-primary);">
-                        <i class="fas fa-cogs me-2"></i>Quick Actions
-                    </h5>
-                    <div class="d-flex flex-wrap gap-2">
-                        <a href="{{ route('feedback.analytics') }}" class="action-btn btn btn-outline-info">
-                            <i class="fas fa-chart-bar"></i>
-                            <span class="d-none d-md-inline">Analytics</span>
-                        </a>
-                        <a href="{{ route('feedback.export') }}" class="action-btn btn btn-outline-success">
-                            <i class="fas fa-download"></i>
-                            <span class="d-none d-md-inline">Export</span>
-                        </a>
-                        <a href="{{ route('feedback.testimonials') }}" class="action-btn btn btn-outline-primary">
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6">
+            <div class="ju-stat-card" data-aos="fade-up" data-aos-delay="200">
+                <div class="p-4">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="stat-label">PENDING REVIEW</div>
+                            <div class="stat-number" style="color: var(--ju-gold);">{{ $statistics['pending'] }}</div>
+                            <div class="stat-trend mt-2">
+                                <i class="fas fa-clock"></i>
+                                Requires attention
+                            </div>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6">
+            <div class="ju-stat-card" data-aos="fade-up" data-aos-delay="300">
+                <div class="p-4">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="stat-label">UNDER REVIEW</div>
+                            <div class="stat-number" style="color: #3498db;">{{ $statistics['reviewed'] }}</div>
+                            <div class="stat-trend mt-2">
+                                <i class="fas fa-eye"></i>
+                                Currently reviewing
+                            </div>
+                        </div>
+                        <div class="stat-icon">
                             <i class="fas fa-eye"></i>
-                            <span class="d-none d-md-inline">View Public</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6">
+            <div class="ju-stat-card" data-aos="fade-up" data-aos-delay="400">
+                <div class="p-4">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="stat-label">RESOLVED</div>
+                            <div class="stat-number" style="color: #28a745;">{{ $statistics['resolved'] }}</div>
+                            <div class="stat-trend mt-2">
+                                <i class="fas fa-check-circle"></i>
+                                {{ $statistics['total'] > 0 ? round(($statistics['resolved']/$statistics['total'])*100, 1) : 0 }}% resolved
+                            </div>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================
+         FILTER SECTION - JU BLUE THEME
+    ============================================ -->
+    <div class="ju-filter-section mb-4" data-aos="fade-up" data-aos-delay="500">
+        <form action="{{ route('feedback.index') }}" method="GET" class="row g-3 align-items-end">
+            <div class="col-lg-3 col-md-6">
+                <div class="ju-filter-label">
+                    <i class="fas fa-tag me-1"></i>Status
+                </div>
+                <select name="status" class="ju-filter-select w-100" onchange="this.form.submit()">
+                    <option value="">All Status</option>
+                    <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>⏳ Pending</option>
+                    <option value="reviewed" {{ request('status') == 'reviewed' ? 'selected' : '' }}>👁️ Reviewed</option>
+                    <option value="resolved" {{ request('status') == 'resolved' ? 'selected' : '' }}>✅ Resolved</option>
+                    <option value="closed" {{ request('status') == 'closed' ? 'selected' : '' }}>❌ Closed</option>
+                </select>
+            </div>
+            
+            <div class="col-lg-3 col-md-6">
+                <div class="ju-filter-label">
+                    <i class="fas fa-filter me-1"></i>Feedback Type
+                </div>
+                <select name="type" class="ju-filter-select w-100" onchange="this.form.submit()">
+                    <option value="">All Types</option>
+                    <option value="event" {{ request('type') == 'event' ? 'selected' : '' }}>📅 Event</option>
+                    <option value="system" {{ request('type') == 'system' ? 'selected' : '' }}>💻 System</option>
+                    <option value="general" {{ request('type') == 'general' ? 'selected' : '' }}>💬 General</option>
+                    <option value="suggestion" {{ request('type') == 'suggestion' ? 'selected' : '' }}>💡 Suggestion</option>
+                    <option value="complaint" {{ request('type') == 'complaint' ? 'selected' : '' }}>⚠️ Complaint</option>
+                </select>
+            </div>
+            
+            <div class="col-lg-3 col-md-6">
+                <div class="ju-filter-label">
+                    <i class="fas fa-star me-1"></i>Minimum Rating
+                </div>
+                <select name="rating" class="ju-filter-select w-100" onchange="this.form.submit()">
+                    <option value="">All Ratings</option>
+                    <option value="5" {{ request('rating') == '5' ? 'selected' : '' }}>⭐⭐⭐⭐⭐ 5 Stars</option>
+                    <option value="4" {{ request('rating') == '4' ? 'selected' : '' }}>⭐⭐⭐⭐ 4+ Stars</option>
+                    <option value="3" {{ request('rating') == '3' ? 'selected' : '' }}>⭐⭐⭐ 3+ Stars</option>
+                    <option value="2" {{ request('rating') == '2' ? 'selected' : '' }}>⭐⭐ 2+ Stars</option>
+                </select>
+            </div>
+            
+            <div class="col-lg-3 col-md-6">
+                <div class="ju-filter-label">
+                    <i class="fas fa-search me-1"></i>Search
+                </div>
+                <div class="ju-search-group">
+                    <i class="fas fa-search ju-search-icon"></i>
+                    <input type="text" name="search" class="ju-search-input" 
+                           placeholder="Search feedback..." value="{{ request('search') }}">
+                </div>
+            </div>
+            
+            <div class="col-12 mt-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        @if(request()->hasAny(['status', 'type', 'rating', 'search']))
+                        <a href="{{ route('feedback.index') }}" class="btn btn-sm" style="
+                            background: var(--ju-blue-soft);
+                            color: var(--ju-blue);
+                            border-radius: 40px;
+                            padding: 0.5rem 1.5rem;
+                            font-weight: 600;
+                        ">
+                            <i class="fas fa-times-circle me-1"></i>Clear Filters
                         </a>
-                        <button class="action-btn btn btn-warning" onclick="refreshPage()">
-                            <i class="fas fa-sync-alt"></i>
-                            <span class="d-none d-md-inline">Refresh</span>
+                        @endif
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a href="{{ route('feedback.analytics') }}" class="btn btn-sm" style="
+                            background: var(--ju-blue-soft);
+                            color: var(--ju-blue);
+                            border-radius: 40px;
+                            padding: 0.5rem 1.5rem;
+                            font-weight: 600;
+                        ">
+                            <i class="fas fa-chart-bar me-1"></i>Analytics
+                        </a>
+                        <a href="{{ route('feedback.export') }}" class="btn btn-sm" style="
+                            background: var(--ju-blue-soft);
+                            color: var(--ju-blue);
+                            border-radius: 40px;
+                            padding: 0.5rem 1.5rem;
+                            font-weight: 600;
+                        ">
+                            <i class="fas fa-download me-1"></i>Export
+                        </a>
+                        <button onclick="location.reload()" class="btn btn-sm" style="
+                            background: var(--gradient-primary);
+                            color: white;
+                            border-radius: 40px;
+                            padding: 0.5rem 1.5rem;
+                            font-weight: 600;
+                            border: none;
+                        ">
+                            <i class="fas fa-sync-alt me-1"></i>Refresh
                         </button>
                     </div>
                 </div>
             </div>
-        </div>
+        </form>
     </div>
 
-    <!-- Enhanced Feedback List -->
-    <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center" style="
-            background: linear-gradient(135deg, #ffffff, #f8f9fa);
-            border-bottom: 2px solid rgba(0, 103, 71, 0.1);
-        ">
-            <h5 class="mb-0" style="color: var(--ju-primary);">
-                <i class="fas fa-list me-2"></i>Feedback Entries
-                <span class="badge bg-primary ms-2">{{ $feedbacks->total() }}</span>
-            </h5>
+    <!-- ============================================
+         FEEDBACK TABLE - JU BLUE THEME
+    ============================================ -->
+    <div class="ju-table-container" data-aos="fade-up" data-aos-delay="600">
+        @if($feedbacks->count() > 0)
+        <div class="table-responsive">
+            <table class="ju-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Type</th>
+                        <th>Subject & Details</th>
+                        <th>Submitted By</th>
+                        <th>Rating</th>
+                        <th>Status</th>
+                        <th>Submitted</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($feedbacks as $feedback)
+                    <tr class="ju-feedback-row" onclick="window.location.href='{{ route('feedback.show', $feedback) }}'">
+                        <td>
+                            <span style="
+                                background: var(--ju-blue-soft);
+                                color: var(--ju-blue);
+                                padding: 0.4rem 0.8rem;
+                                border-radius: 8px;
+                                font-weight: 700;
+                                font-size: 0.8rem;
+                            ">#{{ str_pad($feedback->id, 4, '0', STR_PAD_LEFT) }}</span>
+                        </td>
+                        <td>
+                            <span class="ju-type-badge ju-type-{{ $feedback->type }}">
+                                <i class="fas 
+                                    {{ $feedback->type == 'event' ? 'fa-calendar-alt' : '' }}
+                                    {{ $feedback->type == 'system' ? 'fa-desktop' : '' }}
+                                    {{ $feedback->type == 'general' ? 'fa-comment' : '' }}
+                                    {{ $feedback->type == 'suggestion' ? 'fa-lightbulb' : '' }}
+                                    {{ $feedback->type == 'complaint' ? 'fa-exclamation-circle' : '' }}
+                                "></i>
+                                {{ ucfirst($feedback->type) }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="d-flex flex-column">
+                                <strong style="color: var(--ju-blue);">
+                                    {{ $feedback->subject ?: 'No Subject' }}
+                                </strong>
+                                <small class="text-muted">
+                                    {{ Str::limit(strip_tags($feedback->message), 80) }}
+                                </small>
+                                <div class="mt-2 d-flex gap-1">
+                                    @if($feedback->is_public)
+                                    <span style="
+                                        background: rgba(40, 167, 69, 0.1);
+                                        color: #28a745;
+                                        padding: 0.2rem 0.6rem;
+                                        border-radius: 20px;
+                                        font-size: 0.65rem;
+                                        font-weight: 700;
+                                    ">
+                                        <i class="fas fa-eye me-1"></i>Public
+                                    </span>
+                                    @endif
+                                    @if($feedback->featured)
+                                    <span style="
+                                        background: rgba(196, 167, 71, 0.1);
+                                        color: var(--ju-gold);
+                                        padding: 0.2rem 0.6rem;
+                                        border-radius: 20px;
+                                        font-size: 0.65rem;
+                                        font-weight: 700;
+                                    ">
+                                        <i class="fas fa-star me-1"></i>Featured
+                                    </span>
+                                    @endif
+                                    @if($feedback->event_id)
+                                    <span style="
+                                        background: rgba(10, 44, 110, 0.1);
+                                        color: var(--ju-blue);
+                                        padding: 0.2rem 0.6rem;
+                                        border-radius: 20px;
+                                        font-size: 0.65rem;
+                                        font-weight: 700;
+                                    ">
+                                        <i class="fas fa-calendar me-1"></i>Event
+                                    </span>
+                                    @endif
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div style="
+                                    width: 40px;
+                                    height: 40px;
+                                    background: linear-gradient(135deg, var(--ju-blue-soft), #d4e1f0);
+                                    border-radius: 50%;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    color: var(--ju-blue);
+                                    font-weight: 700;
+                                    font-size: 0.9rem;
+                                    margin-right: 0.8rem;
+                                ">
+                                    @if($feedback->user)
+                                        {{ strtoupper(substr($feedback->user->name, 0, 1)) }}
+                                    @else
+                                        {{ $feedback->name ? strtoupper(substr($feedback->name, 0, 1)) : 'A' }}
+                                    @endif
+                                </div>
+                                <div>
+                                    <strong class="d-block" style="color: var(--ju-blue);">
+                                        @if($feedback->user)
+                                            {{ $feedback->user->name }}
+                                        @else
+                                            {{ $feedback->name ?: 'Anonymous' }}
+                                        @endif
+                                    </strong>
+                                    @if($feedback->email)
+                                        <small class="text-muted">{{ $feedback->email }}</small>
+                                    @endif
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            @if($feedback->rating)
+                                <div class="ju-rating">
+                                    @for($i = 1; $i <= 5; $i++)
+                                        @if($i <= $feedback->rating)
+                                            <i class="fas fa-star"></i>
+                                        @else
+                                            <i class="far fa-star"></i>
+                                        @endif
+                                    @endfor
+                                    <span class="ju-rating-score">{{ $feedback->rating }}/5</span>
+                                </div>
+                            @else
+                                <span class="text-muted small">Not rated</span>
+                            @endif
+                        </td>
+                        <td>
+                            <span class="ju-status-badge ju-status-{{ $feedback->status }}">
+                                <i class="fas 
+                                    {{ $feedback->status == 'pending' ? 'fa-clock' : '' }}
+                                    {{ $feedback->status == 'reviewed' ? 'fa-eye' : '' }}
+                                    {{ $feedback->status == 'resolved' ? 'fa-check-circle' : '' }}
+                                    {{ $feedback->status == 'closed' ? 'fa-times-circle' : '' }}
+                                "></i>
+                                {{ ucfirst($feedback->status) }}
+                            </span>
+                        </td>
+                        <td>
+                            <div style="font-size: 0.85rem;">
+                                <strong>{{ $feedback->created_at->format('M d, Y') }}</strong>
+                                <div class="text-muted small">{{ $feedback->created_at->format('h:i A') }}</div>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div class="d-flex justify-content-center gap-1">
+                                <a href="{{ route('feedback.show', $feedback) }}" 
+                                   class="ju-action-btn btn-view"
+                                   title="View Details"
+                                   onclick="event.stopPropagation();">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <button class="ju-action-btn btn-public"
+                                        onclick="togglePublic({{ $feedback->id }}); event.stopPropagation();"
+                                        title="{{ $feedback->is_public ? 'Make Private' : 'Make Public' }}">
+                                    <i class="fas fa-eye{{ $feedback->is_public ? '' : '-slash' }}"></i>
+                                </button>
+                                @if($feedback->is_public)
+                                <button class="ju-action-btn btn-featured"
+                                        onclick="toggleFeatured({{ $feedback->id }}); event.stopPropagation();"
+                                        title="{{ $feedback->featured ? 'Unfeature' : 'Feature' }}">
+                                    <i class="fas fa-star{{ $feedback->featured ? '' : '-o' }}"></i>
+                                </button>
+                                @endif
+                                <button class="ju-action-btn btn-delete"
+                                        onclick="deleteFeedback({{ $feedback->id }}); event.stopPropagation();"
+                                        title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="d-flex justify-content-between align-items-center p-4 border-top">
             <div class="small text-muted">
                 <i class="fas fa-info-circle me-1"></i>
-                Click on any row for details
+                Showing <strong style="color: var(--ju-blue);">{{ $feedbacks->firstItem() }}</strong> 
+                to <strong style="color: var(--ju-blue);">{{ $feedbacks->lastItem() }}</strong> 
+                of <strong style="color: var(--ju-blue);">{{ $feedbacks->total() }}</strong> entries
+            </div>
+            <div class="ju-pagination">
+                {{ $feedbacks->onEachSide(2)->links() }}
             </div>
         </div>
-        <div class="card-body p-0">
-            @if($feedbacks->count() > 0)
-                <div class="table-responsive">
-                    <table class="table table-hover enhanced-table mb-0">
-                        <thead>
-                            <tr>
-                                <th width="80">ID</th>
-                                <th width="120">Type</th>
-                                <th>Subject & Details</th>
-                                <th width="180">Submitted By</th>
-                                <th width="150">Rating</th>
-                                <th width="120">Status</th>
-                                <th width="150">Submitted</th>
-                                <th width="140" class="text-center">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($feedbacks as $feedback)
-                            <tr class="feedback-row" onclick="window.location.href='{{ route('feedback.show', $feedback) }}'" style="cursor: pointer;">
-                                <td>
-                                    <span class="badge bg-dark">#{{ str_pad($feedback->id, 4, '0', STR_PAD_LEFT) }}</span>
-                                </td>
-                                <td>
-                                    <span class="type-badge type-{{ $feedback->type }}">
-                                        <i class="fas 
-                                            {{ $feedback->type == 'event' ? 'fa-calendar-alt' : '' }}
-                                            {{ $feedback->type == 'system' ? 'fa-desktop' : '' }}
-                                            {{ $feedback->type == 'general' ? 'fa-comment' : '' }}
-                                            {{ $feedback->type == 'suggestion' ? 'fa-lightbulb' : '' }}
-                                            {{ $feedback->type == 'complaint' ? 'fa-exclamation-circle' : '' }}
-                                        "></i>
-                                        {{ ucfirst($feedback->type) }}
-                                    </span>
-                                </td>
-                                <td>
-                                    <div class="d-flex flex-column">
-                                        <strong class="mb-1">{{ $feedback->subject ?: 'No Subject' }}</strong>
-                                        <div class="small text-muted">
-                                            {{ Str::limit(strip_tags($feedback->message), 60) }}
-                                        </div>
-                                        <div class="mt-1">
-                                            @if($feedback->is_public)
-                                                <span class="badge bg-success" style="font-size: 0.7rem;">
-                                                    <i class="fas fa-eye me-1"></i> Public
-                                                </span>
-                                            @endif
-                                            @if($feedback->featured)
-                                                <span class="badge bg-warning" style="font-size: 0.7rem;">
-                                                    <i class="fas fa-star me-1"></i> Featured
-                                                </span>
-                                            @endif
-                                            @if($feedback->event)
-                                                <span class="badge bg-info" style="font-size: 0.7rem;">
-                                                    <i class="fas fa-calendar me-1"></i> Event
-                                                </span>
-                                            @endif
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <div class="flex-shrink-0">
-                                            <div class="rounded-circle bg-light d-flex align-items-center justify-content-center" 
-                                                 style="width: 36px; height: 36px; background: linear-gradient(135deg, var(--ju-light), #d4edda);">
-                                                <i class="fas fa-user text-muted"></i>
-                                            </div>
-                                        </div>
-                                        <div class="flex-grow-1 ms-3">
-                                            <strong class="d-block">
-                                                @if($feedback->user)
-                                                    {{ $feedback->user->name }}
-                                                @else
-                                                    {{ $feedback->name ?: 'Anonymous' }}
-                                                @endif
-                                            </strong>
-                                            @if($feedback->email)
-                                                <small class="text-muted">{{ $feedback->email }}</small>
-                                            @endif
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    @if($feedback->rating)
-                                        <div class="rating-stars">
-                                            @for($i = 1; $i <= 5; $i++)
-                                                @if($i <= $feedback->rating)
-                                                    <i class="fas fa-star"></i>
-                                                @else
-                                                    <i class="far fa-star text-muted"></i>
-                                                @endif
-                                            @endfor
-                                            <div class="mt-1">
-                                                <small class="badge bg-light text-dark">
-                                                    {{ $feedback->rating }}/5
-                                                </small>
-                                            </div>
-                                        </div>
-                                    @else
-                                        <span class="text-muted small">No rating</span>
-                                    @endif
-                                </td>
-                                <td>
-                                    <span class="status-badge status-{{ $feedback->status }}">
-                                        <i class="fas 
-                                            {{ $feedback->status == 'pending' ? 'fa-clock' : '' }}
-                                            {{ $feedback->status == 'reviewed' ? 'fa-eye' : '' }}
-                                            {{ $feedback->status == 'resolved' ? 'fa-check' : '' }}
-                                            {{ $feedback->status == 'closed' ? 'fa-times' : '' }}
-                                        "></i>
-                                        {{ ucfirst($feedback->status) }}
-                                    </span>
-                                </td>
-                                <td>
-                                    <div class="small">
-                                        <div class="fw-bold">{{ $feedback->created_at->format('M d, Y') }}</div>
-                                        <div class="text-muted">{{ $feedback->created_at->format('h:i A') }}</div>
-                                    </div>
-                                </td>
-                                <td class="text-center">
-                                    <div class="d-flex justify-content-center gap-2">
-                                        <a href="{{ route('feedback.show', $feedback) }}" 
-                                           class="quick-action-btn btn btn-sm btn-primary"
-                                           title="View Details"
-                                           onclick="event.stopPropagation();">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                        <button class="quick-action-btn btn btn-sm btn-info"
-                                                onclick="togglePublic({{ $feedback->id }}); event.stopPropagation();"
-                                                title="{{ $feedback->is_public ? 'Make Private' : 'Make Public' }}">
-                                            <i class="fas fa-eye{{ $feedback->is_public ? '' : '-slash' }}"></i>
-                                        </button>
-                                        @if($feedback->is_public)
-                                        <button class="quick-action-btn btn btn-sm btn-warning"
-                                                onclick="toggleFeatured({{ $feedback->id }}); event.stopPropagation();"
-                                                title="{{ $feedback->featured ? 'Unfeature' : 'Feature' }}">
-                                            <i class="fas fa-star{{ $feedback->featured ? '' : '-o' }}"></i>
-                                        </button>
-                                        @endif
-                                        <button class="quick-action-btn btn btn-sm btn-danger"
-                                                onclick="deleteFeedback({{ $feedback->id }}); event.stopPropagation();"
-                                                title="Delete">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-                
-                <!-- Enhanced Pagination -->
-                <div class="d-flex justify-content-between align-items-center p-4 border-top">
-                    <div class="small text-muted">
-                        Showing <strong>{{ $feedbacks->firstItem() }}</strong> to 
-                        <strong>{{ $feedbacks->lastItem() }}</strong> of 
-                        <strong>{{ $feedbacks->total() }}</strong> entries
-                        @if(request()->has('status') || request()->has('type') || request()->has('rating'))
-                            <span class="ms-2 text-primary">
-                                <i class="fas fa-filter me-1"></i>Filtered
-                            </span>
-                        @endif
-                    </div>
-                    <div class="enhanced-pagination">
-                        {{ $feedbacks->links() }}
-                    </div>
-                </div>
-            @else
-                <div class="empty-state">
-                    <div class="empty-state-icon">
-                        <i class="fas fa-comments"></i>
-                    </div>
-                    <h4 class="mb-3" style="color: var(--ju-primary);">No Feedback Found</h4>
-                    <p class="text-muted mb-4">There are no feedback entries matching your criteria.</p>
-                    <a href="{{ route('feedback.index') }}" class="btn btn-primary">
-                        <i class="fas fa-sync-alt me-2"></i>Reset Filters
-                    </a>
-                </div>
-            @endif
+        @else
+        <!-- Empty State -->
+        <div class="ju-empty-state">
+            <div class="ju-empty-state-icon">
+                <i class="fas fa-comments"></i>
+            </div>
+            <h4 style="color: var(--ju-blue); margin-bottom: 1rem;">No Feedback Found</h4>
+            <p class="text-muted mb-4">There are no feedback entries matching your criteria.</p>
+            <a href="{{ route('feedback.index') }}" style="
+                background: var(--gradient-primary);
+                color: white;
+                padding: 0.8rem 2rem;
+                border-radius: 40px;
+                text-decoration: none;
+                font-weight: 600;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+                transition: all 0.3s ease;
+            ">
+                <i class="fas fa-sync-alt"></i>
+                Reset Filters
+            </a>
         </div>
+        @endif
     </div>
 </div>
 
+<!-- Notification Container -->
+<div id="notificationContainer" style="position: fixed; top: 90px; right: 20px; z-index: 9999;"></div>
+
 @push('scripts')
 <script>
+// ============================================
+// NOTIFICATION SYSTEM
+// ============================================
+function showNotification(message, type = 'info') {
+    const container = document.getElementById('notificationContainer');
+    const notification = document.createElement('div');
+    
+    const icons = {
+        success: 'fa-check-circle',
+        error: 'fa-exclamation-circle',
+        warning: 'fa-exclamation-triangle',
+        info: 'fa-info-circle'
+    };
+    
+    notification.className = `ju-notification ju-notification-${type} animate__animated animate__fadeInRight`;
+    notification.innerHTML = `
+        <div class="d-flex align-items-start">
+            <div class="flex-shrink-0 me-3">
+                <i class="fas ${icons[type] || 'fa-info-circle'} fa-lg" style="color: ${
+                    type === 'success' ? '#28a745' : 
+                    type === 'error' ? '#dc3545' : 
+                    type === 'warning' ? '#ffc107' : 
+                    'var(--ju-blue)'
+                };"></i>
+            </div>
+            <div class="flex-grow-1">
+                <strong style="color: var(--ju-blue-dark); text-transform: uppercase; font-size: 0.8rem;">
+                    ${type.charAt(0).toUpperCase() + type.slice(1)}
+                </strong>
+                <div style="color: var(--ju-gray-dark); margin-top: 0.2rem;">${message}</div>
+            </div>
+            <button class="btn-close ms-3" onclick="this.closest('.ju-notification').remove()"></button>
+        </div>
+    `;
+    
+    container.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.transition = 'opacity 0.5s ease';
+        notification.style.opacity = '0';
+        setTimeout(() => notification.remove(), 500);
+    }, 5000);
+}
+
+// ============================================
+// TOGGLE PUBLIC STATUS
+// ============================================
 function togglePublic(feedbackId) {
     event.preventDefault();
     if (confirm('Are you sure you want to change the visibility of this feedback?')) {
@@ -733,6 +1085,9 @@ function togglePublic(feedbackId) {
     }
 }
 
+// ============================================
+// TOGGLE FEATURED STATUS
+// ============================================
 function toggleFeatured(feedbackId) {
     event.preventDefault();
     if (confirm('Are you sure you want to toggle featured status?')) {
@@ -760,9 +1115,12 @@ function toggleFeatured(feedbackId) {
     }
 }
 
+// ============================================
+// DELETE FEEDBACK
+// ============================================
 function deleteFeedback(feedbackId) {
     event.preventDefault();
-    if (confirm('Are you sure you want to delete this feedback? This action cannot be undone.')) {
+    if (confirm('⚠️ Are you sure you want to delete this feedback? This action cannot be undone.')) {
         fetch(`/feedback/admin/${feedbackId}`, {
             method: 'DELETE',
             headers: {
@@ -785,53 +1143,64 @@ function deleteFeedback(feedbackId) {
     }
 }
 
-function refreshPage() {
-    location.reload();
-}
-
-function showNotification(message, type = 'info') {
-    // Create notification element
-    const notification = document.createElement('div');
-    notification.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
-    notification.style.cssText = `
-        top: 20px;
-        right: 20px;
-        z-index: 9999;
-        min-width: 300px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    `;
-    notification.innerHTML = `
-        <strong>${type.charAt(0).toUpperCase() + type.slice(1)}!</strong> ${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    `;
-    
-    document.body.appendChild(notification);
-    
-    // Auto remove after 3 seconds
-    setTimeout(() => {
-        notification.remove();
-    }, 3000);
-}
-
-// Add keyboard shortcuts
+// ============================================
+// KEYBOARD SHORTCUTS
+// ============================================
 document.addEventListener('keydown', function(e) {
-    // Ctrl+F to focus search
-    if (e.ctrlKey && e.key === 'f') {
+    // Ctrl/Cmd + F - Focus search
+    if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
         e.preventDefault();
-        document.querySelector('input[name="search"]').focus();
+        document.querySelector('.ju-search-input')?.focus();
     }
-    // F5 to refresh
-    if (e.key === 'F5') {
+    
+    // Ctrl/Cmd + R - Refresh (prevent default)
+    if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
         e.preventDefault();
-        refreshPage();
+        location.reload();
+    }
+    
+    // Escape - Clear search
+    if (e.key === 'Escape') {
+        const searchInput = document.querySelector('.ju-search-input');
+        if (searchInput && document.activeElement === searchInput) {
+            searchInput.value = '';
+            searchInput.form.submit();
+        }
     }
 });
 
-// Initialize tooltips
+// ============================================
+// TOOLTIP INITIALIZATION
+// ============================================
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize AOS
+    if (typeof AOS !== 'undefined') {
+        AOS.refresh();
+    }
+    
+    // Initialize tooltips
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'));
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
+    tooltipTriggerList.map(function(tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl, {
+            animation: true,
+            delay: { show: 100, hide: 100 }
+        });
+    });
+    
+    // Auto-refresh stats every 30 seconds (optional)
+    // setInterval(() => {
+    //     location.reload();
+    // }, 30000);
+});
+
+// ============================================
+// TABLE ROW CLICK HANDLER
+// ============================================
+document.querySelectorAll('.ju-feedback-row').forEach(row => {
+    row.addEventListener('click', function(e) {
+        if (!e.target.closest('.ju-action-btn')) {
+            window.location.href = this.dataset.href;
+        }
     });
 });
 </script>
