@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Session;
 
 class AuthController extends Controller
 {
@@ -23,20 +23,27 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
-            return redirect()->intended('dashboard');
+
+            $user = Auth::user();
+            
+            // Load role if needed
+            if (!$user->relationLoaded('role')) {
+                $user->load('role');
+            }
+            
+            // Check if user is admin by role slug
+            $adminSlugs = ['super-admin', 'admin', 'administrator'];
+            
+            if ($user->role && in_array($user->role->slug, $adminSlugs)) {
+                return redirect()->intended(route('dashboard'));
+            }
+
+            return redirect()->intended(route('events.guest.dashboard'));
         }
 
         return back()->withErrors([
             'email' => 'The provided credentials do not match our records.',
         ])->onlyInput('email');
-    }
-
-    public function logout(Request $request)
-    {
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-        return redirect('/');
     }
 
     public function showRegisterForm()
@@ -46,27 +53,33 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
-        $validated = $request->validate([
+        $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
         ]);
 
-        $user = \App\Models\User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
-        ]);
+        // Get default role (assuming 5 is for regular users)
+        $defaultRoleId = 5; // Change this based on your roles table
 
-        // Assign default role
-        $defaultRole = \App\Models\Role::where('slug', 'guest')->first();
-        if ($defaultRole) {
-            $user->role_id = $defaultRole->id;
-            $user->save();
-        }
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'role_id' => $defaultRoleId,
+            'status' => 'active',
+        ]);
 
         Auth::login($user);
 
-        return redirect()->route('dashboard')->with('success', 'Registration successful! Welcome to Jimma University Event Management System.');
+        return redirect()->route('events.guest.dashboard');
+    }
+
+    public function logout(Request $request)
+    {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return redirect('/');
     }
 }

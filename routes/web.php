@@ -17,11 +17,9 @@ use App\Http\Controllers\EventRegistrationController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\FeedbackController;
+use App\Http\Controllers\ProfileController;
 
 // =============== PUBLIC ROUTES ===============
-// Homepage - Guest Event Dashboard (NO login required)
-
-// Guest Event Routes (Public - No authentication required)
 Route::prefix('events')->name('events.guest.')->group(function () {
     Route::get('/', [GuestEventController::class, 'dashboard'])->name('dashboard');
     Route::get('/browse', [GuestEventController::class, 'browse'])->name('browse');
@@ -30,20 +28,9 @@ Route::prefix('events')->name('events.guest.')->group(function () {
     Route::get('/{slug}/export/ics', [GuestEventController::class, 'exportIcs'])->name('export-ics');
 });
 
-// Update the homepage route
 Route::get('/', [GuestEventController::class, 'dashboard'])->name('home');
 
-// Dashboard route - admin only
-Route::get('/dashboard', [DashboardController::class, 'index'])
-    ->name('dashboard')
-    ->middleware(['auth', 'can:view_dashboard']);
-
-// Dashboard stats API - admin only
-Route::get('/dashboard/stats', [DashboardController::class, 'getDashboardStats'])
-    ->name('dashboard.stats')
-    ->middleware(['auth', 'can:view_dashboard']);
-
-// Authentication Routes (separate pages)
+// Authentication Routes
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [AuthController::class, 'login']);
@@ -51,13 +38,45 @@ Route::middleware('guest')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
 });
 
-// =============== PROTECTED ROUTES (Require authentication) ===============
+// =============== PROTECTED ROUTES ===============
 Route::middleware('auth')->group(function () {
     // Logout
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-    // Dashboard
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    // =============== ADMIN DASHBOARD - PROTECTED ===============
+    Route::get('/dashboard', function () {
+        $user = auth()->user();
+        
+        // Load role if needed
+        if (!$user->relationLoaded('role')) {
+            $user->load('role');
+        }
+        
+        // Check if user has admin role - ADJUST THESE SLUGS BASED ON YOUR DATABASE
+        $adminSlugs = ['super-admin', 'admin', 'administrator'];
+        
+        if (!$user->role || !in_array($user->role->slug, $adminSlugs)) {
+            abort(403, 'Unauthorized. Admin access only.');
+        }
+        
+        return app(DashboardController::class)->index();
+    })->name('dashboard');
+
+    Route::get('/dashboard/stats', function () {
+        $user = auth()->user();
+        
+        if (!$user->relationLoaded('role')) {
+            $user->load('role');
+        }
+        
+        $adminSlugs = ['super-admin', 'admin', 'administrator'];
+        
+        if (!$user->role || !in_array($user->role->slug, $adminSlugs)) {
+            abort(403, 'Unauthorized. Admin access only.');
+        }
+        
+        return app(DashboardController::class)->getDashboardStats();
+    })->name('dashboard.stats');
 
     // =============== USER MANAGEMENT ===============
     Route::resource('users', UserController::class);
@@ -66,7 +85,6 @@ Route::middleware('auth')->group(function () {
 
     // =============== EVENT MANAGEMENT ===============
     Route::prefix('admin')->name('admin.')->group(function () {
-        // Events
         Route::resource('events', EventController::class);
         Route::post('events/{event}/toggle-featured', [EventController::class, 'toggleFeatured'])
             ->name('events.toggle-featured');
@@ -77,17 +95,14 @@ Route::middleware('auth')->group(function () {
         Route::get('events/export', [EventController::class, 'export'])
             ->name('events.export');
 
-        // Campus Management
         Route::resource('campuses', CampusController::class);
         Route::post('campuses/{campus}/toggle-active', [CampusController::class, 'toggleActive'])
             ->name('campuses.toggle-active');
 
-        // Building Management
         Route::resource('buildings', BuildingController::class);
         Route::post('buildings/{building}/toggle-active', [BuildingController::class, 'toggleActive'])
             ->name('buildings.toggle-active');
 
-        // Venue Management
         Route::resource('venues', VenueController::class);
         Route::post('venues/{venue}/toggle-availability', [VenueController::class, 'toggleAvailability'])
             ->name('venues.toggle-availability');
@@ -101,14 +116,11 @@ Route::middleware('auth')->group(function () {
         ->name('speakers.toggle-featured');
 
     // =============== EVENT REQUEST MANAGEMENT ===============
-    // My Event Requests - USER'S OWN REQUESTS (ADD THIS ROUTE FIRST)
     Route::get('/my-event-requests', [EventRequestController::class, 'myRequests'])
         ->name('event-requests.my-requests');
     
-    // Resource route for event requests
     Route::resource('event-requests', EventRequestController::class);
 
-    // Regular form submission routes (POST)
     Route::post('/event-requests/{eventRequest}/cancel', [EventRequestController::class, 'cancel'])
         ->name('event-requests.cancel');
     Route::post('/event-requests/{eventRequest}/approve', [EventRequestController::class, 'approve'])
@@ -116,7 +128,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/event-requests/{eventRequest}/reject', [EventRequestController::class, 'reject'])
         ->name('event-requests.reject');
 
-    // Quick AJAX routes (POST)
     Route::post('/event-requests/{eventRequest}/quick-approve', [EventRequestController::class, 'quickApprove'])
         ->name('event-requests.quick-approve');
     Route::post('/event-requests/{eventRequest}/quick-reject', [EventRequestController::class, 'quickReject'])
@@ -149,7 +160,7 @@ Route::middleware('auth')->group(function () {
         ->name('registrations.update-status');
 
     // =============== NOTIFICATION ROUTES ===============
-    Route::prefix('notifications')->name('notifications.')->middleware(['auth'])->group(function () {
+    Route::prefix('notifications')->name('notifications.')->group(function () {
         Route::get('/', [NotificationController::class, 'index'])->name('index');
         Route::get('/recent', [NotificationController::class, 'recent'])->name('recent');
         Route::get('/unread-count', [NotificationController::class, 'getUnreadCount'])->name('unread-count');
@@ -163,56 +174,55 @@ Route::middleware('auth')->group(function () {
         Route::get('/statistics', [NotificationController::class, 'statistics'])->name('statistics');
         Route::delete('/{id}', [NotificationController::class, 'destroy'])->name('destroy');
     });
+
+    // =============== PROFILE ROUTES ===============
+    Route::prefix('profile')->name('profile.')->group(function () {
+        Route::get('/', [ProfileController::class, 'show'])->name('show');
+        Route::get('/edit', [ProfileController::class, 'edit'])->name('edit');
+        Route::put('/', [ProfileController::class, 'update'])->name('update');
+        Route::put('/photo', [ProfileController::class, 'updatePhoto'])->name('photo.update');
+        Route::delete('/photo', [ProfileController::class, 'destroyPhoto'])->name('photo.destroy');
+        Route::put('/password', [ProfileController::class, 'changePassword'])->name('password');
+        Route::delete('/', [ProfileController::class, 'destroy'])->name('destroy');
+    });
 });
 
 // =============== ANNOUNCEMENT ROUTES ===============
-// 1. Index (list all) - PUBLIC
 Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
-// 2. Create form - PROTECTED
 Route::get('/announcements/create', [AnnouncementController::class, 'create'])
     ->name('announcements.create')
     ->middleware('auth');
-// 3. Statistics - PROTECTED
 Route::get('/announcements/statistics', [AnnouncementController::class, 'statistics'])
     ->name('announcements.statistics')
     ->middleware('auth');
-// 4. Store new announcement - PROTECTED
 Route::post('/announcements', [AnnouncementController::class, 'store'])
     ->name('announcements.store')
     ->middleware('auth');
-// 5. Show single announcement - PUBLIC
 Route::get('/announcements/{id}', [AnnouncementController::class, 'show'])
     ->name('announcements.show');
-// 6. Edit form - PROTECTED
 Route::get('/announcements/{id}/edit', [AnnouncementController::class, 'edit'])
     ->name('announcements.edit')
     ->middleware('auth');
-// 7. Update announcement - PROTECTED
 Route::put('/announcements/{id}', [AnnouncementController::class, 'update'])
     ->name('announcements.update')
     ->middleware('auth');
-// 8. Delete announcement - PROTECTED
 Route::delete('/announcements/{id}', [AnnouncementController::class, 'destroy'])
     ->name('announcements.destroy')
     ->middleware('auth');
-// 9. Toggle publish - PROTECTED
 Route::post('/announcements/{id}/toggle-publish', [AnnouncementController::class, 'togglePublish'])
     ->name('announcements.toggle-publish')
     ->middleware('auth');
-// 10. Send notification for existing announcement - PROTECTED
 Route::post('/announcements/{id}/send-notification', [AnnouncementController::class, 'sendNotification'])
     ->name('announcements.send-notification')
     ->middleware('auth');
 
 // =============== FEEDBACK ROUTES ===============
 Route::prefix('feedback')->name('feedback.')->group(function () {
-    // =============== PUBLIC FEEDBACK ROUTES ===============
     Route::get('/create', [FeedbackController::class, 'create'])->name('create');
     Route::post('/', [FeedbackController::class, 'store'])->name('store');
     Route::get('/thankyou', [FeedbackController::class, 'thankyou'])->name('thankyou');
     Route::get('/testimonials', [FeedbackController::class, 'testimonials'])->name('testimonials');
 
-    // =============== ADMIN FEEDBACK ROUTES ===============
     Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
         Route::get('/', [FeedbackController::class, 'index'])->name('index');
         Route::get('/{feedback}', [FeedbackController::class, 'show'])->name('show');

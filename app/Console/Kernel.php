@@ -65,6 +65,8 @@ class Kernel extends HttpKernel
     // ... other middleware
     'can' => \Illuminate\Auth\Middleware\Authorize::class,
     'permission' => \App\Http\Middleware\CheckPermission::class, // If you have this
+        'admin' => \App\Http\Middleware\AdminMiddleware::class,
+
 ];
 
 }

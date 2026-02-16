@@ -1543,6 +1543,102 @@
                 break-inside: avoid;
             }
         }
+
+          .user-profile-btn {
+        background: transparent;
+        border: none;
+        padding: 0;
+    }
+    
+    .user-profile-btn:hover {
+        background: transparent;
+    }
+    
+    .user-profile-btn::after {
+        display: none;
+    }
+    
+    .dropdown-item {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.95rem;
+        transition: all 0.2s ease;
+    }
+    
+    .dropdown-item:hover {
+        background-color: #f0f7ff;
+        color: #0d2b4b;
+        transform: translateX(5px);
+    }
+    
+    .dropdown-item.active {
+        background: linear-gradient(135deg, #0a1929 0%, #0d2b4b 100%);
+        color: white;
+    }
+    
+    .dropdown-item i {
+        color: #0d2b4b;
+    }
+    
+    .dropdown-item:hover i {
+        color: #0d2b4b;
+    }
+    
+    .dropdown-item.active i {
+        color: white;
+    }
+    
+    .dropdown-header {
+        border-radius: 0.375rem 0.375rem 0 0;
+    }
+    
+    .text-white-50 {
+        color: rgba(255, 255, 255, 0.7) !important;
+    }
+
+
+     .notification-dropdown {
+        animation: notificationSlide 0.3s ease;
+    }
+    
+    @keyframes notificationSlide {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .notification-body::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    .notification-body::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+    
+    .notification-body::-webkit-scrollbar-thumb {
+        background: #0d2b4b;
+        border-radius: 10px;
+    }
+    
+    .notification-body::-webkit-scrollbar-thumb:hover {
+        background: #0a1929;
+    }
+    
+    .notification-footer .btn:hover {
+        background: #0d2b4b !important;
+        color: white !important;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(13, 43, 75, 0.2);
+    }
+    
+    .text-white-50 {
+        color: rgba(255, 255, 255, 0.7) !important;
+    }
+
     </style>
 
     @stack('styles')
@@ -1589,50 +1685,149 @@
                         <span class="notification-badge">{{ $unreadCount }}</span>
                         @endif
                     </button>
-                    <div class="dropdown-menu notification-dropdown dropdown-menu-end" aria-labelledby="notificationDropdown" style="width: 320px;">
-                        <div class="notification-header" style="background: var(--gradient-primary); padding: 1rem; border-radius: 0.375rem 0.375rem 0 0;">
-                            <h6 class="notification-title mb-0 text-white d-flex justify-content-between align-items-center">
-                                <span><i class="fas fa-bell me-2"></i>Notifications</span>
-                                @if($unreadCount > 0)
-                                <button class="btn btn-sm btn-light" onclick="markAllAsRead()">
-                                    <i class="fas fa-check-double me-1"></i>Mark all read
-                                </button>
-                                @endif
-                            </h6>
-                        </div>
-                        <div class="notification-body" id="notificationList" style="max-height: 350px; overflow-y: auto;">
-                            <div class="text-center py-4">
-                                <div class="spinner-border text-primary" role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </div>
-                                <p class="mt-2 text-muted">Loading notifications...</p>
-                            </div>
-                        </div>
-                        <div class="notification-footer p-3 border-top">
-                            <a href="{{ route('notifications.index') }}" class="btn btn-sm btn-outline-primary w-100">
-                                <i class="fas fa-list me-1"></i>View All Notifications
-                            </a>
-                        </div>
-                    </div>
+                   
+<!-- Notifications Dropdown -->
+<div class="dropdown-menu notification-dropdown dropdown-menu-end" aria-labelledby="notificationDropdown" style="width: 360px; padding: 0; border: none; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.15);">
+    <!-- Header -->
+    <div class="notification-header" style="background: linear-gradient(135deg, #0a1929 0%, #0d2b4b 100%); padding: 1.25rem; border-radius: 12px 12px 0 0;">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h6 class="mb-0 text-white fw-semibold">
+                    <i class="fas fa-bell me-2"></i>Notifications
+                </h6>
+                <small class="text-white-50">Stay updated with latest activities</small>
+            </div>
+            @if($unreadCount > 0)
+            <button class="btn btn-sm btn-light" onclick="markAllAsRead()" style="border-radius: 20px; padding: 0.3rem 1rem; font-size: 0.8rem;">
+                <i class="fas fa-check-double me-1"></i>Mark all read
+            </button>
+            @endif
+        </div>
+    </div>
+    
+    <!-- Notification List -->
+    <div class="notification-body" id="notificationList" style="max-height: 380px; overflow-y: auto; background: #fff;">
+        <!-- Loading State -->
+        <div class="text-center py-5" id="loadingNotifications">
+            <div class="spinner-border" style="color: #0d2b4b; width: 2.5rem; height: 2.5rem;" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-3 text-muted mb-0">Fetching your notifications...</p>
+        </div>
+        
+        <!-- Empty State (hidden by default) -->
+        <div class="text-center py-5 d-none" id="emptyNotifications">
+            <div style="width: 80px; height: 80px; background: #f0f7ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                <i class="fas fa-bell-slash fa-3x" style="color: #0d2b4b; opacity: 0.5;"></i>
+            </div>
+            <h6 class="fw-semibold mb-2">No Notifications</h6>
+            <p class="text-muted small mb-0 px-4">You're all caught up! Check back later for updates.</p>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <div class="notification-footer p-3" style="background: #f8f9fa; border-top: 1px solid #e9ecef; border-radius: 0 0 12px 12px;">
+        <div class="d-grid">
+            <a href="{{ route('notifications.index') }}" class="btn" style="background: white; border: 1px solid #0d2b4b; color: #0d2b4b; border-radius: 8px; padding: 0.6rem; font-weight: 500; transition: all 0.3s ease;">
+                <i class="fas fa-list me-2"></i>View All Notifications
+                <i class="fas fa-arrow-right ms-2" style="font-size: 0.8rem;"></i>
+            </a>
+        </div>
+    </div>
+</div>
                 </div>
 
-                <!-- User Profile -->
-                <div class="user-profile hover-lift">
-                    <div class="user-avatar">
-                        {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
-                    </div>
-                    <div class="user-details">
-                        <div class="user-name">{{ auth()->user()->name }}</div>
-                        <div class="user-role">
-                            @if(auth()->user()->role)
-                            {{ auth()->user()->role->name }}
-                            @else
-                            User
-                            @endif
-                        </div>
-                    </div>
-                    <i class="fas fa-chevron-down ml-2" style="font-size: 0.75rem; color: var(--ju-white);"></i>
+               
+<!-- User Profile Dropdown -->
+<div class="dropdown">
+    <button class="user-profile-btn dropdown-toggle" type="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+        <div class="user-profile hover-lift">
+            <div class="user-avatar">
+                @if(auth()->user()->profile_photo)
+                    <img src="{{ asset('storage/profile_photos/'.auth()->user()->profile_photo) }}" 
+                         alt="{{ auth()->user()->name }}" 
+                         style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+                @else
+                    {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                @endif
+            </div>
+            <div class="user-details">
+                <div class="user-name">{{ auth()->user()->name }}</div>
+                <div class="user-role">
+                    @if(auth()->user()->role)
+                        {{ auth()->user()->role->name }}
+                    @else
+                        User
+                    @endif
                 </div>
+            </div>
+            <i class="fas fa-chevron-down ml-2" style="font-size: 0.75rem; color: var(--ju-white);"></i>
+        </div>
+    </button>
+
+    <!-- Dropdown Menu -->
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown" style="min-width: 250px; padding: 0.5rem 0;">
+        <!-- Profile Header -->
+        <li class="dropdown-header" style="background: linear-gradient(135deg, #0a1929 0%, #0d2b4b 100%); color: white; padding: 1rem;">
+            <div class="d-flex align-items-center gap-3">
+                <div style="width: 50px; height: 50px; border-radius: 50%; background: white; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #0d2b4b; font-size: 1.5rem;">
+                    @if(auth()->user()->profile_photo)
+                        <img src="{{ asset('storage/profile_photos/'.auth()->user()->profile_photo) }}" 
+                             alt="{{ auth()->user()->name }}" 
+                             style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+                    @else
+                        {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                    @endif
+                </div>
+                <div>
+                    <h6 class="mb-0 text-white">{{ auth()->user()->name }}</h6>
+                    <small class="text-white-50">{{ auth()->user()->email }}</small>
+                </div>
+            </div>
+        </li>
+
+        <!-- Menu Items -->
+        <li>
+            <a class="dropdown-item {{ request()->routeIs('profile.show') ? 'active' : '' }}" href="{{ route('profile.show') }}">
+                <i class="fas fa-user-circle me-2" style="width: 20px;"></i> My Profile
+            </a>
+        </li>
+        <li>
+            <a class="dropdown-item {{ request()->routeIs('profile.edit') ? 'active' : '' }}" href="{{ route('profile.edit') }}">
+                <i class="fas fa-edit me-2" style="width: 20px;"></i> Edit Profile
+            </a>
+        </li>
+        <li>
+            <a class="dropdown-item" href="{{ route('my-events.index') }}">
+                <i class="fas fa-calendar-alt me-2" style="width: 20px;"></i> My Events
+            </a>
+        </li>
+        <li>
+            <a class="dropdown-item" href="{{ route('notifications.index') }}">
+                <i class="fas fa-bell me-2" style="width: 20px;"></i> Notifications
+                @if(auth()->user()->unread_notifications_count > 0)
+                    <span class="badge bg-danger rounded-pill float-end">{{ auth()->user()->unread_notifications_count }}</span>
+                @endif
+            </a>
+        </li>
+        
+        <li><hr class="dropdown-divider"></li>
+        
+        <li>
+            <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
+                <i class="fas fa-key me-2" style="width: 20px;"></i> Change Password
+            </a>
+        </li>
+        <li>
+            <a class="dropdown-item text-danger" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                <i class="fas fa-sign-out-alt me-2" style="width: 20px;"></i> Logout
+            </a>
+            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                @csrf
+            </form>
+        </li>
+    </ul>
+</div>
 
                 <!-- Logout -->
                 <form method="POST" action="{{ route('logout') }}" class="d-inline" id="logoutForm">
@@ -2084,6 +2279,15 @@
                     </a>
                 </li>
             </ul>
+
+            <!-- Add this after the notifications or in the user dropdown -->
+<li class="menu-item">
+    <a href="{{ route('profile.show') }}" class="menu-link {{ request()->routeIs('profile.*') ? 'active' : '' }}">
+        <i class="menu-icon fas fa-user-circle"></i>
+        <span class="menu-title">My Profile</span>
+    </a>
+</li>
+
         </nav>
         @endauth
 
@@ -2465,6 +2669,69 @@
                 });
             }, 5000);
         }
+
+        
+function loadNotifications() {
+    fetch('/notifications/recent')
+        .then(response => response.json())
+        .then(data => {
+            const list = document.getElementById('notificationList');
+            const loading = document.getElementById('loadingNotifications');
+            const empty = document.getElementById('emptyNotifications');
+            
+            loading.classList.add('d-none');
+            
+            if (data.length === 0) {
+                empty.classList.remove('d-none');
+            } else {
+                // Render notifications
+                let html = '';
+                data.forEach(notif => {
+                    html += `
+                        <a href="${notif.url || '#'}" class="dropdown-item notification-item ${notif.read_at ? '' : 'unread'}" style="padding: 1rem; border-bottom: 1px solid #e9ecef;">
+                            <div class="d-flex align-items-start gap-3">
+                                <div style="width: 40px; height: 40px; background: ${notif.read_at ? '#f8f9fa' : '#e3f2fd'}; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas ${notif.icon || 'fa-bell'}" style="color: #0d2b4b;"></i>
+                                </div>
+                                <div style="flex: 1;">
+                                    <h6 class="mb-1 fw-semibold" style="font-size: 0.9rem;">${notif.title}</h6>
+                                    <p class="mb-1 text-muted" style="font-size: 0.8rem;">${notif.message}</p>
+                                    <small class="text-muted" style="font-size: 0.7rem;">${notif.time}</small>
+                                </div>
+                                ${!notif.read_at ? '<span style="width: 8px; height: 8px; background: #0d2b4b; border-radius: 50%;"></span>' : ''}
+                            </div>
+                        </a>
+                    `;
+                });
+                list.innerHTML = html;
+            }
+        })
+        .catch(error => {
+            console.error('Error loading notifications:', error);
+            document.getElementById('loadingNotifications').innerHTML = `
+                <div class="text-center py-4">
+                    <i class="fas fa-exclamation-circle fa-3x text-danger mb-3"></i>
+                    <p class="text-muted">Failed to load notifications</p>
+                    <button class="btn btn-sm btn-outline-primary mt-2" onclick="loadNotifications()">
+                        <i class="fas fa-sync-alt me-1"></i>Retry
+                    </button>
+                </div>
+            `;
+        });
+}
+
+function markAllAsRead() {
+    fetch('/notifications/mark-all-read', { method: 'POST' })
+        .then(() => {
+            location.reload();
+        });
+}
+
+// Load notifications when dropdown is opened
+document.getElementById('notificationDropdown').addEventListener('click', function() {
+    setTimeout(loadNotifications, 100);
+});
+
     </script>
 
     @stack('scripts')
