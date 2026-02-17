@@ -1,5 +1,5 @@
 <?php
-// app/Models/Event.php - COMPLETE FIXED VERSION
+// app/Models/Event.php
 
 namespace App\Models;
 
@@ -30,6 +30,11 @@ class Event extends Model
         'venue',
         'event_type',
         'organizer',
+        'speaker_names',
+        'speaker_bios',
+        'speaker_photos',
+        'speaker_titles',
+        'speaker_organizations',
         'contact_email',
         'contact_phone',
         'max_attendees',
@@ -56,6 +61,11 @@ class Event extends Model
         'max_attendees' => 'integer',
         'registered_attendees' => 'integer',
         'views_count' => 'integer',
+        'speaker_names' => 'array',
+        'speaker_bios' => 'array',
+        'speaker_photos' => 'array',
+        'speaker_titles' => 'array',
+        'speaker_organizations' => 'array',
     ];
 
     protected $appends = [
@@ -68,7 +78,10 @@ class Event extends Model
         'status',
         'venue_name',
         'building_name',
-        'campus_name'
+        'campus_name',
+        'speakers_list',
+        'speakers_count',
+        'has_speakers',
     ];
 
     /**
@@ -95,6 +108,97 @@ class Event extends Model
                 Storage::disk('public')->delete($event->image);
             }
         });
+    }
+
+    /**
+     * Get the speakers for this event.
+     */
+    public function speakers()
+    {
+        return $this->belongsToMany(Speaker::class, 'event_speaker')
+                    ->withPivot('session_title', 'session_time', 'session_duration', 
+                               'session_description', 'order', 'is_keynote', 
+                               'is_moderator', 'is_panelist', 'custom_data')
+                    ->withTimestamps()
+                    ->orderBy('order');
+    }
+
+    /**
+     * Get keynote speakers.
+     */
+    public function keynoteSpeakers()
+    {
+        return $this->belongsToMany(Speaker::class, 'event_speaker')
+                    ->withPivot('session_title', 'session_time', 'session_duration', 
+                               'session_description', 'order')
+                    ->wherePivot('is_keynote', true)
+                    ->orderBy('order');
+    }
+
+    /**
+     * Get moderators.
+     */
+    public function moderators()
+    {
+        return $this->belongsToMany(Speaker::class, 'event_speaker')
+                    ->withPivot('session_title', 'session_time', 'session_duration', 
+                               'session_description', 'order')
+                    ->wherePivot('is_moderator', true)
+                    ->orderBy('order');
+    }
+
+    /**
+     * Get panelists.
+     */
+    public function panelists()
+    {
+        return $this->belongsToMany(Speaker::class, 'event_speaker')
+                    ->withPivot('session_title', 'session_time', 'session_duration', 
+                               'session_description', 'order')
+                    ->wherePivot('is_panelist', true)
+                    ->orderBy('order');
+    }
+
+    /**
+     * Get speakers list attribute.
+     */
+    public function getSpeakersListAttribute()
+    {
+        if ($this->speakers->isNotEmpty()) {
+            return $this->speakers;
+        }
+        
+        // Fallback to legacy speaker data
+        $speakers = [];
+        if (!empty($this->speaker_names)) {
+            foreach ($this->speaker_names as $index => $name) {
+                $speakers[] = (object)[
+                    'name' => $name,
+                    'title' => $this->speaker_titles[$index] ?? null,
+                    'bio' => $this->speaker_bios[$index] ?? null,
+                    'photo' => $this->speaker_photos[$index] ?? null,
+                    'organization' => $this->speaker_organizations[$index] ?? null,
+                ];
+            }
+        }
+        
+        return collect($speakers);
+    }
+
+    /**
+     * Get speakers count attribute.
+     */
+    public function getSpeakersCountAttribute()
+    {
+        return $this->speakers()->count();
+    }
+
+    /**
+     * Get has speakers attribute.
+     */
+    public function getHasSpeakersAttribute()
+    {
+        return $this->speakers_count > 0;
     }
 
     /**
@@ -638,5 +742,31 @@ class Event extends Model
     public function hasImage()
     {
         return !empty($this->image);
+    }
+
+    /**
+     * Sync speakers with pivot data.
+     */
+    public function syncSpeakers($speakerData)
+    {
+        $syncData = [];
+        
+        foreach ($speakerData as $data) {
+            if (isset($data['speaker_id'])) {
+                $syncData[$data['speaker_id']] = [
+                    'session_title' => $data['session_title'] ?? null,
+                    'session_time' => $data['session_time'] ?? null,
+                    'session_duration' => $data['session_duration'] ?? null,
+                    'session_description' => $data['session_description'] ?? null,
+                    'order' => $data['order'] ?? 0,
+                    'is_keynote' => $data['is_keynote'] ?? false,
+                    'is_moderator' => $data['is_moderator'] ?? false,
+                    'is_panelist' => $data['is_panelist'] ?? false,
+                    'custom_data' => isset($data['custom_data']) ? json_encode($data['custom_data']) : null,
+                ];
+            }
+        }
+        
+        $this->speakers()->sync($syncData);
     }
 }

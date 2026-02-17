@@ -1,3 +1,4 @@
+{{-- resources/views/admin/events/edit.blade.php --}}
 @extends('layouts.app')
 
 @section('title', 'Edit Event - Jimma University')
@@ -247,15 +248,14 @@
                                         <div class="row g-3">
                                             <div class="col-md-6">
                                                 <div class="form-group">
-                                                    <label for="campus_id" class="form-label required">
+                                                    <label for="campus_id" class="form-label">
                                                         <i class="fas fa-university me-1 text-muted"></i>
                                                         Campus
                                                     </label>
                                                     <select class="form-select @error('campus_id') is-invalid @enderror" 
                                                             id="campus_id" 
-                                                            name="campus_id" 
-                                                            required>
-                                                        <option value="">Select Campus</option>
+                                                            name="campus_id">
+                                                        <option value="">Select Campus (Optional)</option>
                                                         @foreach($campuses as $campus)
                                                             <option value="{{ $campus->id }}" 
                                                                     {{ old('campus_id', $event->campus_id) == $campus->id ? 'selected' : '' }}
@@ -648,6 +648,9 @@
                             </div>
                         </div>
 
+                        <!-- Speaker Assignment Section -->
+                     @include('admin.events.partials.speaker-assignment') 
+
                         <!-- Form Actions -->
                         <div class="row mt-4">
                             <div class="col-12">
@@ -664,7 +667,7 @@
                                             <i class="fas fa-times me-2"></i>
                                             Cancel
                                         </a>
-                                        <button type="submit" class="btn btn-warning">
+                                        <button type="submit" class="btn btn-ju-primary">
                                             <i class="fas fa-save me-2"></i>
                                             Update Event
                                         </button>
@@ -703,6 +706,34 @@
     
     .ju-sub-card-body {
         padding: 20px;
+    }
+    
+    .btn-ju-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        color: white;
+        padding: 0.5rem 1.5rem;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-ju-primary:hover {
+        background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        color: white;
+    }
+    
+    .btn-outline-ju-primary {
+        border: 2px solid #667eea;
+        color: #667eea;
+        background: transparent;
+        padding: 0.5rem 1.5rem;
+    }
+    
+    .btn-outline-ju-primary:hover {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-color: transparent;
+        color: white;
     }
     
     .upload-area {
@@ -772,6 +803,7 @@
 @endpush
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Image upload with drag & drop

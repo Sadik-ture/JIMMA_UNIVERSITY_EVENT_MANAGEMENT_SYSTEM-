@@ -1,9 +1,13 @@
 <?php
+// app/Http/Controllers/SpeakerController.php - Add event assignment methods
 
 namespace App\Http\Controllers;
 
 use App\Models\Speaker;
+use App\Models\Event;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class SpeakerController extends Controller
 {
@@ -16,12 +20,7 @@ class SpeakerController extends Controller
 
         // Apply search
         if ($request->filled('search')) {
-            $query->where(function ($q) use ($request) {
-                $q->where('name', 'like', "%{$request->search}%")
-                    ->orWhere('title', 'like', "%{$request->search}%")
-                    ->orWhere('department', 'like', "%{$request->search}%")
-                    ->orWhere('bio', 'like', "%{$request->search}%");
-            });
+            $query->search($request->search);
         }
 
         // Filter by department
@@ -52,7 +51,11 @@ class SpeakerController extends Controller
         $totalCount = Speaker::count();
         $activeCount = Speaker::where('is_active', true)->count();
         $featuredCount = Speaker::where('is_featured', true)->where('is_active', true)->count();
-        $upcomingTalks = 0; // You can implement this based on your events
+        
+        // Get upcoming talks count
+        $upcomingTalks = Event::upcoming()
+            ->whereHas('speakers')
+            ->count();
 
         // Get paginated results with events count
         $speakers = $query->withCount('events')->paginate(20)->withQueryString();
@@ -82,6 +85,7 @@ class SpeakerController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'title' => 'required|string|max:255',
+            'department' => 'required|string|max:255',
             'email' => 'required|email|unique:speakers,email',
             'phone' => 'nullable|string|max:20',
             'bio' => 'nullable|string',
@@ -91,10 +95,11 @@ class SpeakerController extends Controller
             'twitter' => 'nullable|url',
             'photo' => 'nullable|image|max:2048',
             'is_active' => 'boolean',
+            'is_featured' => 'boolean',
         ]);
 
         // Generate slug from name
-        $validated['slug'] = \Illuminate\Support\Str::slug($validated['name']);
+        $validated['slug'] = Str::slug($validated['name']);
 
         // Handle photo upload
         if ($request->hasFile('photo')) {
@@ -133,6 +138,7 @@ class SpeakerController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'title' => 'required|string|max:255',
+            'department' => 'required|string|max:255',
             'email' => 'required|email|unique:speakers,email,' . $speaker->id,
             'phone' => 'nullable|string|max:20',
             'bio' => 'nullable|string',
@@ -142,11 +148,12 @@ class SpeakerController extends Controller
             'twitter' => 'nullable|url',
             'photo' => 'nullable|image|max:2048',
             'is_active' => 'boolean',
+            'is_featured' => 'boolean',
         ]);
 
         // Update slug if name changed
         if ($speaker->name !== $validated['name']) {
-            $validated['slug'] = \Illuminate\Support\Str::slug($validated['name']);
+            $validated['slug'] = Str::slug($validated['name']);
         }
 
         // Handle photo upload
@@ -162,7 +169,7 @@ class SpeakerController extends Controller
 
         $speaker->update($validated);
 
-        return redirect()->route('speakers.index')
+        return redirect()->route('speakers.show', $speaker)
             ->with('success', 'Speaker updated successfully.');
     }
 
@@ -171,9 +178,15 @@ class SpeakerController extends Controller
      */
     public function destroy(Speaker $speaker)
     {
+        // Check if speaker is assigned to any events
+        if ($speaker->events()->count() > 0) {
+            return redirect()->back()
+                ->with('error', 'Cannot delete speaker because they are assigned to ' . $speaker->events()->count() . ' events. Please remove them from events first.');
+        }
+
         // Delete photo if exists
         if ($speaker->photo) {
-            \Storage::disk('public')->delete($speaker->photo);
+            Storage::disk('public')->delete($speaker->photo);
         }
 
         $speaker->delete();
@@ -202,5 +215,25 @@ class SpeakerController extends Controller
 
         return redirect()->back()
             ->with('success', 'Featured status updated successfully.');
+    }
+
+    /**
+     * Get events for this speaker
+     */
+    public function events(Speaker $speaker)
+    {
+        $events = $speaker->events()->paginate(20);
+        return view('admin.speakers.events', compact('speaker', 'events'));
+    }
+
+    /**
+     * Remove speaker from an event
+     */
+    public function removeFromEvent(Speaker $speaker, Event $event)
+    {
+        $speaker->events()->detach($event->id);
+
+        return redirect()->back()
+            ->with('success', 'Speaker removed from event successfully.');
     }
 }

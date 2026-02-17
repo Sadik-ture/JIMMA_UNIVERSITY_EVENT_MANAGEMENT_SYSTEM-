@@ -1639,6 +1639,67 @@
         color: rgba(255, 255, 255, 0.7) !important;
     }
 
+
+     .nav-section-title {
+        padding: 0.5rem 1rem 0.25rem 2rem;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #6c757d;
+        border-bottom: 1px solid rgba(0, 51, 102, 0.1);
+        margin-top: 0.5rem;
+    }
+    
+    .nav-section-title:first-of-type {
+        margin-top: 0;
+    }
+    
+    .nav-section-text {
+        font-weight: 600;
+    }
+    
+    .menu-badge {
+        float: right;
+        padding: 0.2rem 0.5rem;
+        border-radius: 10px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: white;
+        background-color: #003366;
+        margin-top: 0.15rem;
+    }
+    
+    .hover-pulse:hover {
+        animation: pulse 1s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+    
+    .nav-link {
+        transition: all 0.3s ease;
+        border-left: 3px solid transparent;
+    }
+    
+    .nav-link:hover {
+        background-color: rgba(0, 51, 102, 0.05);
+        border-left-color: #003366;
+    }
+    
+    .nav-link.active {
+        background-color: rgba(0, 51, 102, 0.1);
+        border-left-color: #003366;
+        font-weight: 500;
+    }
+    
+    .nav-link i {
+        width: 20px;
+        text-align: center;
+    }
+
     </style>
 
     @stack('styles')
@@ -2067,65 +2128,133 @@
                 @endif
 
                 <!-- EVENT ADMINISTRATION -->
-                @if(auth()->user()->hasPermission('manage_events') || auth()->user()->hasPermission('view_event_requests'))
-                <li class="menu-item">
-                    <a class="menu-link menu-collapse hover-slide-up {{ request()->routeIs('admin.events.*') || request()->routeIs('event-requests.index') || request()->routeIs('speakers.*') ? '' : 'collapsed' }}"
-                        data-bs-toggle="collapse" href="#eventAdmin" role="button" aria-expanded="{{ request()->routeIs('admin.events.*') || request()->routeIs('event-requests.index') || request()->routeIs('speakers.*') ? 'true' : 'false' }}">
-                        <i class="menu-icon fas fa-calendar-plus"></i>
-                        <span class="menu-title">Event Administration</span>
-                        <i class="menu-arrow fas fa-chevron-right"></i>
-                    </a>
-                    <div class="collapse {{ request()->routeIs('admin.events.*') || request()->routeIs('event-requests.index') || request()->routeIs('speakers.*') ? 'show' : '' }}" id="eventAdmin">
-                        <ul class="nav flex-column sub-menu">
-                            @if(auth()->user()->hasPermission('manage_events'))
-                            <li class="nav-item">
-                                <a class="nav-link hover-border {{ request()->routeIs('admin.events.index') ? 'active' : '' }}"
-                                    href="{{ route('admin.events.index') }}">
-                                    <i class="fas fa-calendar me-2"></i>
-                                    <span>All Events</span>
-                                </a>
-                            </li>
-                            @endif
+@if(auth()->user()->hasPermission('manage_events') || auth()->user()->hasPermission('view_event_requests') || auth()->user()->hasPermission('manage_speakers'))
+<li class="menu-item">
+    <a class="menu-link menu-collapse hover-slide-up {{ request()->routeIs('admin.events.*') || request()->routeIs('event-requests.index') || request()->routeIs('speakers.*') || request()->routeIs('admin.events.speakers.*') ? '' : 'collapsed' }}"
+        data-bs-toggle="collapse" href="#eventAdmin" role="button" aria-expanded="{{ request()->routeIs('admin.events.*') || request()->routeIs('event-requests.index') || request()->routeIs('speakers.*') || request()->routeIs('admin.events.speakers.*') ? 'true' : 'false' }}">
+        <i class="menu-icon fas fa-calendar-plus"></i>
+        <span class="menu-title">Event Administration</span>
+        <i class="menu-arrow fas fa-chevron-right"></i>
+    </a>
+    <div class="collapse {{ request()->routeIs('admin.events.*') || request()->routeIs('event-requests.index') || request()->routeIs('speakers.*') || request()->routeIs('admin.events.speakers.*') ? 'show' : '' }}" id="eventAdmin">
+        <ul class="nav flex-column sub-menu">
+            
+            <!-- Events Management Section -->
+            @if(auth()->user()->hasPermission('manage_events') || auth()->user()->hasPermission('create_events'))
+            <li class="nav-item nav-section-title">
+                <span class="nav-section-text">Events</span>
+            </li>
+            
+            @if(auth()->user()->hasPermission('manage_events'))
+            <li class="nav-item">
+                <a class="nav-link hover-border {{ request()->routeIs('admin.events.index') ? 'active' : '' }}"
+                    href="{{ route('admin.events.index') }}">
+                    <i class="fas fa-calendar-alt me-2"></i>
+                    <span>All Events</span>
+                    @php
+                    $upcomingEvents = \App\Models\Event::upcoming()->count();
+                    @endphp
+                    @if($upcomingEvents > 0)
+                    <span class="menu-badge hover-pulse" style="background-color: #003366;">{{ $upcomingEvents }}</span>
+                    @endif
+                </a>
+            </li>
+            @endif
 
-                            @if(auth()->user()->hasPermission('create_events'))
-                            <li class="nav-item">
-                                <a class="nav-link hover-border {{ request()->routeIs('admin.events.create') ? 'active' : '' }}"
-                                    href="{{ route('admin.events.create') }}">
-                                    <i class="fas fa-plus-circle me-2"></i>
-                                    <span>Create Event</span>
-                                </a>
-                            </li>
-                            @endif
+            @if(auth()->user()->hasPermission('create_events'))
+            <li class="nav-item">
+                <a class="nav-link hover-border {{ request()->routeIs('admin.events.create') ? 'active' : '' }}"
+                    href="{{ route('admin.events.create') }}">
+                    <i class="fas fa-plus-circle me-2"></i>
+                    <span>Create Event</span>
+                </a>
+            </li>
+            @endif
+            @endif
 
-                            @if(class_exists('App\Models\Speaker') && auth()->user()->hasPermission('manage_speakers'))
-                            <li class="nav-item">
-                                <a class="nav-link hover-border {{ request()->routeIs('speakers.*') ? 'active' : '' }}"
-                                    href="{{ route('speakers.index') }}">
-                                    <i class="fas fa-microphone-alt me-2"></i>
-                                    <span>Speakers</span>
-                                </a>
-                            </li>
-                            @endif
+            <!-- Speakers Management Section -->
+            @if(class_exists('App\Models\Speaker') && auth()->user()->hasPermission('manage_speakers'))
+            <li class="nav-item nav-section-title">
+                <span class="nav-section-text">Speakers</span>
+            </li>
+            
+            <li class="nav-item">
+                <a class="nav-link hover-border {{ request()->routeIs('speakers.index') ? 'active' : '' }}"
+                    href="{{ route('speakers.index') }}">
+                    <i class="fas fa-microphone-alt me-2"></i>
+                    <span>All Speakers</span>
+                    @php
+                    $activeSpeakers = \App\Models\Speaker::active()->count();
+                    @endphp
+                    @if($activeSpeakers > 0)
+                    <span class="menu-badge" style="background-color: #28a745;">{{ $activeSpeakers }}</span>
+                    @endif
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a class="nav-link hover-border {{ request()->routeIs('speakers.create') ? 'active' : '' }}"
+                    href="{{ route('speakers.create') }}">
+                    <i class="fas fa-user-plus me-2"></i>
+                    <span>Add Speaker</span>
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a class="nav-link hover-border {{ request()->routeIs('speakers.featured') ? 'active' : '' }}"
+                    href="{{ route('speakers.index', ['featured' => 1]) }}">
+                    <i class="fas fa-star me-2" style="color: #ffc107;"></i>
+                    <span>Featured Speakers</span>
+                    @php
+                    $featuredSpeakers = \App\Models\Speaker::featured()->count();
+                    @endphp
+                    @if($featuredSpeakers > 0)
+                    <span class="menu-badge" style="background-color: #ffc107; color: #000;">{{ $featuredSpeakers }}</span>
+                    @endif
+                </a>
+            </li>
+            @endif
 
-                            @if(auth()->user()->hasPermission('view_event_requests'))
-                            <li class="nav-item">
-                                <a class="nav-link hover-border {{ request()->routeIs('event-requests.index') ? 'active' : '' }}"
-                                    href="{{ route('event-requests.index') }}">
-                                    <i class="fas fa-clipboard-list me-2"></i>
-                                    <span>All Event Requests</span>
-                                    @php
-                                    $pendingRequests = \App\Models\EventRequest::where('status', 'pending')->count();
-                                    @endphp
-                                    @if($pendingRequests > 0)
-                                    <span class="menu-badge hover-pulse">{{ $pendingRequests }}</span>
-                                    @endif
-                                </a>
-                            </li>
-                            @endif
-                        </ul>
-                    </div>
-                </li>
-                @endif
+            <!-- Event Requests Section -->
+            @if(auth()->user()->hasPermission('view_event_requests'))
+            <li class="nav-item nav-section-title">
+                <span class="nav-section-text">Requests</span>
+            </li>
+            
+            <li class="nav-item">
+                <a class="nav-link hover-border {{ request()->routeIs('event-requests.index') ? 'active' : '' }}"
+                    href="{{ route('event-requests.index') }}">
+                    <i class="fas fa-clipboard-list me-2"></i>
+                    <span>All Requests</span>
+                    @php
+                    $pendingRequests = \App\Models\EventRequest::where('status', 'pending')->count();
+                    @endphp
+                    @if($pendingRequests > 0)
+                    <span class="menu-badge hover-pulse" style="background-color: #ffc107; color: #000;">{{ $pendingRequests }}</span>
+                    @endif
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a class="nav-link hover-border {{ request()->routeIs('event-requests.pending') ? 'active' : '' }}"
+                    href="{{ route('event-requests.index', ['status' => 'pending']) }}">
+                    <i class="fas fa-hourglass-half me-2" style="color: #ffc107;"></i>
+                    <span>Pending</span>
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a class="nav-link hover-border {{ request()->routeIs('event-requests.approved') ? 'active' : '' }}"
+                    href="{{ route('event-requests.index', ['status' => 'approved']) }}">
+                    <i class="fas fa-check-circle me-2" style="color: #28a745;"></i>
+                    <span>Approved</span>
+                </a>
+            </li>
+            @endif
+        </ul>
+    </div>
+</li>
+@endif
 
                 <!-- USER ADMINISTRATION -->
                 @if(auth()->user()->hasAnyPermission(['view_users', 'create_users', 'view_roles', 'view_permissions']))

@@ -1,3 +1,4 @@
+{{-- resources/views/admin/speakers/show.blade.php --}}
 @extends('layouts.app')
 
 @section('title', $speaker->name . ' - Jimma University')
@@ -14,8 +15,8 @@
 <div class="row">
     <div class="col-md-8">
         <div class="ju-card mb-4">
-            <div class="ju-card-header d-flex justify-content-between align-items-center">
-                <h5 class="ju-card-title mb-0">Speaker Information</h5>
+            <div class="ju-card-header d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #003366 0%, #004080 100%);">
+                <h5 class="ju-card-title text-white mb-0">Speaker Information</h5>
                 <div class="btn-group">
                     <a href="{{ route('speakers.edit', $speaker) }}" class="btn btn-sm btn-warning">
                         <i class="fas fa-edit me-1"></i> Edit
@@ -34,16 +35,16 @@
                 <div class="row">
                     <div class="col-md-4 text-center">
                         @if($speaker->photo)
-                        <img src="{{ asset('storage/' . $speaker->photo) }}" alt="{{ $speaker->name }}" 
+                        <img src="{{ $speaker->photo_url }}" alt="{{ $speaker->name }}" 
                              class="img-fluid rounded-circle mb-3" style="width: 200px; height: 200px; object-fit: cover;">
                         @else
                         <div class="rounded-circle d-flex align-items-center justify-content-center mb-3 mx-auto" 
-                             style="width: 200px; height: 200px; background: var(--ju-light-green); color: var(--ju-green);">
+                             style="width: 200px; height: 200px; background: linear-gradient(135deg, #003366 0%, #004080 100%); color: white;">
                             <i class="fas fa-user fa-5x"></i>
                         </div>
                         @endif
                         
-                        <h4>{{ $speaker->name }}</h4>
+                        <h4>{{ $speaker->full_name }}</h4>
                         <p class="text-muted">{{ $speaker->title }}</p>
                         
                         <div class="mb-3">
@@ -61,26 +62,41 @@
                     
                     <div class="col-md-8">
                         <div class="mb-4">
-                            <h5>Biography</h5>
+                            <h5 style="color: #003366;">Biography</h5>
                             <p>{{ $speaker->bio }}</p>
                         </div>
                         
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <h6><i class="fas fa-building text-primary me-2"></i> Department</h6>
-                                    <p class="ms-4">{{ $speaker->department }}</p>
+                                    <h6 style="color: #003366;"><i class="fas fa-building me-2"></i> Department</h6>
+                                    <p class="ms-4">{{ $speaker->position }}</p>
                                 </div>
                                 
                                 <div class="mb-3">
-                                    <h6><i class="fas fa-graduation-cap text-success me-2"></i> Expertise</h6>
-                                    <p class="ms-4">{{ $speaker->expertise ?: 'Not specified' }}</p>
+                                    <h6 style="color: #003366;"><i class="fas fa-building me-2"></i> Organization</h6>
+                                    <p class="ms-4">{{ $speaker->organization ?: 'Not specified' }}</p>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <h6 style="color: #003366;"><i class="fas fa-graduation-cap me-2"></i> Expertise</h6>
+                                    <p class="ms-4">
+                                        @if($speaker->expertise)
+                                            @if(is_array($speaker->expertise))
+                                                {{ implode(', ', $speaker->expertise) }}
+                                            @else
+                                                {{ $speaker->expertise }}
+                                            @endif
+                                        @else
+                                            Not specified
+                                        @endif
+                                    </p>
                                 </div>
                             </div>
                             
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <h6><i class="fas fa-envelope text-danger me-2"></i> Contact</h6>
+                                    <h6 style="color: #003366;"><i class="fas fa-envelope me-2"></i> Contact</h6>
                                     <div class="ms-4">
                                         <div><strong>Email:</strong> <a href="mailto:{{ $speaker->email }}">{{ $speaker->email }}</a></div>
                                         @if($speaker->phone)
@@ -90,7 +106,7 @@
                                 </div>
                                 
                                 <div class="mb-3">
-                                    <h6><i class="fas fa-link text-info me-2"></i> Links</h6>
+                                    <h6 style="color: #003366;"><i class="fas fa-link me-2"></i> Links</h6>
                                     <div class="ms-4">
                                         @if($speaker->website)
                                         <div><strong>Website:</strong> <a href="{{ $speaker->website }}" target="_blank">{{ $speaker->website }}</a></div>
@@ -112,8 +128,8 @@
         
         <!-- Speaker's Events -->
         <div class="ju-card">
-            <div class="ju-card-header">
-                <h5 class="ju-card-title mb-0">Speaker's Events</h5>
+            <div class="ju-card-header" style="background: linear-gradient(135deg, #003366 0%, #004080 100%);">
+                <h5 class="ju-card-title text-white mb-0">Speaker's Events</h5>
             </div>
             <div class="ju-card-body">
                 @if($speaker->events->count() > 0)
@@ -125,6 +141,7 @@
                                 <th>Date</th>
                                 <th>Venue</th>
                                 <th>Type</th>
+                                <th>Role</th>
                                 <th>Status</th>
                             </tr>
                         </thead>
@@ -132,12 +149,29 @@
                             @foreach($speaker->events as $event)
                             <tr>
                                 <td>
-                                    <a href="{{ route('events.show', $event) }}">{{ $event->title }}</a>
+                                    {{-- FIXED: Changed from 'events.show' to 'admin.events.show' --}}
+                                    <a href="{{ route('admin.events.show', $event) }}" style="color: #003366;">
+                                        {{ $event->title }}
+                                    </a>
                                 </td>
                                 <td>{{ \Carbon\Carbon::parse($event->start_date)->format('M d, Y') }}</td>
-                                <td>{{ $event->venue }}</td>
+                                <td>{{ $event->venue_name }}</td>
                                 <td>
-                                    <span class="badge bg-info">{{ ucfirst($event->event_type) }}</span>
+                                    <span class="badge" style="background-color: #003366; color: white;">{{ ucfirst($event->event_type) }}</span>
+                                </td>
+                                <td>
+                                    @if($event->pivot->is_keynote)
+                                        <span class="badge" style="background-color: #003366; color: white;">Keynote</span>
+                                    @endif
+                                    @if($event->pivot->is_moderator)
+                                        <span class="badge bg-success">Moderator</span>
+                                    @endif
+                                    @if($event->pivot->is_panelist)
+                                        <span class="badge bg-info">Panelist</span>
+                                    @endif
+                                    @if(!$event->pivot->is_keynote && !$event->pivot->is_moderator && !$event->pivot->is_panelist)
+                                        <span class="badge bg-secondary">Speaker</span>
+                                    @endif
                                 </td>
                                 <td>
                                     @php
@@ -148,15 +182,18 @@
                                         if ($now < $start) {
                                             $status = 'Upcoming';
                                             $badgeClass = 'bg-primary';
+                                            $bgColor = '#003366';
                                         } elseif ($now >= $start && $now <= $end) {
                                             $status = 'Ongoing';
                                             $badgeClass = 'bg-success';
+                                            $bgColor = '#28a745';
                                         } else {
                                             $status = 'Completed';
                                             $badgeClass = 'bg-secondary';
+                                            $bgColor = '#6c757d';
                                         }
                                     @endphp
-                                    <span class="badge {{ $badgeClass }}">{{ $status }}</span>
+                                    <span class="badge" style="background-color: {{ $bgColor }}; color: white;">{{ $status }}</span>
                                 </td>
                             </tr>
                             @endforeach
@@ -165,10 +202,10 @@
                 </div>
                 @else
                 <div class="text-center py-4">
-                    <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                    <i class="fas fa-calendar-times fa-3x mb-3" style="color: #003366;"></i>
                     <h5>No events assigned</h5>
                     <p class="text-muted">This speaker has not been assigned to any events yet.</p>
-                   <a href="{{ route('admin.events.create') }}" class="btn btn-ju mt-2">        
+                    <a href="{{ route('admin.events.create') }}" class="btn mt-2" style="background-color: #003366; color: white;">        
                         <i class="fas fa-plus me-2"></i> Create Event
                     </a>
                 </div>
@@ -179,8 +216,8 @@
     
     <div class="col-md-4">
         <div class="ju-card mb-4">
-            <div class="ju-card-header">
-                <h6 class="ju-card-title mb-0">Quick Actions</h6>
+            <div class="ju-card-header" style="background: linear-gradient(135deg, #003366 0%, #004080 100%);">
+                <h6 class="ju-card-title text-white mb-0">Quick Actions</h6>
             </div>
             <div class="ju-card-body">
                 <div class="d-grid gap-2">
@@ -206,7 +243,7 @@
                         </button>
                     </form>
                     
-                    <a href="{{ route('speakers.index') }}" class="btn btn-outline-primary">
+                    <a href="{{ route('speakers.index') }}" class="btn btn-outline-primary" style="border-color: #003366; color: #003366;">
                         <i class="fas fa-list me-2"></i> Back to List
                     </a>
                 </div>
@@ -214,22 +251,38 @@
         </div>
         
         <div class="ju-card">
-            <div class="ju-card-header">
-                <h6 class="ju-card-title mb-0">Speaker Statistics</h6>
+            <div class="ju-card-header" style="background: linear-gradient(135deg, #003366 0%, #004080 100%);">
+                <h6 class="ju-card-title text-white mb-0">Speaker Statistics</h6>
             </div>
             <div class="ju-card-body">
                 <div class="mb-3">
                     <small class="text-muted">Total Events</small>
                     <div class="d-flex align-items-center">
-                        <i class="fas fa-calendar-alt text-primary me-2"></i>
+                        <i class="fas fa-calendar-alt me-2" style="color: #003366;"></i>
                         <h4 class="mb-0">{{ $speaker->events_count }}</h4>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <small class="text-muted">Upcoming Events</small>
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-clock me-2" style="color: #28a745;"></i>
+                        <h4 class="mb-0">{{ $speaker->upcoming_events_count }}</h4>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <small class="text-muted">Keynote Sessions</small>
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-star me-2" style="color: #ffc107;"></i>
+                        <h4 class="mb-0">{{ $speaker->keynoteEvents()->count() }}</h4>
                     </div>
                 </div>
                 
                 <div class="mb-3">
                     <small class="text-muted">Created</small>
                     <div class="d-flex align-items-center">
-                        <i class="fas fa-calendar-plus text-muted me-2"></i>
+                        <i class="fas fa-calendar-plus me-2" style="color: #003366;"></i>
                         {{ $speaker->created_at->format('M d, Y') }}
                     </div>
                 </div>
@@ -237,7 +290,7 @@
                 <div class="mb-3">
                     <small class="text-muted">Last Updated</small>
                     <div class="d-flex align-items-center">
-                        <i class="fas fa-history text-muted me-2"></i>
+                        <i class="fas fa-history me-2" style="color: #003366;"></i>
                         {{ $speaker->updated_at->format('M d, Y') }}
                     </div>
                 </div>

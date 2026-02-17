@@ -1,11 +1,13 @@
 <?php
 // app/Http/Controllers/EventController.php - UPDATED VERSION
+
 namespace App\Http\Controllers;
 
 use App\Models\Event;
 use App\Models\Campus;
 use App\Models\Building;
 use App\Models\Venue;
+use App\Models\Speaker;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
@@ -17,7 +19,7 @@ class EventController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Event::query()->with(['campusRelation', 'buildingRelation', 'venueRelation']);
+        $query = Event::query()->with(['campusRelation', 'buildingRelation', 'venueRelation', 'speakers']);
         
         // Search
         if ($request->filled('search')) {
@@ -50,6 +52,13 @@ class EventController extends Controller
             $query->featured();
         }
         
+        // Filter by speaker
+        if ($request->filled('speaker_id')) {
+            $query->whereHas('speakers', function ($q) use ($request) {
+                $q->where('speakers.id', $request->speaker_id);
+            });
+        }
+        
         // Default: show upcoming and ongoing events
         if (!$request->filled('status')) {
             $query->where('end_date', '>=', now()->subDays(1));
@@ -73,6 +82,7 @@ class EventController extends Controller
         $campuses = Campus::active()->get();
         $buildings = Building::active()->get();
         $venues = Venue::available()->get();
+        $speakers = Speaker::active()->orderBy('name')->get();
         
         return view('admin.events.index', compact(
             'events', 
@@ -83,7 +93,8 @@ class EventController extends Controller
             'featuredCount',
             'campuses',
             'buildings',
-            'venues'
+            'venues',
+            'speakers'
         ));
     }
 
@@ -95,6 +106,7 @@ class EventController extends Controller
         $campuses = Campus::active()->get();
         $buildings = Building::active()->get();
         $venues = Venue::available()->get();
+        $speakers = Speaker::active()->orderBy('name')->get();
         
         $eventTypes = [
             'academic' => 'Academic',
@@ -105,7 +117,7 @@ class EventController extends Controller
             'seminar' => 'Seminar'
         ];
         
-        return view('admin.events.create', compact('campuses', 'buildings', 'venues', 'eventTypes'));
+        return view('admin.events.create', compact('campuses', 'buildings', 'venues', 'speakers', 'eventTypes'));
     }
 
     /**
@@ -137,6 +149,13 @@ class EventController extends Controller
             'tags' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
             'additional_venue_info' => 'nullable|array',
+            'speakers' => 'nullable|array',
+            'speakers.*.speaker_id' => 'nullable|exists:speakers,id',
+            'speakers.*.session_title' => 'nullable|string|max:255',
+            'speakers.*.session_time' => 'nullable|date',
+            'speakers.*.session_duration' => 'nullable|integer|min:1',
+            'speakers.*.session_description' => 'nullable|string',
+            'speakers.*.is_keynote' => 'nullable|boolean',
         ]);
 
         // Generate slug
@@ -176,8 +195,17 @@ class EventController extends Controller
         // Handle image upload after event is created
         if ($request->hasFile('image')) {
             $event->uploadImage($request->file('image'));
-            $path = $request->file('image')->store('events', 'public');
-    $validated['image'] = $path;
+        }
+
+        // Handle speaker assignments
+        if ($request->has('speakers') && is_array($request->speakers)) {
+            $speakerData = array_filter($request->speakers, function ($speaker) {
+                return !empty($speaker['speaker_id']);
+            });
+            
+            if (!empty($speakerData)) {
+                $event->syncSpeakers($speakerData);
+            }
         }
 
         return redirect()->route('admin.events.show', $event)
@@ -189,7 +217,7 @@ class EventController extends Controller
      */
     public function show(Event $event)
     {
-        $event->load(['campusRelation', 'buildingRelation', 'venueRelation']);
+        $event->load(['campusRelation', 'buildingRelation', 'venueRelation', 'speakers']);
         return view('admin.events.show', compact('event'));
     }
 
@@ -198,10 +226,13 @@ class EventController extends Controller
      */
     public function edit(Event $event)
     {
-        $event->load(['campusRelation', 'buildingRelation', 'venueRelation']);
+        $event->load(['campusRelation', 'buildingRelation', 'venueRelation', 'speakers']);
         $campuses = Campus::active()->get();
         $buildings = Building::active()->where('campus_id', $event->campus_id)->get();
         $venues = Venue::available()->where('building_id', $event->building_id)->get();
+        $speakers = Speaker::active()->orderBy('name')->get();
+        
+        $assignedSpeakerIds = $event->speakers->pluck('id')->toArray();
         
         $eventTypes = [
             'academic' => 'Academic',
@@ -212,7 +243,15 @@ class EventController extends Controller
             'seminar' => 'Seminar'
         ];
         
-        return view('admin.events.edit', compact('event', 'campuses', 'buildings', 'venues', 'eventTypes'));
+        return view('admin.events.edit', compact(
+            'event', 
+            'campuses', 
+            'buildings', 
+            'venues', 
+            'speakers',
+            'assignedSpeakerIds',
+            'eventTypes'
+        ));
     }
 
     /**
@@ -245,6 +284,13 @@ class EventController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
             'additional_venue_info' => 'nullable|array',
             'remove_image' => 'nullable|boolean',
+            'speakers' => 'nullable|array',
+            'speakers.*.speaker_id' => 'nullable|exists:speakers,id',
+            'speakers.*.session_title' => 'nullable|string|max:255',
+            'speakers.*.session_time' => 'nullable|date',
+            'speakers.*.session_duration' => 'nullable|integer|min:1',
+            'speakers.*.session_description' => 'nullable|string',
+            'speakers.*.is_keynote' => 'nullable|boolean',
         ]);
 
         // Update slug if title changed
@@ -275,7 +321,6 @@ class EventController extends Controller
         // Handle new image upload
         if ($request->hasFile('image')) {
             $event->uploadImage($request->file('image'));
-            unset($validated['image']); // Remove from validation as it's already handled
         }
 
         // Get names for string fields if IDs are provided
@@ -296,6 +341,21 @@ class EventController extends Controller
 
         $event->update($validated);
 
+        // Handle speaker assignments
+        if ($request->has('speakers') && is_array($request->speakers)) {
+            $speakerData = array_filter($request->speakers, function ($speaker) {
+                return !empty($speaker['speaker_id']);
+            });
+            
+            if (!empty($speakerData)) {
+                $event->syncSpeakers($speakerData);
+            } else {
+                $event->speakers()->detach();
+            }
+        } else {
+            $event->speakers()->detach();
+        }
+
         return redirect()->route('admin.events.show', $event)
             ->with('success', 'Event updated successfully!');
     }
@@ -307,6 +367,9 @@ class EventController extends Controller
     {
         // Delete image if exists
         $event->deleteImage();
+        
+        // Detach speakers
+        $event->speakers()->detach();
         
         $event->delete();
 
@@ -396,6 +459,26 @@ class EventController extends Controller
         
         $newEvent->save();
 
+        // Copy speakers
+        $speakerData = [];
+        foreach ($event->speakers as $speaker) {
+            $speakerData[] = [
+                'speaker_id' => $speaker->id,
+                'session_title' => $speaker->pivot->session_title,
+                'session_time' => $speaker->pivot->session_time,
+                'session_duration' => $speaker->pivot->session_duration,
+                'session_description' => $speaker->pivot->session_description,
+                'order' => $speaker->pivot->order,
+                'is_keynote' => $speaker->pivot->is_keynote,
+                'is_moderator' => $speaker->pivot->is_moderator,
+                'is_panelist' => $speaker->pivot->is_panelist,
+            ];
+        }
+        
+        if (!empty($speakerData)) {
+            $newEvent->syncSpeakers($speakerData);
+        }
+
         return redirect()->route('admin.events.edit', $newEvent)
             ->with('success', 'Event duplicated successfully. You can now edit the copy.');
     }
@@ -405,13 +488,15 @@ class EventController extends Controller
      */
     public function export(Request $request)
     {
-        $events = Event::where('end_date', '>=', now())->get();
+        $events = Event::where('end_date', '>=', now())->with('speakers')->get();
         
-        $csvData = "Title,Description,Start Date,End Date,Campus,Building,Venue,Type,Organizer,Max Attendees,Status\n";
+        $csvData = "Title,Description,Start Date,End Date,Campus,Building,Venue,Type,Organizer,Speakers,Max Attendees,Status\n";
         
         foreach ($events as $event) {
+            $speakerNames = $event->speakers->pluck('name')->implode('; ');
+            
             $csvData .= '"' . str_replace('"', '""', $event->title) . '",';
-            $csvData .= '"' . str_replace('"', '""', $event->short_description) . '",';
+            $csvData .= '"' . str_replace('"', '""', $event->short_description ?: $event->description) . '",';
             $csvData .= $event->start_date->format('Y-m-d H:i') . ',';
             $csvData .= $event->end_date->format('Y-m-d H:i') . ',';
             $csvData .= $event->campus_name . ',';
@@ -419,6 +504,7 @@ class EventController extends Controller
             $csvData .= $event->venue_name . ',';
             $csvData .= ucfirst($event->event_type) . ',';
             $csvData .= $event->organizer . ',';
+            $csvData .= '"' . $speakerNames . '",';
             $csvData .= ($event->max_attendees ?: 'Unlimited') . ',';
             $csvData .= ucfirst($event->status) . "\n";
         }

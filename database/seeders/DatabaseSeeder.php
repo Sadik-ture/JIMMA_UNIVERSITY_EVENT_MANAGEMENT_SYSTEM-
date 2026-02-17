@@ -1,4 +1,5 @@
 <?php
+// database/seeders/DatabaseSeeder.php - UPDATED
 
 namespace Database\Seeders;
 
@@ -15,14 +16,14 @@ class DatabaseSeeder extends Seeder
         
         // Clear tables in the right order (child tables first)
         $tables = [
-            'user_notifications',
-            'notifications',
+            'event_speaker', // Pivot table first
             'event_registrations',
             'event_requests',
             'speakers',
             'events',
-            'role_permission',  // Pivot table first
-            'permissions',
+            'campuses',
+            'buildings',
+            'venues',
             'users',
             'roles'
         ];
@@ -38,11 +39,13 @@ class DatabaseSeeder extends Seeder
         
         // Now run seeders
         $this->call([
+            CampusSeeder::class,
+            BuildingSeeder::class,
+            VenueSeeder::class,
             RoleSeeder::class,
-            PermissionSeeder::class,
             UserSeeder::class,
-            EventSeeder::class,
             SpeakerSeeder::class,
+            EventSeeder::class,
         ]);
     }
 }

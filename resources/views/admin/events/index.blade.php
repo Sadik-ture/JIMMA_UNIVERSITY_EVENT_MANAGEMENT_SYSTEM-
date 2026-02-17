@@ -1,3 +1,4 @@
+{{-- resources/views/admin/events/index.blade.php --}}
 @extends('layouts.app')
 
 @section('title', 'Events Management - Jimma University')
@@ -13,50 +14,50 @@
     <!-- Quick Stats -->
     <div class="row g-4 mb-4">
         <div class="col-xl-3 col-md-6">
-            <div class="stat-card stat-card-primary">
+            <div class="stat-card" style="background: linear-gradient(135deg, #003366 0%, #004080 100%);">
                 <div class="stat-icon">
-                    <i class="fas fa-calendar-alt"></i>
+                    <i class="fas fa-calendar-alt text-white"></i>
                 </div>
-                <div class="stat-number">{{ $totalCount }}</div>
-                <div class="stat-label">Total Events</div>
+                <div class="stat-number text-white">{{ $totalCount }}</div>
+                <div class="stat-label text-white-50">Total Events</div>
             </div>
         </div>
         
         <div class="col-xl-3 col-md-6">
-            <div class="stat-card stat-card-success">
+            <div class="stat-card" style="background: linear-gradient(135deg, #004d40 0%, #00695c 100%);">
                 <div class="stat-icon">
-                    <i class="fas fa-clock"></i>
+                    <i class="fas fa-clock text-white"></i>
                 </div>
-                <div class="stat-number">{{ $upcomingCount }}</div>
-                <div class="stat-label">Upcoming</div>
+                <div class="stat-number text-white">{{ $upcomingCount }}</div>
+                <div class="stat-label text-white-50">Upcoming</div>
             </div>
         </div>
         
         <div class="col-xl-3 col-md-6">
-            <div class="stat-card stat-card-info">
+            <div class="stat-card" style="background: linear-gradient(135deg, #0277bd 0%, #039be5 100%);">
                 <div class="stat-icon">
-                    <i class="fas fa-play-circle"></i>
+                    <i class="fas fa-play-circle text-white"></i>
                 </div>
-                <div class="stat-number">{{ $ongoingCount }}</div>
-                <div class="stat-label">Ongoing</div>
+                <div class="stat-number text-white">{{ $ongoingCount }}</div>
+                <div class="stat-label text-white-50">Ongoing</div>
             </div>
         </div>
         
         <div class="col-xl-3 col-md-6">
-            <div class="stat-card stat-card-warning">
+            <div class="stat-card" style="background: linear-gradient(135deg, #b71c1c 0%, #d32f2f 100%);">
                 <div class="stat-icon">
-                    <i class="fas fa-history"></i>
+                    <i class="fas fa-history text-white"></i>
                 </div>
-                <div class="stat-number">{{ $completedCount }}</div>
-                <div class="stat-label">Completed</div>
+                <div class="stat-number text-white">{{ $completedCount }}</div>
+                <div class="stat-label text-white-50">Completed</div>
             </div>
         </div>
     </div>
 
     <!-- Filters Card -->
     <div class="ju-card mb-4">
-        <div class="ju-card-header">
-            <h5 class="ju-card-title">
+        <div class="ju-card-header" style="background: linear-gradient(135deg, #003366 0%, #004080 100%);">
+            <h5 class="ju-card-title text-white mb-0">
                 <i class="fas fa-filter me-2"></i>Filter Events
             </h5>
         </div>
@@ -64,24 +65,25 @@
             <div class="row g-3">
                 <div class="col-md-3">
                     <div class="form-group">
-                        <label class="form-label-ju">Search</label>
+                        <label class="form-label-ju" style="color: #003366;">Search</label>
                         <div class="input-group">
-                            <span class="input-group-text">
-                                <i class="fas fa-search"></i>
+                            <span class="input-group-text" style="border-color: #003366;">
+                                <i class="fas fa-search" style="color: #003366;"></i>
                             </span>
                             <input type="text" 
                                    class="form-control form-control-ju" 
                                    id="searchInput" 
                                    placeholder="Search events..."
-                                   value="{{ request('search') }}">
+                                   value="{{ request('search') }}"
+                                   style="border-color: #003366;">
                         </div>
                     </div>
                 </div>
                 
                 <div class="col-md-2">
                     <div class="form-group">
-                        <label class="form-label-ju">Status</label>
-                        <select class="form-select form-control-ju" id="statusFilter">
+                        <label class="form-label-ju" style="color: #003366;">Status</label>
+                        <select class="form-select form-control-ju" id="statusFilter" style="border-color: #003366;">
                             <option value="">All Status</option>
                             <option value="upcoming" {{ request('status') == 'upcoming' ? 'selected' : '' }}>
                                 Upcoming
@@ -98,8 +100,8 @@
                 
                 <div class="col-md-2">
                     <div class="form-group">
-                        <label class="form-label-ju">Type</label>
-                        <select class="form-select form-control-ju" id="typeFilter">
+                        <label class="form-label-ju" style="color: #003366;">Type</label>
+                        <select class="form-select form-control-ju" id="typeFilter" style="border-color: #003366;">
                             <option value="">All Types</option>
                             <option value="academic" {{ request('event_type') == 'academic' ? 'selected' : '' }}>
                                 Academic
@@ -125,8 +127,8 @@
                 
                 <div class="col-md-2">
                     <div class="form-group">
-                        <label class="form-label-ju">Campus</label>
-                        <select class="form-select form-control-ju" id="campusFilter">
+                        <label class="form-label-ju" style="color: #003366;">Campus</label>
+                        <select class="form-select form-control-ju" id="campusFilter" style="border-color: #003366;">
                             <option value="">All Campuses</option>
                             @foreach($campuses as $campus)
                             <option value="{{ $campus->id }}" {{ request('campus_id') == $campus->id ? 'selected' : '' }}>
@@ -139,15 +141,26 @@
                 
                 <div class="col-md-3">
                     <div class="form-group">
-                        <label class="form-label-ju">&nbsp;</label>
-                        <div class="d-flex gap-2">
-                            <button class="btn btn-ju w-100" id="applyFilters">
-                                <i class="fas fa-filter me-2"></i>Apply Filters
-                            </button>
-                            <a href="{{ route('admin.events.index') }}" class="btn btn-ju-outline">
-                                <i class="fas fa-redo"></i>
-                            </a>
-                        </div>
+                        <label class="form-label-ju" style="color: #003366;">Speaker</label>
+                        <select class="form-select form-control-ju" id="speakerFilter" style="border-color: #003366;">
+                            <option value="">All Speakers</option>
+                            @foreach($speakers as $speaker)
+                            <option value="{{ $speaker->id }}" {{ request('speaker_id') == $speaker->id ? 'selected' : '' }}>
+                                {{ $speaker->name }}
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="col-12">
+                    <div class="d-flex gap-2 justify-content-end">
+                        <button class="btn" style="background-color: #003366; color: white;" id="applyFilters">
+                            <i class="fas fa-filter me-2"></i>Apply Filters
+                        </button>
+                        <a href="{{ route('admin.events.index') }}" class="btn btn-outline-secondary" style="border-color: #003366; color: #003366;">
+                            <i class="fas fa-redo me-2"></i>Reset
+                        </a>
                     </div>
                 </div>
             </div>
@@ -156,15 +169,15 @@
 
     <!-- Main Events Table Card -->
     <div class="ju-card">
-        <div class="ju-card-header d-flex justify-content-between align-items-center">
-            <h5 class="ju-card-title">
+        <div class="ju-card-header d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #003366 0%, #004080 100%);">
+            <h5 class="ju-card-title text-white mb-0">
                 <i class="fas fa-calendar me-2"></i>All Events
             </h5>
             <div>
-                <a href="{{ route('admin.events.export') }}" class="btn btn-ju-outline me-2">
+                <a href="{{ route('admin.events.export') }}" class="btn btn-light me-2" style="color: #003366;">
                     <i class="fas fa-download me-2"></i>Export
                 </a>
-                <a href="{{ route('admin.events.create') }}" class="btn btn-ju">
+                <a href="{{ route('admin.events.create') }}" class="btn btn-light" style="color: #003366;">
                     <i class="fas fa-plus me-2"></i>Create Event
                 </a>
             </div>
@@ -172,11 +185,12 @@
         <div class="ju-card-body">
             @if($events->count() > 0)
             <div class="table-responsive">
-                <table class="table table-ju" id="eventsTable">
+                <table class="table table-ju table-hover" id="eventsTable">
                     <thead>
                         <tr>
                             <th>Event Details</th>
                             <th>Type & Organizer</th>
+                            <th>Speakers</th>
                             <th>Date & Time</th>
                             <th>Venue</th>
                             <th>Status</th>
@@ -190,15 +204,15 @@
                                 <div class="d-flex align-items-center">
                                     @if($event->image)
                                     <div class="flex-shrink-0 me-3">
-                                        <img src="{{ asset('storage/' . $event->image) }}" 
+                                        <img src="{{ $event->image_url }}" 
                                              alt="{{ $event->title }}"
                                              class="rounded"
                                              style="width: 60px; height: 60px; object-fit: cover;">
                                     </div>
                                     @else
                                     <div class="flex-shrink-0 me-3">
-                                        <div class="ju-avatar ju-avatar-lg" style="background: var(--ju-gradient-{{ $event->event_type_color }})">
-                                            <i class="fas fa-{{ $event->event_type_icon }}"></i>
+                                        <div class="ju-avatar ju-avatar-lg" style="background: linear-gradient(135deg, #003366 0%, #004080 100%);">
+                                            <i class="fas fa-{{ $event->event_type_icon }} text-white"></i>
                                         </div>
                                     </div>
                                     @endif
@@ -216,7 +230,7 @@
                             </td>
                             <td>
                                 <div class="mb-2">
-                                    <span class="ju-badge ju-badge-{{ $event->event_type_color }}">
+                                    <span class="badge" style="background-color: #003366; color: white;">
                                         {{ ucfirst($event->event_type) }}
                                     </span>
                                 </div>
@@ -226,15 +240,44 @@
                                 </small>
                             </td>
                             <td>
+                                @if($event->speakers->count() > 0)
+                                    <div class="speaker-avatars">
+                                        @foreach($event->speakers->take(3) as $speaker)
+                                            @if($speaker->photo)
+                                                <img src="{{ $speaker->photo_url }}" 
+                                                     alt="{{ $speaker->name }}"
+                                                     class="rounded-circle border border-2 border-white"
+                                                     style="width: 30px; height: 30px; object-fit: cover; margin-left: -5px;"
+                                                     data-bs-toggle="tooltip"
+                                                     title="{{ $speaker->name }}">
+                                            @else
+                                                <div class="rounded-circle d-inline-flex align-items-center justify-content-center border border-2 border-white"
+                                                     style="width: 30px; height: 30px; background: linear-gradient(135deg, #003366 0%, #004080 100%); color: white; margin-left: -5px;"
+                                                     data-bs-toggle="tooltip"
+                                                     title="{{ $speaker->name }}">
+                                                    <i class="fas fa-user fa-xs"></i>
+                                                </div>
+                                            @endif
+                                        @endforeach
+                                        @if($event->speakers->count() > 3)
+                                            <span class="ms-1 small text-muted">+{{ $event->speakers->count() - 3 }} more</span>
+                                        @endif
+                                    </div>
+                                    <small class="text-muted d-block mt-1">
+                                        {{ $event->keynoteSpeakers->count() }} keynote
+                                    </small>
+                                @else
+                                    <span class="text-muted small">No speakers assigned</span>
+                                @endif
+                            </td>
+                            <td>
                                 <div class="small">
                                     <div class="mb-1">
                                         <i class="fas fa-play text-success me-1"></i>
-                                        <strong>Start:</strong>
                                         {{ $event->start_date->format('M d, Y h:i A') }}
                                     </div>
                                     <div>
                                         <i class="fas fa-stop text-danger me-1"></i>
-                                        <strong>End:</strong>
                                         {{ $event->end_date->format('M d, Y h:i A') }}
                                     </div>
                                 </div>
@@ -243,59 +286,44 @@
                                 <div class="small">
                                     @if($event->campus_name != 'Not specified')
                                     <div class="mb-1">
-                                        <i class="fas fa-university me-1"></i>
+                                        <i class="fas fa-university me-1" style="color: #003366;"></i>
                                         {{ $event->campus_name }}
                                     </div>
                                     @endif
                                     
                                     @if($event->building_name != 'Not specified')
                                     <div class="mb-1">
-                                        <i class="fas fa-building me-1"></i>
+                                        <i class="fas fa-building me-1" style="color: #003366;"></i>
                                         {{ $event->building_name }}
                                     </div>
                                     @endif
                                     
                                     @if($event->venue_name != 'Not specified')
-                                    <div class="mb-1">
-                                        <i class="fas fa-door-open me-1"></i>
+                                    <div>
+                                        <i class="fas fa-door-open me-1" style="color: #003366;"></i>
                                         {{ $event->venue_name }}
                                     </div>
-                                    @endif
-                                    
-                                    @if($event->campus_name == 'Not specified' && $event->building_name == 'Not specified' && $event->venue_name == 'Not specified')
-                                    <span class="text-muted">Location not specified</span>
                                     @endif
                                 </div>
                             </td>
                             <td>
                                 @php
-                                    $now = now();
-                                    if ($now < $event->start_date) {
-                                        $status = 'upcoming';
-                                        $badge = 'primary';
-                                        $icon = 'clock';
-                                    } elseif ($now >= $event->start_date && $now <= $event->end_date) {
-                                        $status = 'ongoing';
-                                        $badge = 'success';
-                                        $icon = 'play-circle';
-                                    } else {
-                                        $status = 'completed';
-                                        $badge = 'secondary';
-                                        $icon = 'check-circle';
-                                    }
+                                    $status = $event->status;
+                                    $badgeClass = $status == 'upcoming' ? 'bg-primary' : ($status == 'ongoing' ? 'bg-success' : 'bg-secondary');
+                                    $icon = $status == 'upcoming' ? 'clock' : ($status == 'ongoing' ? 'play-circle' : 'check-circle');
                                 @endphp
                                 <div class="d-flex align-items-center gap-2">
-                                    <span class="ju-badge ju-badge-{{ $badge }}">
+                                    <span class="badge {{ $badgeClass }}" style="background-color: {{ $status == 'upcoming' ? '#003366' : ($status == 'ongoing' ? '#004d40' : '#6c757d') }};">
                                         <i class="fas fa-{{ $icon }} me-1"></i>
                                         {{ ucfirst($status) }}
                                     </span>
                                     @if($event->is_featured)
-                                    <span class="ju-badge ju-badge-warning" title="Featured Event">
+                                    <span class="badge bg-warning text-dark" title="Featured Event">
                                         <i class="fas fa-star"></i>
                                     </span>
                                     @endif
                                     @if(!$event->is_public)
-                                    <span class="ju-badge ju-badge-dark" title="Private Event">
+                                    <span class="badge bg-dark" title="Private Event">
                                         <i class="fas fa-lock"></i>
                                     </span>
                                     @endif
@@ -306,14 +334,23 @@
                                     <a href="{{ route('admin.events.show', $event) }}" 
                                        class="btn btn-outline-info" 
                                        data-bs-toggle="tooltip" 
-                                       title="View Details">
+                                       title="View Details"
+                                       style="border-color: #003366; color: #003366;">
                                         <i class="fas fa-eye"></i>
                                     </a>
                                     <a href="{{ route('admin.events.edit', $event) }}" 
                                        class="btn btn-outline-warning" 
                                        data-bs-toggle="tooltip" 
-                                       title="Edit Event">
+                                       title="Edit Event"
+                                       style="border-color: #ffc107; color: #ffc107;">
                                         <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{{ route('admin.events.speakers.manage', $event) }}" 
+                                       class="btn btn-outline-success" 
+                                       data-bs-toggle="tooltip" 
+                                       title="Manage Speakers"
+                                       style="border-color: #28a745; color: #28a745;">
+                                        <i class="fas fa-users"></i>
                                     </a>
                                     <form action="{{ route('admin.events.destroy', $event) }}" 
                                           method="POST" 
@@ -338,18 +375,18 @@
             @else
             <div class="text-center py-5">
                 <div class="mb-4">
-                    <i class="fas fa-calendar-times fa-4x text-muted"></i>
+                    <i class="fas fa-calendar-times fa-4x" style="color: #003366;"></i>
                 </div>
                 <h4 class="text-muted">No Events Found</h4>
                 <p class="text-muted mb-4">Get started by creating your first event</p>
-                <a href="{{ route('admin.events.create') }}" class="btn btn-ju">
+                <a href="{{ route('admin.events.create') }}" class="btn" style="background-color: #003366; color: white;">
                     <i class="fas fa-plus me-2"></i>Create Event
                 </a>
             </div>
             @endif
         </div>
         
-        @if($events->hasPages() && !request()->has('search'))
+        @if($events->hasPages())
         <div class="ju-card-footer">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
@@ -369,75 +406,68 @@
 
 @push('styles')
 <style>
-    .ju-badge {
-        padding: 0.35rem 0.75rem;
-        border-radius: var(--ju-radius-full);
-        font-size: 0.75rem;
+    .stat-card {
+        padding: 1.5rem;
+        border-radius: 10px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .stat-card .stat-icon {
+        position: absolute;
+        right: 20px;
+        top: 20px;
+        font-size: 2.5rem;
+        opacity: 0.3;
+    }
+    
+    .stat-card .stat-number {
+        font-size: 2rem;
         font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.25rem;
+        margin-bottom: 0.25rem;
     }
     
-    .ju-badge-primary {
-        background: var(--ju-gradient-primary);
-        color: white;
+    .stat-card .stat-label {
+        font-size: 0.875rem;
     }
     
-    .ju-badge-success {
-        background: var(--ju-gradient-success);
-        color: white;
+    .ju-card {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
     
-    .ju-badge-info {
-        background: var(--ju-gradient-info);
-        color: white;
-    }
-    
-    .ju-badge-warning {
-        background: var(--ju-gradient-warning);
-        color: white;
-    }
-    
-    .ju-badge-secondary {
-        background: var(--ju-gradient-dark);
-        color: white;
-    }
-    
-    .ju-badge-dark {
-        background: var(--ju-gray-700);
-        color: white;
+    .ju-card-header {
+        padding: 1rem 1.5rem;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
     }
     
     .form-label-ju {
         font-weight: 500;
-        color: var(--ju-primary);
         margin-bottom: 0.5rem;
         font-size: 0.875rem;
     }
     
-    .table-ju tbody tr {
-        transition: all 0.3s ease;
+    .speaker-avatars {
+        display: flex;
+        align-items: center;
     }
     
-    .table-ju tbody tr:hover {
-        background-color: rgba(var(--ju-primary-rgb), 0.05);
+    .speaker-avatars img,
+    .speaker-avatars div {
+        transition: transform 0.2s;
     }
     
-    /* DataTables Custom Styling */
-    .dataTables_wrapper .dataTables_length,
-    .dataTables_wrapper .dataTables_filter,
-    .dataTables_wrapper .dataTables_info,
-    .dataTables_wrapper .dataTables_paginate {
-        padding: 1rem;
+    .speaker-avatars img:hover,
+    .speaker-avatars div:hover {
+        transform: scale(1.1);
+        z-index: 10;
     }
     
-    .dataTables_wrapper .dataTables_filter input {
-        border: 1px solid #dee2e6;
-        border-radius: 0.375rem;
-        padding: 0.375rem 0.75rem;
+    .btn-group .btn:hover {
+        transform: translateY(-2px);
+        transition: transform 0.2s;
     }
 </style>
 @endpush
@@ -445,49 +475,11 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Check if we need DataTables (only when not using server-side pagination)
-        const hasSearchParams = window.location.search.includes('search=') || 
-                               window.location.search.includes('status=') ||
-                               window.location.search.includes('event_type=') ||
-                               window.location.search.includes('campus_id=');
-        
-        const eventsTable = document.getElementById('eventsTable');
-        
-        if (eventsTable && !hasSearchParams) {
-            // Initialize DataTable only when not using server-side filters
-            $('#eventsTable').DataTable({
-                "pageLength": 25,
-                "responsive": true,
-                "order": [[2, 'asc']], // Default sort by date (3rd column)
-                "language": {
-                    "search": "<i class='fas fa-search me-2'></i>Search:",
-                    "lengthMenu": "<i class='fas fa-list me-2'></i>Show _MENU_ entries",
-                    "info": "Showing _START_ to _END_ of _TOTAL_ entries",
-                    "infoEmpty": "No entries available",
-                    "infoFiltered": "(filtered from _MAX_ total entries)",
-                    "zeroRecords": "No matching records found",
-                    "paginate": {
-                        "first": "<i class='fas fa-angle-double-left'></i>",
-                        "last": "<i class='fas fa-angle-double-right'></i>",
-                        "next": "<i class='fas fa-angle-right'></i>",
-                        "previous": "<i class='fas fa-angle-left'></i>"
-                    }
-                },
-                "columnDefs": [
-                    {
-                        "targets": [5], // Actions column
-                        "orderable": false,
-                        "searchable": false
-                    }
-                ]
-            });
-        }
-        
-        // Filter functionality
         const searchInput = document.getElementById('searchInput');
         const statusFilter = document.getElementById('statusFilter');
         const typeFilter = document.getElementById('typeFilter');
         const campusFilter = document.getElementById('campusFilter');
+        const speakerFilter = document.getElementById('speakerFilter');
         const applyFilters = document.getElementById('applyFilters');
         
         applyFilters.addEventListener('click', function() {
@@ -509,10 +501,13 @@
                 params.set('campus_id', campusFilter.value);
             }
             
+            if (speakerFilter.value) {
+                params.set('speaker_id', speakerFilter.value);
+            }
+            
             window.location.href = '{{ route("admin.events.index") }}?' + params.toString();
         });
         
-        // Enter key to search
         searchInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 applyFilters.click();
@@ -524,13 +519,6 @@
         tooltipTriggerList.map(function (tooltipTriggerEl) {
             return new bootstrap.Tooltip(tooltipTriggerEl);
         });
-        
-        // Auto-refresh page every 5 minutes to update event statuses (only if not using DataTables)
-        if (!hasSearchParams) {
-            setTimeout(function() {
-                window.location.reload();
-            }, 300000); // 5 minutes
-        }
     });
 </script>
 @endpush

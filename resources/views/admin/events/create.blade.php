@@ -1,9 +1,10 @@
+{{-- resources/views/admin/events/create.blade.php --}}
 @extends('layouts.app')
 
 @section('title', 'Create Event - Jimma University')
 
 @section('page-title', 'Create New Event')
-@section('page-subtitle', 'Add a new university event')
+@section('page-subtitle', 'Add a new university event with speakers')
 
 @section('breadcrumb-items')
     <li class="breadcrumb-item">
@@ -20,12 +21,12 @@
     <div class="row">
         <div class="col-12">
             <div class="ju-card shadow-sm">
-                <div class="ju-card-header d-flex align-items-center justify-content-between py-3">
-                    <h4 class="ju-card-title mb-0">
-                        <i class="fas fa-calendar-plus me-2 text-primary"></i>
-                        Event Details
+                <div class="ju-card-header d-flex align-items-center justify-content-between py-3" style="background: linear-gradient(135deg, #003366 0%, #004080 100%);">
+                    <h4 class="ju-card-title mb-0 text-white">
+                        <i class="fas fa-calendar-plus me-2"></i>
+                        Create New Event
                     </h4>
-                    <div class="badge bg-primary p-2">
+                    <div class="badge bg-white text-primary p-2">
                         <i class="fas fa-clock me-1"></i>
                         {{ now()->format('M d, Y') }}
                     </div>
@@ -37,12 +38,12 @@
                         
                         <div class="row">
                             <!-- Left Column: Event Information -->
-                            <div class="col-lg-8">
+                            <div class="col-lg-7">
                                 <!-- Basic Information Card -->
                                 <div class="ju-sub-card mb-4">
-                                    <div class="ju-sub-card-header">
-                                        <h5 class="mb-0">
-                                            <i class="fas fa-info-circle me-2 text-info"></i>
+                                    <div class="ju-sub-card-header" style="background: linear-gradient(135deg, #003366 0%, #004080 100%);">
+                                        <h5 class="mb-0 text-white">
+                                            <i class="fas fa-info-circle me-2"></i>
                                             Basic Information
                                         </h5>
                                     </div>
@@ -50,8 +51,8 @@
                                         <div class="row g-3">
                                             <div class="col-md-12">
                                                 <div class="form-group">
-                                                    <label for="title" class="form-label required">
-                                                        <i class="fas fa-heading me-1 text-muted"></i>
+                                                    <label for="title" class="form-label required" style="color: #003366;">
+                                                        <i class="fas fa-heading me-1"></i>
                                                         Event Title
                                                     </label>
                                                     <input type="text" 
@@ -72,8 +73,8 @@
                                             
                                             <div class="col-md-12">
                                                 <div class="form-group">
-                                                    <label for="short_description" class="form-label">
-                                                        <i class="fas fa-align-left me-1 text-muted"></i>
+                                                    <label for="short_description" class="form-label" style="color: #003366;">
+                                                        <i class="fas fa-align-left me-1"></i>
                                                         Short Description (Optional)
                                                     </label>
                                                     <textarea class="form-control @error('short_description') is-invalid @enderror" 
@@ -84,19 +85,13 @@
                                                     <div class="form-text">
                                                         <small>Brief summary that appears in event cards. Leave empty to use first 100 characters of main description.</small>
                                                     </div>
-                                                    @error('short_description')
-                                                        <div class="invalid-feedback d-flex align-items-center">
-                                                            <i class="fas fa-exclamation-circle me-2"></i>
-                                                            {{ $message }}
-                                                        </div>
-                                                    @enderror
                                                 </div>
                                             </div>
                                             
                                             <div class="col-md-12">
                                                 <div class="form-group">
-                                                    <label for="description" class="form-label required">
-                                                        <i class="fas fa-align-left me-1 text-muted"></i>
+                                                    <label for="description" class="form-label required" style="color: #003366;">
+                                                        <i class="fas fa-align-left me-1"></i>
                                                         Full Description
                                                     </label>
                                                     <textarea class="form-control @error('description') is-invalid @enderror" 
@@ -108,61 +103,6 @@
                                                     <div class="form-text">
                                                         <small>Provide a clear and detailed description of your event. HTML is allowed.</small>
                                                     </div>
-                                                    @error('description')
-                                                        <div class="invalid-feedback d-flex align-items-center">
-                                                            <i class="fas fa-exclamation-circle me-2"></i>
-                                                            {{ $message }}
-                                                        </div>
-                                                    @enderror
-                                                </div>
-                                            </div>
-                                            
-                                            <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label for="event_type" class="form-label required">
-                                                        <i class="fas fa-tag me-1 text-muted"></i>
-                                                        Event Type
-                                                    </label>
-                                                    <select class="form-select @error('event_type') is-invalid @enderror" 
-                                                            id="event_type" 
-                                                            name="event_type" 
-                                                            required>
-                                                        <option value="">Select Event Type</option>
-                                                        <option value="academic" {{ old('event_type') == 'academic' ? 'selected' : '' }}>📚 Academic</option>
-                                                        <option value="cultural" {{ old('event_type') == 'cultural' ? 'selected' : '' }}>🎭 Cultural</option>
-                                                        <option value="sports" {{ old('event_type') == 'sports' ? 'selected' : '' }}>⚽ Sports</option>
-                                                        <option value="conference" {{ old('event_type') == 'conference' ? 'selected' : '' }}>🎤 Conference</option>
-                                                        <option value="workshop" {{ old('event_type') == 'workshop' ? 'selected' : '' }}>🛠️ Workshop</option>
-                                                        <option value="seminar" {{ old('event_type') == 'seminar' ? 'selected' : '' }}>👨‍🏫 Seminar</option>
-                                                    </select>
-                                                    @error('event_type')
-                                                        <div class="invalid-feedback d-flex align-items-center">
-                                                            <i class="fas fa-exclamation-circle me-2"></i>
-                                                            {{ $message }}
-                                                        </div>
-                                                    @enderror
-                                                </div>
-                                            </div>
-                                            
-                                            <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label for="organizer" class="form-label required">
-                                                        <i class="fas fa-users me-1 text-muted"></i>
-                                                        Organizer
-                                                    </label>
-                                                    <input type="text" 
-                                                           class="form-control @error('organizer') is-invalid @enderror" 
-                                                           id="organizer" 
-                                                           name="organizer" 
-                                                           value="{{ old('organizer') }}" 
-                                                           placeholder="Department, Club, or Organization..."
-                                                           required>
-                                                    @error('organizer')
-                                                        <div class="invalid-feedback d-flex align-items-center">
-                                                            <i class="fas fa-exclamation-circle me-2"></i>
-                                                            {{ $message }}
-                                                        </div>
-                                                    @enderror
                                                 </div>
                                             </div>
                                         </div>
@@ -171,9 +111,9 @@
 
                                 <!-- Date & Time Card -->
                                 <div class="ju-sub-card mb-4">
-                                    <div class="ju-sub-card-header">
-                                        <h5 class="mb-0">
-                                            <i class="fas fa-clock me-2 text-warning"></i>
+                                    <div class="ju-sub-card-header" style="background: linear-gradient(135deg, #003366 0%, #004080 100%);">
+                                        <h5 class="mb-0 text-white">
+                                            <i class="fas fa-clock me-2"></i>
                                             Date & Time
                                         </h5>
                                     </div>
@@ -181,8 +121,8 @@
                                         <div class="row g-3">
                                             <div class="col-md-6">
                                                 <div class="form-group">
-                                                    <label for="start_date" class="form-label required">
-                                                        <i class="fas fa-play me-1 text-muted"></i>
+                                                    <label for="start_date" class="form-label required" style="color: #003366;">
+                                                        <i class="fas fa-play me-1"></i>
                                                         Start Date & Time
                                                     </label>
                                                     <input type="datetime-local" 
@@ -191,19 +131,13 @@
                                                            name="start_date" 
                                                            value="{{ old('start_date') }}" 
                                                            required>
-                                                    @error('start_date')
-                                                        <div class="invalid-feedback d-flex align-items-center">
-                                                            <i class="fas fa-exclamation-circle me-2"></i>
-                                                            {{ $message }}
-                                                        </div>
-                                                    @enderror
                                                 </div>
                                             </div>
                                             
                                             <div class="col-md-6">
                                                 <div class="form-group">
-                                                    <label for="end_date" class="form-label required">
-                                                        <i class="fas fa-stop me-1 text-muted"></i>
+                                                    <label for="end_date" class="form-label required" style="color: #003366;">
+                                                        <i class="fas fa-stop me-1"></i>
                                                         End Date & Time
                                                     </label>
                                                     <input type="datetime-local" 
@@ -212,19 +146,6 @@
                                                            name="end_date" 
                                                            value="{{ old('end_date') }}" 
                                                            required>
-                                                    @error('end_date')
-                                                        <div class="invalid-feedback d-flex align-items-center">
-                                                            <i class="fas fa-exclamation-circle me-2"></i>
-                                                            {{ $message }}
-                                                        </div>
-                                                    @enderror
-                                                </div>
-                                            </div>
-                                            
-                                            <div class="col-12">
-                                                <div class="alert alert-info py-2">
-                                                    <i class="fas fa-info-circle me-2"></i>
-                                                    <small>Event duration will be calculated automatically.</small>
                                                 </div>
                                             </div>
                                         </div>
@@ -233,9 +154,9 @@
 
                                 <!-- Location Card -->
                                 <div class="ju-sub-card mb-4">
-                                    <div class="ju-sub-card-header">
-                                        <h5 class="mb-0">
-                                            <i class="fas fa-map-marker-alt me-2 text-danger"></i>
+                                    <div class="ju-sub-card-header" style="background: linear-gradient(135deg, #003366 0%, #004080 100%);">
+                                        <h5 class="mb-0 text-white">
+                                            <i class="fas fa-map-marker-alt me-2"></i>
                                             Location
                                         </h5>
                                     </div>
@@ -243,8 +164,8 @@
                                         <div class="row g-3">
                                             <div class="col-md-6">
                                                 <div class="form-group">
-                                                    <label for="campus_id" class="form-label required">
-                                                        <i class="fas fa-university me-1 text-muted"></i>
+                                                    <label for="campus_id" class="form-label required" style="color: #003366;">
+                                                        <i class="fas fa-university me-1"></i>
                                                         Campus
                                                     </label>
                                                     <select class="form-select @error('campus_id') is-invalid @enderror" 
@@ -260,61 +181,41 @@
                                                             </option>
                                                         @endforeach
                                                     </select>
-                                                    @error('campus_id')
-                                                        <div class="invalid-feedback d-flex align-items-center">
-                                                            <i class="fas fa-exclamation-circle me-2"></i>
-                                                            {{ $message }}
-                                                        </div>
-                                                    @enderror
                                                 </div>
                                             </div>
                                             
                                             <div class="col-md-6">
                                                 <div class="form-group">
-                                                    <label for="building_id" class="form-label">
-                                                        <i class="fas fa-building me-1 text-muted"></i>
+                                                    <label for="building_id" class="form-label" style="color: #003366;">
+                                                        <i class="fas fa-building me-1"></i>
                                                         Building
                                                     </label>
                                                     <select class="form-select @error('building_id') is-invalid @enderror" 
                                                             id="building_id" 
                                                             name="building_id">
                                                         <option value="">Select Building (Optional)</option>
-                                                        <!-- Buildings will be loaded via AJAX -->
                                                     </select>
-                                                    @error('building_id')
-                                                        <div class="invalid-feedback d-flex align-items-center">
-                                                            <i class="fas fa-exclamation-circle me-2"></i>
-                                                            {{ $message }}
-                                                        </div>
-                                                    @enderror
                                                 </div>
                                             </div>
                                             
                                             <div class="col-md-8">
                                                 <div class="form-group">
-                                                    <label for="venue_id" class="form-label">
-                                                        <i class="fas fa-door-open me-1 text-muted"></i>
+                                                    <label for="venue_id" class="form-label" style="color: #003366;">
+                                                        <i class="fas fa-door-open me-1"></i>
                                                         Venue/Room
                                                     </label>
                                                     <select class="form-select @error('venue_id') is-invalid @enderror" 
                                                             id="venue_id" 
                                                             name="venue_id">
                                                         <option value="">Select Venue (Optional)</option>
-                                                        <!-- Venues will be loaded via AJAX -->
                                                     </select>
-                                                    @error('venue_id')
-                                                        <div class="invalid-feedback d-flex align-items-center">
-                                                            <i class="fas fa-exclamation-circle me-2"></i>
-                                                            {{ $message }}
-                                                        </div>
-                                                    @enderror
                                                 </div>
                                             </div>
                                             
                                             <div class="col-md-4">
                                                 <div class="form-group">
-                                                    <label for="max_attendees" class="form-label">
-                                                        <i class="fas fa-users me-1 text-muted"></i>
+                                                    <label for="max_attendees" class="form-label" style="color: #003366;">
+                                                        <i class="fas fa-users me-1"></i>
                                                         Capacity
                                                     </label>
                                                     <input type="number" 
@@ -324,32 +225,6 @@
                                                            value="{{ old('max_attendees') }}" 
                                                            min="1"
                                                            placeholder="Max attendees">
-                                                    @error('max_attendees')
-                                                        <div class="invalid-feedback d-flex align-items-center">
-                                                            <i class="fas fa-exclamation-circle me-2"></i>
-                                                            {{ $message }}
-                                                        </div>
-                                                    @enderror
-                                                </div>
-                                            </div>
-                                            
-                                            <div class="col-12">
-                                                <div class="venue-details-card d-none p-3 bg-light rounded border">
-                                                    <h6 class="mb-2">Venue Details</h6>
-                                                    <div class="row">
-                                                        <div class="col-md-6">
-                                                            <small class="text-muted d-block">Type:</small>
-                                                            <span id="venue-type" class="fw-semibold">-</span>
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <small class="text-muted d-block">Capacity:</small>
-                                                            <span id="venue-capacity" class="fw-semibold">-</span>
-                                                        </div>
-                                                        <div class="col-12 mt-2">
-                                                            <small class="text-muted d-block">Amenities:</small>
-                                                            <div id="venue-amenities" class="amenities-list"></div>
-                                                        </div>
-                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -358,19 +233,19 @@
                             </div>
 
                             <!-- Right Column: Settings & Media -->
-                            <div class="col-lg-4">
+                            <div class="col-lg-5">
                                 <!-- Media Card -->
                                 <div class="ju-sub-card mb-4">
-                                    <div class="ju-sub-card-header">
-                                        <h5 class="mb-0">
-                                            <i class="fas fa-images me-2 text-success"></i>
+                                    <div class="ju-sub-card-header" style="background: linear-gradient(135deg, #003366 0%, #004080 100%);">
+                                        <h5 class="mb-0 text-white">
+                                            <i class="fas fa-images me-2"></i>
                                             Event Image
                                         </h5>
                                     </div>
                                     <div class="ju-sub-card-body">
                                         <div class="form-group">
-                                            <label for="image" class="form-label">
-                                                <i class="fas fa-image me-1 text-muted"></i>
+                                            <label for="image" class="form-label" style="color: #003366;">
+                                                <i class="fas fa-image me-1"></i>
                                                 Event Image
                                             </label>
                                             <div class="image-upload-container">
@@ -384,16 +259,10 @@
                                                            id="image" 
                                                            name="image" 
                                                            accept="image/*">
-                                                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="document.getElementById('image').click()">
+                                                    <button type="button" class="btn btn-sm" style="background-color: #003366; color: white;" onclick="document.getElementById('image').click()">
                                                         <i class="fas fa-upload me-1"></i> Choose File
                                                     </button>
                                                 </div>
-                                                @error('image')
-                                                    <div class="invalid-feedback d-flex align-items-center mt-2">
-                                                        <i class="fas fa-exclamation-circle me-2"></i>
-                                                        {{ $message }}
-                                                    </div>
-                                                @enderror
                                                 
                                                 <div class="image-preview mt-3 d-none" id="imagePreview">
                                                     <div class="preview-container position-relative">
@@ -413,18 +282,68 @@
                                     </div>
                                 </div>
 
+                                <!-- Event Type & Organizer Card -->
+                                <div class="ju-sub-card mb-4">
+                                    <div class="ju-sub-card-header" style="background: linear-gradient(135deg, #003366 0%, #004080 100%);">
+                                        <h5 class="mb-0 text-white">
+                                            <i class="fas fa-tag me-2"></i>
+                                            Event Type & Organizer
+                                        </h5>
+                                    </div>
+                                    <div class="ju-sub-card-body">
+                                        <div class="row g-3">
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <label for="event_type" class="form-label required" style="color: #003366;">
+                                                        <i class="fas fa-tag me-1"></i>
+                                                        Event Type
+                                                    </label>
+                                                    <select class="form-select @error('event_type') is-invalid @enderror" 
+                                                            id="event_type" 
+                                                            name="event_type" 
+                                                            required>
+                                                        <option value="">Select Event Type</option>
+                                                        <option value="academic" {{ old('event_type') == 'academic' ? 'selected' : '' }}>📚 Academic</option>
+                                                        <option value="cultural" {{ old('event_type') == 'cultural' ? 'selected' : '' }}>🎭 Cultural</option>
+                                                        <option value="sports" {{ old('event_type') == 'sports' ? 'selected' : '' }}>⚽ Sports</option>
+                                                        <option value="conference" {{ old('event_type') == 'conference' ? 'selected' : '' }}>🎤 Conference</option>
+                                                        <option value="workshop" {{ old('event_type') == 'workshop' ? 'selected' : '' }}>🛠️ Workshop</option>
+                                                        <option value="seminar" {{ old('event_type') == 'seminar' ? 'selected' : '' }}>👨‍🏫 Seminar</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <label for="organizer" class="form-label required" style="color: #003366;">
+                                                        <i class="fas fa-users me-1"></i>
+                                                        Organizer
+                                                    </label>
+                                                    <input type="text" 
+                                                           class="form-control @error('organizer') is-invalid @enderror" 
+                                                           id="organizer" 
+                                                           name="organizer" 
+                                                           value="{{ old('organizer') }}" 
+                                                           placeholder="Department, Club, or Organization..."
+                                                           required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <!-- Contact Information Card -->
                                 <div class="ju-sub-card mb-4">
-                                    <div class="ju-sub-card-header">
-                                        <h5 class="mb-0">
-                                            <i class="fas fa-address-book me-2 text-purple"></i>
+                                    <div class="ju-sub-card-header" style="background: linear-gradient(135deg, #003366 0%, #004080 100%);">
+                                        <h5 class="mb-0 text-white">
+                                            <i class="fas fa-address-book me-2"></i>
                                             Contact Information
                                         </h5>
                                     </div>
                                     <div class="ju-sub-card-body">
                                         <div class="form-group mb-3">
-                                            <label for="contact_email" class="form-label">
-                                                <i class="fas fa-envelope me-1 text-muted"></i>
+                                            <label for="contact_email" class="form-label" style="color: #003366;">
+                                                <i class="fas fa-envelope me-1"></i>
                                                 Contact Email
                                             </label>
                                             <input type="email" 
@@ -433,17 +352,11 @@
                                                    name="contact_email" 
                                                    value="{{ old('contact_email') }}" 
                                                    placeholder="event@ju.edu.et">
-                                            @error('contact_email')
-                                                <div class="invalid-feedback d-flex align-items-center">
-                                                    <i class="fas fa-exclamation-circle me-2"></i>
-                                                    {{ $message }}
-                                                </div>
-                                            @enderror
                                         </div>
                                         
                                         <div class="form-group">
-                                            <label for="contact_phone" class="form-label">
-                                                <i class="fas fa-phone me-1 text-muted"></i>
+                                            <label for="contact_phone" class="form-label" style="color: #003366;">
+                                                <i class="fas fa-phone me-1"></i>
                                                 Contact Phone
                                             </label>
                                             <input type="tel" 
@@ -452,21 +365,15 @@
                                                    name="contact_phone" 
                                                    value="{{ old('contact_phone') }}" 
                                                    placeholder="+251 47 111 0000">
-                                            @error('contact_phone')
-                                                <div class="invalid-feedback d-flex align-items-center">
-                                                    <i class="fas fa-exclamation-circle me-2"></i>
-                                                    {{ $message }}
-                                                </div>
-                                            @enderror
                                         </div>
                                     </div>
                                 </div>
 
                                 <!-- Settings Card -->
                                 <div class="ju-sub-card mb-4">
-                                    <div class="ju-sub-card-header">
-                                        <h5 class="mb-0">
-                                            <i class="fas fa-cog me-2 text-secondary"></i>
+                                    <div class="ju-sub-card-header" style="background: linear-gradient(135deg, #003366 0%, #004080 100%);">
+                                        <h5 class="mb-0 text-white">
+                                            <i class="fas fa-cog me-2"></i>
                                             Event Settings
                                         </h5>
                                     </div>
@@ -478,7 +385,7 @@
                                                    name="is_featured" 
                                                    value="1"
                                                    {{ old('is_featured') ? 'checked' : '' }}>
-                                            <label class="form-check-label" for="is_featured">
+                                            <label class="form-check-label" for="is_featured" style="color: #003366;">
                                                 <i class="fas fa-star me-2 text-warning"></i>
                                                 Featured Event
                                             </label>
@@ -494,7 +401,7 @@
                                                    name="is_public" 
                                                    value="1"
                                                    {{ old('is_public', true) ? 'checked' : '' }}>
-                                            <label class="form-check-label" for="is_public">
+                                            <label class="form-check-label" for="is_public" style="color: #003366;">
                                                 <i class="fas fa-globe me-2 text-primary"></i>
                                                 Public Event
                                             </label>
@@ -510,7 +417,7 @@
                                                    name="requires_registration" 
                                                    value="1"
                                                    {{ old('requires_registration') ? 'checked' : '' }}>
-                                            <label class="form-check-label" for="requires_registration">
+                                            <label class="form-check-label" for="requires_registration" style="color: #003366;">
                                                 <i class="fas fa-user-plus me-2 text-success"></i>
                                                 Requires Registration
                                             </label>
@@ -522,8 +429,8 @@
                                         <div class="registration-link-field mt-3 {{ old('requires_registration') ? '' : 'd-none' }}" 
                                              id="registrationLinkField">
                                             <div class="form-group">
-                                                <label for="registration_link" class="form-label">
-                                                    <i class="fas fa-link me-1 text-muted"></i>
+                                                <label for="registration_link" class="form-label" style="color: #003366;">
+                                                    <i class="fas fa-link me-1"></i>
                                                     Registration Link
                                                 </label>
                                                 <input type="url" 
@@ -532,12 +439,6 @@
                                                        name="registration_link" 
                                                        value="{{ old('registration_link') }}" 
                                                        placeholder="https://forms.example.com/event">
-                                                @error('registration_link')
-                                                    <div class="invalid-feedback d-flex align-items-center">
-                                                        <i class="fas fa-exclamation-circle me-2"></i>
-                                                        {{ $message }}
-                                                    </div>
-                                                @enderror
                                             </div>
                                         </div>
                                     </div>
@@ -545,16 +446,16 @@
 
                                 <!-- Tags Card -->
                                 <div class="ju-sub-card">
-                                    <div class="ju-sub-card-header">
-                                        <h5 class="mb-0">
-                                            <i class="fas fa-tags me-2 text-orange"></i>
-                                            Tags & Categories
+                                    <div class="ju-sub-card-header" style="background: linear-gradient(135deg, #003366 0%, #004080 100%);">
+                                        <h5 class="mb-0 text-white">
+                                            <i class="fas fa-tags me-2"></i>
+                                            Tags
                                         </h5>
                                     </div>
                                     <div class="ju-sub-card-body">
                                         <div class="form-group">
-                                            <label for="tags" class="form-label">
-                                                <i class="fas fa-hashtag me-1 text-muted"></i>
+                                            <label for="tags" class="form-label" style="color: #003366;">
+                                                <i class="fas fa-hashtag me-1"></i>
                                                 Event Tags
                                             </label>
                                             <input type="text" 
@@ -566,37 +467,169 @@
                                             <small class="text-muted d-block mt-1">
                                                 Separate tags with commas (max 10 tags).
                                             </small>
-                                            @error('tags')
-                                                <div class="invalid-feedback d-flex align-items-center">
-                                                    <i class="fas fa-exclamation-circle me-2"></i>
-                                                    {{ $message }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Speakers Section - Full Width -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="ju-sub-card mb-4">
+                                    <div class="ju-sub-card-header" style="background: linear-gradient(135deg, #003366 0%, #004080 100%);">
+                                        <h5 class="mb-0 text-white">
+                                            <i class="fas fa-users me-2"></i>
+                                            Event Speakers
+                                        </h5>
+                                    </div>
+                                    <div class="ju-sub-card-body">
+                                        <div class="alert alert-info" style="background-color: #e6f0ff; border-color: #003366; color: #003366;">
+                                            <i class="fas fa-info-circle me-2"></i>
+                                            Add speakers to your event. You can specify their session details and role.
+                                        </div>
+                                        
+                                        <div id="speakers-container">
+                                            <!-- Speakers will be added here dynamically -->
+                                        </div>
+                                        
+                                        <div class="text-center mt-3">
+                                            <button type="button" class="btn" style="background-color: #003366; color: white;" id="addSpeakerBtn">
+                                                <i class="fas fa-plus-circle me-2"></i>
+                                                Add Speaker
+                                            </button>
+                                        </div>
+                                        
+                                        <template id="speaker-template">
+                                            <div class="speaker-item card mb-3 border" style="border-color: #003366 !important;">
+                                                <div class="card-header" style="background-color: #f0f5ff; border-bottom-color: #003366;">
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <h6 class="mb-0" style="color: #003366;">
+                                                            <i class="fas fa-user-tie me-2"></i>
+                                                            Speaker <span class="speaker-number"></span>
+                                                        </h6>
+                                                        <button type="button" class="btn btn-sm btn-outline-danger remove-speaker">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </div>
                                                 </div>
-                                            @enderror
-                                            
-                                            <div class="tag-suggestions mt-3">
-                                                <small class="text-muted d-block mb-2">Suggested tags:</small>
-                                                <div class="d-flex flex-wrap gap-2">
-                                                    <span class="badge bg-light text-dark cursor-pointer tag-suggestion">
-                                                        academic
-                                                    </span>
-                                                    <span class="badge bg-light text-dark cursor-pointer tag-suggestion">
-                                                        workshop
-                                                    </span>
-                                                    <span class="badge bg-light text-dark cursor-pointer tag-suggestion">
-                                                        seminar
-                                                    </span>
-                                                    <span class="badge bg-light text-dark cursor-pointer tag-suggestion">
-                                                        conference
-                                                    </span>
-                                                    <span class="badge bg-light text-dark cursor-pointer tag-suggestion">
-                                                        cultural
-                                                    </span>
-                                                    <span class="badge bg-light text-dark cursor-pointer tag-suggestion">
-                                                        sports
-                                                    </span>
+                                                <div class="card-body">
+                                                    <input type="hidden" name="speakers[INDEX][speaker_id]" class="speaker-id-input">
+                                                    
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <div class="form-group mb-3">
+                                                                <label class="form-label required" style="color: #003366;">Select Speaker</label>
+                                                                <select class="form-select speaker-select" required>
+                                                                    <option value="">Select a speaker</option>
+                                                                    @foreach($speakers as $speaker)
+                                                                        <option value="{{ $speaker->id }}" 
+                                                                                data-name="{{ $speaker->name }}"
+                                                                                data-title="{{ $speaker->title }}"
+                                                                                data-organization="{{ $speaker->organization }}"
+                                                                                data-photo="{{ $speaker->photo_url }}">
+                                                                            {{ $speaker->name }} - {{ $speaker->title ?? '' }} {{ $speaker->organization ? '('.$speaker->organization.')' : '' }}
+                                                                        </option>
+                                                                    @endforeach
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <div class="col-md-6">
+                                                            <div class="form-group mb-3">
+                                                                <label class="form-label" style="color: #003366;">Session Title</label>
+                                                                <input type="text" 
+                                                                       class="form-control" 
+                                                                       name="speakers[INDEX][session_title]" 
+                                                                       placeholder="e.g., Keynote Address, Workshop Session">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div class="row">
+                                                        <div class="col-md-4">
+                                                            <div class="form-group mb-3">
+                                                                <label class="form-label" style="color: #003366;">Session Time</label>
+                                                                <input type="datetime-local" 
+                                                                       class="form-control" 
+                                                                       name="speakers[INDEX][session_time]">
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <div class="col-md-4">
+                                                            <div class="form-group mb-3">
+                                                                <label class="form-label" style="color: #003366;">Duration (minutes)</label>
+                                                                <input type="number" 
+                                                                       class="form-control" 
+                                                                       name="speakers[INDEX][session_duration]" 
+                                                                       min="1" 
+                                                                       placeholder="e.g., 60">
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <div class="col-md-4">
+                                                            <div class="form-group mb-3">
+                                                                <label class="form-label" style="color: #003366;">Order</label>
+                                                                <input type="number" 
+                                                                       class="form-control" 
+                                                                       name="speakers[INDEX][order]" 
+                                                                       value="0" 
+                                                                       min="0">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div class="form-group mb-3">
+                                                        <label class="form-label" style="color: #003366;">Session Description</label>
+                                                        <textarea class="form-control" 
+                                                                  name="speakers[INDEX][session_description]" 
+                                                                  rows="2" 
+                                                                  placeholder="Describe the speaker's session..."></textarea>
+                                                    </div>
+                                                    
+                                                    <div class="row">
+                                                        <div class="col-md-4">
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" 
+                                                                       type="checkbox" 
+                                                                       name="speakers[INDEX][is_keynote]" 
+                                                                       value="1"
+                                                                       id="keynote-INDEX">
+                                                                <label class="form-check-label" for="keynote-INDEX" style="color: #003366;">
+                                                                    Keynote Speaker
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <div class="col-md-4">
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" 
+                                                                       type="checkbox" 
+                                                                       name="speakers[INDEX][is_moderator]" 
+                                                                       value="1"
+                                                                       id="moderator-INDEX">
+                                                                <label class="form-check-label" for="moderator-INDEX" style="color: #003366;">
+                                                                    Moderator
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <div class="col-md-4">
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" 
+                                                                       type="checkbox" 
+                                                                       name="speakers[INDEX][is_panelist]" 
+                                                                       value="1"
+                                                                       id="panelist-INDEX">
+                                                                <label class="form-check-label" for="panelist-INDEX" style="color: #003366;">
+                                                                    Panelist
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </template>
                                     </div>
                                 </div>
                             </div>
@@ -618,7 +651,7 @@
                                             <i class="fas fa-times me-2"></i>
                                             Cancel
                                         </a>
-                                        <button type="submit" class="btn btn-primary">
+                                        <button type="submit" class="btn" style="background-color: #003366; color: white;">
                                             <i class="fas fa-save me-2"></i>
                                             Create Event
                                         </button>
@@ -649,7 +682,6 @@
     }
     
     .ju-sub-card-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
         padding: 12px 20px;
         border-bottom: 1px solid rgba(255,255,255,0.1);
@@ -667,44 +699,18 @@
     }
     
     .upload-area:hover {
-        border-color: #667eea;
-        background-color: rgba(102, 126, 234, 0.05);
+        border-color: #003366;
+        background-color: rgba(0, 51, 102, 0.05);
     }
     
     .upload-area.dragover {
-        border-color: #667eea;
-        background-color: rgba(102, 126, 234, 0.1);
+        border-color: #003366;
+        background-color: rgba(0, 51, 102, 0.1);
     }
     
     .image-preview img {
         max-height: 200px;
         object-fit: cover;
-    }
-    
-    .amenities-list {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 5px;
-        margin-top: 5px;
-    }
-    
-    .amenity-badge {
-        font-size: 11px;
-        padding: 2px 8px;
-    }
-    
-    .tag-suggestion {
-        cursor: pointer;
-        transition: all 0.2s ease;
-    }
-    
-    .tag-suggestion:hover {
-        background-color: #667eea !important;
-        color: white !important;
-    }
-    
-    .cursor-pointer {
-        cursor: pointer;
     }
     
     .preview-container {
@@ -722,12 +728,103 @@
         justify-content: center;
         border-radius: 50%;
     }
+    
+    .speaker-item .card-header {
+        border-bottom-width: 2px;
+    }
+    
+    .form-check-input:checked {
+        background-color: #003366;
+        border-color: #003366;
+    }
 </style>
 @endpush
 
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        let speakerCount = 0;
+        const speakersContainer = document.getElementById('speakers-container');
+        const speakerTemplate = document.getElementById('speaker-template');
+        const addSpeakerBtn = document.getElementById('addSpeakerBtn');
+        
+        // Add speaker function
+        function addSpeaker() {
+            const template = speakerTemplate.content.cloneNode(true);
+            const speakerItem = template.querySelector('.speaker-item');
+            const html = speakerItem.outerHTML.replace(/INDEX/g, speakerCount);
+            
+            speakersContainer.insertAdjacentHTML('beforeend', html);
+            
+            const newSpeaker = speakersContainer.lastElementChild;
+            const select = newSpeaker.querySelector('.speaker-select');
+            const speakerIdInput = newSpeaker.querySelector('.speaker-id-input');
+            const speakerNumber = newSpeaker.querySelector('.speaker-number');
+            
+            speakerNumber.textContent = speakerCount + 1;
+            
+            // Update speaker ID when select changes
+            select.addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+                speakerIdInput.value = this.value;
+                
+                // Auto-fill some fields based on speaker data
+                if (this.value) {
+                    // You could auto-fill session title or other fields here if needed
+                }
+            });
+            
+            // Remove speaker
+            const removeBtn = newSpeaker.querySelector('.remove-speaker');
+            removeBtn.addEventListener('click', function() {
+                newSpeaker.remove();
+                updateSpeakerNumbers();
+            });
+            
+            speakerCount++;
+        }
+        
+        // Update speaker numbers after removal
+        function updateSpeakerNumbers() {
+            const speakers = document.querySelectorAll('.speaker-item');
+            speakers.forEach((speaker, index) => {
+                const numberSpan = speaker.querySelector('.speaker-number');
+                if (numberSpan) {
+                    numberSpan.textContent = index + 1;
+                }
+                
+                // Update all input names with new index
+                const inputs = speaker.querySelectorAll('input, select, textarea');
+                inputs.forEach(input => {
+                    const name = input.getAttribute('name');
+                    if (name) {
+                        const newName = name.replace(/\[\d+\]/, '[' + index + ']');
+                        input.setAttribute('name', newName);
+                    }
+                });
+                
+                // Update checkbox IDs
+                const checkboxes = speaker.querySelectorAll('input[type="checkbox"]');
+                checkboxes.forEach(checkbox => {
+                    const id = checkbox.getAttribute('id');
+                    if (id) {
+                        const newId = id.replace(/-\d+/, '-' + index);
+                        checkbox.setAttribute('id', newId);
+                        
+                        // Update associated label
+                        const label = speaker.querySelector('label[for="' + id + '"]');
+                        if (label) {
+                            label.setAttribute('for', newId);
+                        }
+                    }
+                });
+            });
+            
+            speakerCount = speakers.length;
+        }
+        
+        addSpeakerBtn.addEventListener('click', addSpeaker);
+        
         // Image upload with drag & drop
         const dropArea = document.getElementById('dropArea');
         const imageInput = document.getElementById('image');
@@ -781,7 +878,6 @@
                         imagePreview.classList.remove('d-none');
                     };
                     reader.readAsDataURL(file);
-                    imageInput.files = files;
                 } else {
                     alert('Please select an image file.');
                 }
@@ -792,23 +888,17 @@
         const campusSelect = document.getElementById('campus_id');
         const buildingSelect = document.getElementById('building_id');
         const venueSelect = document.getElementById('venue_id');
-        const venueDetailsCard = document.querySelector('.venue-details-card');
-        const maxAttendeesInput = document.getElementById('max_attendees');
         
         campusSelect.addEventListener('change', function() {
             const campusId = this.value;
             
-            // Clear building and venue selects
             buildingSelect.innerHTML = '<option value="">Select Building (Optional)</option>';
             venueSelect.innerHTML = '<option value="">Select Venue (Optional)</option>';
-            venueDetailsCard.classList.add('d-none');
             
             if (campusId) {
-                // Load buildings for selected campus
                 fetch(`/admin/events/get-buildings/${campusId}`)
                     .then(response => response.json())
                     .then(data => {
-                        buildingSelect.innerHTML = '<option value="">Select Building (Optional)</option>';
                         data.forEach(building => {
                             const option = document.createElement('option');
                             option.value = building.id;
@@ -823,16 +913,12 @@
         buildingSelect.addEventListener('change', function() {
             const buildingId = this.value;
             
-            // Clear venue select
             venueSelect.innerHTML = '<option value="">Select Venue (Optional)</option>';
-            venueDetailsCard.classList.add('d-none');
             
             if (buildingId) {
-                // Load venues for selected building
                 fetch(`/admin/events/get-venues/${buildingId}`)
                     .then(response => response.json())
                     .then(data => {
-                        venueSelect.innerHTML = '<option value="">Select Venue (Optional)</option>';
                         data.forEach(venue => {
                             const option = document.createElement('option');
                             option.value = venue.id;
@@ -841,47 +927,6 @@
                         });
                     })
                     .catch(error => console.error('Error loading venues:', error));
-            }
-        });
-        
-        venueSelect.addEventListener('change', function() {
-            const venueId = this.value;
-            
-            if (venueId) {
-                // Load venue details
-                fetch(`/admin/events/get-venue-details/${venueId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        // Update venue details card
-                        document.getElementById('venue-type').textContent = data.type;
-                        document.getElementById('venue-capacity').textContent = data.capacity;
-                        
-                        // Update max attendees input with venue capacity
-                        if (!maxAttendeesInput.value || parseInt(maxAttendeesInput.value) > data.capacity) {
-                            maxAttendeesInput.value = data.capacity;
-                            maxAttendeesInput.max = data.capacity;
-                        }
-                        
-                        // Show amenities
-                        const amenitiesList = document.getElementById('venue-amenities');
-                        amenitiesList.innerHTML = '';
-                        
-                        if (data.amenities && data.amenities.length > 0) {
-                            data.amenities.forEach(amenity => {
-                                const badge = document.createElement('span');
-                                badge.className = 'badge bg-light text-dark amenity-badge me-1 mb-1';
-                                badge.textContent = amenity;
-                                amenitiesList.appendChild(badge);
-                            });
-                        } else {
-                            amenitiesList.innerHTML = '<span class="text-muted">No amenities listed</span>';
-                        }
-                        
-                        venueDetailsCard.classList.remove('d-none');
-                    })
-                    .catch(error => console.error('Error loading venue details:', error));
-            } else {
-                venueDetailsCard.classList.add('d-none');
             }
         });
         
@@ -902,7 +947,6 @@
         const startDateInput = document.getElementById('start_date');
         const endDateInput = document.getElementById('end_date');
         
-        // Set min dates to current datetime
         const now = new Date();
         now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
         const localISOTime = now.toISOString().slice(0, 16);
@@ -927,29 +971,9 @@
             }
         });
         
-        // Tag suggestions
-        document.querySelectorAll('.tag-suggestion').forEach(tag => {
-            tag.addEventListener('click', function() {
-                const tagsInput = document.getElementById('tags');
-                const currentTags = tagsInput.value ? tagsInput.value.split(',').map(t => t.trim()) : [];
-                const newTag = this.textContent.trim();
-                
-                if (!currentTags.includes(newTag)) {
-                    if (currentTags.length >= 10) {
-                        showToast('Maximum 10 tags allowed', 'warning');
-                        return;
-                    }
-                    
-                    currentTags.push(newTag);
-                    tagsInput.value = currentTags.join(', ');
-                }
-            });
-        });
-        
         // Form validation
         const form = document.getElementById('eventForm');
         form.addEventListener('submit', function(e) {
-            // Validate dates
             if (startDateInput.value && endDateInput.value) {
                 const start = new Date(startDateInput.value);
                 const end = new Date(endDateInput.value);
@@ -961,27 +985,13 @@
                 }
             }
             
-            // Validate max attendees if venue is selected
-            if (venueSelect.value && maxAttendeesInput.value) {
-                const venueCapacity = parseInt(document.getElementById('venue-capacity').textContent);
-                const maxAttendees = parseInt(maxAttendeesInput.value);
-                
-                if (maxAttendees > venueCapacity) {
-                    e.preventDefault();
-                    showToast(`Maximum attendees cannot exceed venue capacity (${venueCapacity})`, 'error');
-                    return;
-                }
-            }
-            
             // Show loading state
             const submitBtn = form.querySelector('button[type="submit"]');
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Creating...';
             submitBtn.disabled = true;
         });
         
-        // Helper functions
         function showToast(message, type = 'info') {
-            // Create toast element
             const toast = document.createElement('div');
             toast.className = `alert alert-${type === 'error' ? 'danger' : type} alert-dismissible fade show position-fixed`;
             toast.style.top = '20px';
@@ -995,7 +1005,6 @@
             
             document.body.appendChild(toast);
             
-            // Auto remove after 5 seconds
             setTimeout(() => {
                 toast.remove();
             }, 5000);
@@ -1007,18 +1016,7 @@
             imageInput.value = '';
         }
         
-        // Initialize old values for form repopulation
-        @if(old('campus_id'))
-            campusSelect.dispatchEvent(new Event('change'));
-            setTimeout(() => {
-                buildingSelect.value = "{{ old('building_id') }}";
-                buildingSelect.dispatchEvent(new Event('change'));
-                setTimeout(() => {
-                    venueSelect.value = "{{ old('venue_id') }}";
-                    venueSelect.dispatchEvent(new Event('change'));
-                }, 500);
-            }, 500);
-        @endif
+        window.removeImage = removeImage;
     });
 </script>
 @endpush

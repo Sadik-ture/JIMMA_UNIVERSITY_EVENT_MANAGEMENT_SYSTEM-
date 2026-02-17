@@ -1,4 +1,5 @@
 <?php
+// routes/web.php - COMPLETE MERGED VERSION
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -18,6 +19,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\EventSpeakerController;
 
 // =============== PUBLIC ROUTES ===============
 Route::prefix('events')->name('events.guest.')->group(function () {
@@ -47,12 +49,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', function () {
         $user = auth()->user();
         
-        // Load role if needed
         if (!$user->relationLoaded('role')) {
             $user->load('role');
         }
         
-        // Check if user has admin role - ADJUST THESE SLUGS BASED ON YOUR DATABASE
         $adminSlugs = ['super-admin', 'admin', 'administrator'];
         
         if (!$user->role || !in_array($user->role->slug, $adminSlugs)) {
@@ -83,7 +83,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('roles', RoleController::class);
     Route::resource('permissions', PermissionController::class);
 
-    // =============== EVENT MANAGEMENT ===============
+    // =============== EVENT MANAGEMENT - COMPLETE WITH ALL AJAX ROUTES ===============
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('events', EventController::class);
         Route::post('events/{event}/toggle-featured', [EventController::class, 'toggleFeatured'])
@@ -95,14 +95,49 @@ Route::middleware('auth')->group(function () {
         Route::get('events/export', [EventController::class, 'export'])
             ->name('events.export');
 
+        // =============== LOCATION AJAX ROUTES ===============
+        Route::get('events/get-buildings/{campusId}', [EventController::class, 'getBuildings'])
+            ->name('events.get-buildings');
+        Route::get('events/get-venues/{buildingId}', [EventController::class, 'getVenues'])
+            ->name('events.get-venues');
+        Route::get('events/get-venue-details/{venueId}', [EventController::class, 'getVenueDetails'])
+            ->name('events.get-venue-details');
+
+        // =============== SPEAKER AJAX ROUTES - COMPREHENSIVE ===============
+        Route::get('events/get-speakers', [EventController::class, 'getSpeakers'])
+            ->name('events.get-speakers');
+        Route::get('events/get-speaker-details/{speakerId}', [EventController::class, 'getSpeakerDetails'])
+            ->name('events.get-speaker-details');
+        
+        // =============== EVENT SPEAKER MANAGEMENT ROUTES ===============
+        Route::get('/events/{event}/speakers', [EventSpeakerController::class, 'manage'])
+            ->name('events.speakers.manage');
+        Route::post('/events/{event}/speakers/assign', [EventSpeakerController::class, 'assign'])
+            ->name('events.speakers.assign');
+        Route::delete('/events/{event}/speakers/{speaker}', [EventSpeakerController::class, 'remove'])
+            ->name('events.speakers.remove');
+        Route::put('/events/{event}/speakers/{speaker}', [EventSpeakerController::class, 'updateSpeakerDetails'])
+            ->name('events.speakers.update');
+        Route::post('/events/{event}/speakers/reorder', [EventSpeakerController::class, 'reorder'])
+            ->name('events.speakers.reorder');
+        
+        // =============== SPEAKER AJAX ENDPOINTS ===============
+        Route::get('/speakers/available', [EventSpeakerController::class, 'getAvailableSpeakers'])
+            ->name('speakers.available');
+        Route::get('/events/{event}/speakers/assigned', [EventSpeakerController::class, 'getAssignedSpeakers'])
+            ->name('events.speakers.assigned');
+
+        // Campus Management Routes
         Route::resource('campuses', CampusController::class);
         Route::post('campuses/{campus}/toggle-active', [CampusController::class, 'toggleActive'])
             ->name('campuses.toggle-active');
 
+        // Building Management Routes
         Route::resource('buildings', BuildingController::class);
         Route::post('buildings/{building}/toggle-active', [BuildingController::class, 'toggleActive'])
             ->name('buildings.toggle-active');
 
+        // Venue Management Routes
         Route::resource('venues', VenueController::class);
         Route::post('venues/{venue}/toggle-availability', [VenueController::class, 'toggleAvailability'])
             ->name('venues.toggle-availability');
