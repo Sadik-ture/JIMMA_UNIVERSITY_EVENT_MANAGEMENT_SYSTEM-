@@ -1048,7 +1048,7 @@
             <div class="premium-stat-icon">
                 <i class="fas fa-bullhorn"></i>
             </div>
-            <div class="premium-stat-number">{{ $stats['totalAnnouncements'] }}</div>
+            <div class="premium-stat-number">{{ $stats['totalAnnouncements'] ?? 0 }}</div>
             <div class="premium-stat-label">Total Announcements</div>
             <div class="premium-stat-subtext">All time</div>
         </div>
@@ -1058,9 +1058,9 @@
             <div class="premium-stat-icon">
                 <i class="fas fa-check-circle"></i>
             </div>
-            <div class="premium-stat-number">{{ $stats['publishedAnnouncements'] }}</div>
+            <div class="premium-stat-number">{{ $stats['publishedAnnouncements'] ?? 0 }}</div>
             <div class="premium-stat-label">Published</div>
-            <div class="premium-stat-subtext">{{ $stats['totalAnnouncements'] > 0 ? round(($stats['publishedAnnouncements'] / $stats['totalAnnouncements']) * 100) : 0 }}% of total</div>
+            <div class="premium-stat-subtext">{{ isset($stats['totalAnnouncements']) && $stats['totalAnnouncements'] > 0 ? round(($stats['publishedAnnouncements'] / $stats['totalAnnouncements']) * 100) : 0 }}% of total</div>
         </div>
         
         <!-- Active - GOLD -->
@@ -1068,7 +1068,7 @@
             <div class="premium-stat-icon">
                 <i class="fas fa-clock"></i>
             </div>
-            <div class="premium-stat-number">{{ $stats['activeAnnouncements'] }}</div>
+            <div class="premium-stat-number">{{ $stats['activeAnnouncements'] ?? 0 }}</div>
             <div class="premium-stat-label">Active</div>
             <div class="premium-stat-subtext">Currently available</div>
         </div>
@@ -1078,7 +1078,7 @@
             <div class="premium-stat-icon">
                 <i class="fas fa-chart-line"></i>
             </div>
-            <div class="premium-stat-number">{{ number_format($stats['totalViews']) }}</div>
+            <div class="premium-stat-number">{{ number_format($stats['totalViews'] ?? 0) }}</div>
             <div class="premium-stat-label">Total Views</div>
             <div class="premium-stat-subtext">Across all announcements</div>
         </div>
@@ -1225,7 +1225,7 @@
             </a>
             @endif
             
-            @can('create_announcements')
+            @can('create', App\Models\Announcement::class)
             <a href="{{ route('announcements.create') }}" class="premium-header-btn-sm premium-header-btn-sm-primary">
                 <i class="fas fa-plus-circle"></i>
                 <span>Create</span>
@@ -1314,9 +1314,7 @@
                         <i class="fas fa-clock"></i> Draft
                     </span>
                 </div>
-                @endif
-
-                @if($announcement->expires_at && $announcement->expires_at->isPast())
+                @elseif($announcement->expires_at && $announcement->expires_at->isPast())
                 <div class="card-status-badge">
                     <span class="premium-status-badge expired">
                         <i class="fas fa-history"></i> Expired
@@ -1419,7 +1417,7 @@
                 There are no announcements available at the moment.
                 @endif
             </p>
-            @can('create_announcements')
+            @can('create', App\Models\Announcement::class)
             <a href="{{ route('announcements.create') }}" class="premium-empty-btn">
                 <i class="fas fa-plus-circle"></i>
                 <span>Create First Announcement</span>
@@ -1434,7 +1432,7 @@
         ============================================ -->
     @if($announcements->hasPages())
     <div class="premium-pagination">
-        {{ $announcements->withQueryString()->onEachSide(1)->links('vendor.pagination.bootstrap-5') }}
+        {{ $announcements->withQueryString()->onEachSide(1)->links() }}
     </div>
     @endif
 </div>
@@ -1530,179 +1528,203 @@
         showToast('Switched to list view', 'info');
     }
 
-    function createGridCard(announcement, index) {
-        const card = document.createElement('div');
-        card.className = `premium-announcement-card ${announcement.type || 'general'}`;
-        card.setAttribute('data-aos', 'fade-up');
-        card.setAttribute('data-aos-delay', (index % 3) * 50);
-        card.setAttribute('data-aos-duration', '600');
-        
-        let icon = 'fa-bullhorn';
-        if (announcement.type === 'event') icon = 'fa-calendar-alt';
-        else if (announcement.type === 'campus') icon = 'fa-university';
-        else if (announcement.type === 'urgent') icon = 'fa-exclamation-triangle';
-        
-        let audienceLabel = 'Everyone';
-        if (announcement.audience === 'students') audienceLabel = 'Students';
-        else if (announcement.audience === 'faculty') audienceLabel = 'Faculty';
-        else if (announcement.audience === 'staff') audienceLabel = 'Staff';
-        
-        let statusBadge = '';
-        if (!announcement.is_published) {
-            statusBadge = `<div class="card-status-badge"><span class="premium-status-badge draft"><i class="fas fa-clock"></i> Draft</span></div>`;
-        } else if (announcement.expires_at && new Date(announcement.expires_at) < new Date()) {
-            statusBadge = `<div class="card-status-badge"><span class="premium-status-badge expired"><i class="fas fa-history"></i> Expired</span></div>`;
-        }
-        
-        let expirationHtml = '';
-        if (announcement.expires_at) {
-            expirationHtml = `<div class="premium-expiration"><i class="fas fa-clock"></i> Expires: ${new Date(announcement.expires_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>`;
-        }
-        
-        card.innerHTML = `
-            ${statusBadge}
-            <div class="premium-card-header">
-                <div class="premium-card-icon ${announcement.type || 'general'}">
-                    <i class="fas ${icon}"></i>
+   function createGridCard(announcement, index) {
+    const card = document.createElement('div');
+    card.className = `premium-announcement-card ${announcement.type || 'general'}`;
+    card.setAttribute('data-aos', 'fade-up');
+    card.setAttribute('data-aos-delay', (index % 3) * 50);
+    card.setAttribute('data-aos-duration', '600');
+    
+    let icon = 'fa-bullhorn';
+    if (announcement.type === 'event') icon = 'fa-calendar-alt';
+    else if (announcement.type === 'campus') icon = 'fa-university';
+    else if (announcement.type === 'urgent') icon = 'fa-exclamation-triangle';
+    
+    let audienceLabel = 'Everyone';
+    if (announcement.audience === 'students') audienceLabel = 'Students';
+    else if (announcement.audience === 'faculty') audienceLabel = 'Faculty';
+    else if (announcement.audience === 'staff') audienceLabel = 'Staff';
+    
+    let statusBadge = '';
+    if (!announcement.is_published) {
+        statusBadge = `<div class="card-status-badge"><span class="premium-status-badge draft"><i class="fas fa-clock"></i> Draft</span></div>`;
+    } else if (announcement.expires_at && new Date(announcement.expires_at) < new Date()) {
+        statusBadge = `<div class="card-status-badge"><span class="premium-status-badge expired"><i class="fas fa-history"></i> Expired</span></div>`;
+    }
+    
+    let expirationHtml = '';
+    if (announcement.expires_at) {
+        expirationHtml = `<div class="premium-expiration"><i class="fas fa-clock"></i> Expires: ${new Date(announcement.expires_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>`;
+    }
+    
+    // FIXED: Check if user can update/delete
+   
+    let actionsHtml = `
+        <a href="/announcements/${announcement.id}" class="premium-action-btn" title="View">
+            <i class="fas fa-eye"></i>
+        </a>
+    `;
+    
+    if (canUpdate) {
+        actionsHtml += `
+            <a href="/announcements/${announcement.id}/edit" class="premium-action-btn warning" title="Edit">
+                <i class="fas fa-edit"></i>
+            </a>
+        `;
+    }
+    
+    if (canDelete) {
+        actionsHtml += `
+            <form action="/announcements/${announcement.id}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this announcement?');">
+                <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="_method" value="DELETE">
+                <button type="submit" class="premium-action-btn danger" title="Delete">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </form>
+        `;
+    }
+    
+    card.innerHTML = `
+        ${statusBadge}
+        <div class="premium-card-header">
+            <div class="premium-card-icon ${announcement.type || 'general'}">
+                <i class="fas ${icon}"></i>
+            </div>
+        </div>
+        <div class="premium-card-body">
+            <h5 class="premium-card-title">
+                <a href="/announcements/${announcement.id}">${announcement.title.length > 60 ? announcement.title.substring(0, 60) + '...' : announcement.title}</a>
+            </h5>
+            <p class="premium-card-excerpt">${announcement.content.replace(/<[^>]*>/g, '').substring(0, 100)}...</p>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="premium-audience-badge">
+                    <i class="fas fa-users"></i> ${audienceLabel}
+                </span>
+                <span class="premium-views-count">
+                    <i class="fas fa-eye"></i> ${announcement.views.toLocaleString()}
+                </span>
+            </div>
+        </div>
+        <div class="premium-card-meta">
+            <div class="premium-card-footer">
+                <div>
+                    <small class="text-muted">
+                        <i class="fas fa-user me-1"></i> ${announcement.creator?.name || 'System'}
+                    </small>
+                    <br>
+                    <small class="text-muted">
+                        <i class="fas fa-calendar me-1"></i> ${new Date(announcement.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </small>
+                </div>
+                <div class="premium-card-actions">
+                    ${actionsHtml}
                 </div>
             </div>
-            <div class="premium-card-body">
-                <h5 class="premium-card-title">
-                    <a href="/announcements/${announcement.id}">${announcement.title.length > 60 ? announcement.title.substring(0, 60) + '...' : announcement.title}</a>
-                </h5>
-                <p class="premium-card-excerpt">${announcement.content.replace(/<[^>]*>/g, '').substring(0, 100)}...</p>
-                <div class="d-flex justify-content-between align-items-center mb-2">
+            ${expirationHtml}
+        </div>
+    `;
+    
+    return card;
+}
+
+    function createListItem(announcement, index) {
+    const item = document.createElement('div');
+    item.className = `premium-list-item ${announcement.type || 'general'}`;
+    
+    let icon = 'fa-bullhorn';
+    if (announcement.type === 'event') icon = 'fa-calendar-alt';
+    else if (announcement.type === 'campus') icon = 'fa-university';
+    else if (announcement.type === 'urgent') icon = 'fa-exclamation-triangle';
+    
+    let audienceLabel = 'Everyone';
+    if (announcement.audience === 'students') audienceLabel = 'Students';
+    else if (announcement.audience === 'faculty') audienceLabel = 'Faculty';
+    else if (announcement.audience === 'staff') audienceLabel = 'Staff';
+    
+    let statusBadge = '';
+    if (!announcement.is_published) {
+        statusBadge = `<span class="premium-status-badge draft"><i class="fas fa-clock"></i> Draft</span>`;
+    } else if (announcement.expires_at && new Date(announcement.expires_at) < new Date()) {
+        statusBadge = `<span class="premium-status-badge expired"><i class="fas fa-history"></i> Expired</span>`;
+    }
+    
+    let expirationHtml = '';
+    if (announcement.expires_at) {
+        expirationHtml = `<span class="premium-expiration"><i class="fas fa-clock"></i> Expires: ${new Date(announcement.expires_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>`;
+    }
+    
+    // FIXED: Check if user can update/delete
+       
+    let actionsHtml = `
+        <a href="/announcements/${announcement.id}" class="premium-action-btn" title="View">
+            <i class="fas fa-eye"></i>
+        </a>
+    `;
+    
+    if (canUpdate) {
+        actionsHtml += `
+            <a href="/announcements/${announcement.id}/edit" class="premium-action-btn warning" title="Edit">
+                <i class="fas fa-edit"></i>
+            </a>
+        `;
+    }
+    
+    if (canDelete) {
+        actionsHtml += `
+            <form action="/announcements/${announcement.id}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this announcement?');">
+                <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="_method" value="DELETE">
+                <button type="submit" class="premium-action-btn danger" title="Delete">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </form>
+        `;
+    }
+    
+    item.innerHTML = `
+        <div class="premium-list-row">
+            <div class="premium-list-icon ${announcement.type || 'general'}">
+                <i class="fas ${icon}"></i>
+            </div>
+            <div class="premium-list-content">
+                <div class="premium-announcement-header">
+                    <div class="premium-announcement-title-wrapper">
+                        <h5 class="premium-list-title">
+                            <a href="/announcements/${announcement.id}">${announcement.title}</a>
+                        </h5>
+                        ${statusBadge}
+                    </div>
+                </div>
+                <div class="premium-list-meta">
+                    <span class="premium-list-meta-item">
+                        <i class="fas fa-user"></i> ${announcement.creator?.name || 'System'}
+                    </span>
+                    <span class="premium-list-meta-item">
+                        <i class="fas fa-calendar"></i> ${new Date(announcement.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </span>
+                    <span class="premium-views-count">
+                        <i class="fas fa-eye"></i> ${announcement.views.toLocaleString()} views
+                    </span>
                     <span class="premium-audience-badge">
                         <i class="fas fa-users"></i> ${audienceLabel}
                     </span>
-                    <span class="premium-views-count">
-                        <i class="fas fa-eye"></i> ${announcement.views.toLocaleString()}
-                    </span>
                 </div>
-            </div>
-            <div class="premium-card-meta">
-                <div class="premium-card-footer">
-                    <div>
-                        <small class="text-muted">
-                            <i class="fas fa-user me-1"></i> ${announcement.creator?.name || 'System'}
-                        </small>
-                        <br>
-                        <small class="text-muted">
-                            <i class="fas fa-calendar me-1"></i> ${new Date(announcement.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                        </small>
-                    </div>
+                <div class="premium-list-excerpt">
+                    ${announcement.content.replace(/<[^>]*>/g, '').substring(0, 200)}...
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                    ${expirationHtml}
                     <div class="premium-card-actions">
-                        <a href="/announcements/${announcement.id}" class="premium-action-btn" title="View">
-                            <i class="fas fa-eye"></i>
-                        </a>
-                        @can('update', $announcement)
-                        <a href="/announcements/${announcement.id}/edit" class="premium-action-btn warning" title="Edit">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                        @endcan
-                        @can('delete', $announcement)
-                        <form action="/announcements/${announcement.id}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this announcement?');">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="premium-action-btn danger" title="Delete">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </form>
-                        @endcan
-                    </div>
-                </div>
-                ${expirationHtml}
-            </div>
-        `;
-        
-        return card;
-    }
-
-    function createListItem(announcement, index) {
-        const item = document.createElement('div');
-        item.className = `premium-list-item ${announcement.type || 'general'}`;
-        
-        let icon = 'fa-bullhorn';
-        if (announcement.type === 'event') icon = 'fa-calendar-alt';
-        else if (announcement.type === 'campus') icon = 'fa-university';
-        else if (announcement.type === 'urgent') icon = 'fa-exclamation-triangle';
-        
-        let audienceLabel = 'Everyone';
-        if (announcement.audience === 'students') audienceLabel = 'Students';
-        else if (announcement.audience === 'faculty') audienceLabel = 'Faculty';
-        else if (announcement.audience === 'staff') audienceLabel = 'Staff';
-        
-        let statusBadge = '';
-        if (!announcement.is_published) {
-            statusBadge = `<span class="premium-status-badge draft"><i class="fas fa-clock"></i> Draft</span>`;
-        } else if (announcement.expires_at && new Date(announcement.expires_at) < new Date()) {
-            statusBadge = `<span class="premium-status-badge expired"><i class="fas fa-history"></i> Expired</span>`;
-        }
-        
-        let expirationHtml = '';
-        if (announcement.expires_at) {
-            expirationHtml = `<span class="premium-expiration"><i class="fas fa-clock"></i> Expires: ${new Date(announcement.expires_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>`;
-        }
-        
-        item.innerHTML = `
-            <div class="premium-list-row">
-                <div class="premium-list-icon ${announcement.type || 'general'}">
-                    <i class="fas ${icon}"></i>
-                </div>
-                <div class="premium-list-content">
-                    <div class="premium-announcement-header">
-                        <div class="premium-announcement-title-wrapper">
-                            <h5 class="premium-list-title">
-                                <a href="/announcements/${announcement.id}">${announcement.title}</a>
-                            </h5>
-                            ${statusBadge}
-                        </div>
-                    </div>
-                    <div class="premium-list-meta">
-                        <span class="premium-list-meta-item">
-                            <i class="fas fa-user"></i> ${announcement.creator?.name || 'System'}
-                        </span>
-                        <span class="premium-list-meta-item">
-                            <i class="fas fa-calendar"></i> ${new Date(announcement.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                        </span>
-                        <span class="premium-views-count">
-                            <i class="fas fa-eye"></i> ${announcement.views.toLocaleString()} views
-                        </span>
-                        <span class="premium-audience-badge">
-                            <i class="fas fa-users"></i> ${audienceLabel}
-                        </span>
-                    </div>
-                    <div class="premium-list-excerpt">
-                        ${announcement.content.replace(/<[^>]*>/g, '').substring(0, 200)}...
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center">
-                        ${expirationHtml}
-                        <div class="premium-card-actions">
-                            <a href="/announcements/${announcement.id}" class="premium-action-btn" title="View">
-                                <i class="fas fa-eye"></i>
-                            </a>
-                            @can('update', $announcement)
-                            <a href="/announcements/${announcement.id}/edit" class="premium-action-btn warning" title="Edit">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                            @endcan
-                            @can('delete', $announcement)
-                            <form action="/announcements/${announcement.id}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this announcement?');">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="premium-action-btn danger" title="Delete">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </form>
-                            @endcan
-                        </div>
+                        ${actionsHtml}
                     </div>
                 </div>
             </div>
-        `;
-        
-        return item;
-    }
+        </div>
+    `;
+    
+    return item;
+}
 
     gridViewBtn.addEventListener('click', setGridView);
     listViewBtn.addEventListener('click', setListView);
@@ -1776,6 +1798,9 @@
             setTimeout(() => toast.remove(), 300);
         }, 3000);
     }
+
+    // Make showToast available globally
+    window.showToast = showToast;
 
     // Filter button active state persistence
     document.addEventListener('DOMContentLoaded', function() {
