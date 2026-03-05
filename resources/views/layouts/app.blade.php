@@ -3173,25 +3173,7 @@
                                 </a>
                             </li>
 
-                            <!-- Export Section -->
-                            <li class="nav-item nav-section-title">
-                                <span class="nav-section-text">Export</span>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link hover-border" href="{{ route('admin.registrations.export') }}">
-                                    <i class="fas fa-file-excel me-2" style="color: #28a745;"></i>
-                                    <span>Export to Excel</span>
-                                </a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link hover-border"
-                                    href="{{ route('admin.registrations.export', ['format' => 'pdf']) }}">
-                                    <i class="fas fa-file-pdf me-2" style="color: #dc3545;"></i>
-                                    <span>Export to PDF</span>
-                                </a>
-                            </li>
+                            
                         </ul>
                     </div>
                 </li>
