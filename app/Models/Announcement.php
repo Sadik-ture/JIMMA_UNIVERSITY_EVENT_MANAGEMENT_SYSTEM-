@@ -1,4 +1,5 @@
 <?php
+// app/Models/Announcement.php
 
 namespace App\Models;
 
@@ -78,7 +79,7 @@ class Announcement extends Model
         return Str::limit($content, $length);
     }
     
-    // FIXED: Add missing method that's called in views
+    // Fixed: Add missing isActive method
     public function isActive()
     {
         if (!$this->is_published) {
@@ -92,7 +93,7 @@ class Announcement extends Model
         return true;
     }
     
-    // FIXED: Add scope for active announcements
+    // Fixed: Add scope for active announcements
     public function scopeActive($query)
     {
         return $query->where('is_published', true)

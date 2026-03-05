@@ -7,11 +7,11 @@
 @section('breadcrumb-items')
     <li class="breadcrumb-item">
         <a href="{{ route('home') }}" class="d-flex align-items-center text-decoration-none">
-            <i class="fas fa-home me-2" style="color: var(--ju-blue);"></i>Home
+            <i class="fas fa-home me-2" style="color: var(--ju-gold);"></i>Home
         </a>
     </li>
     <li class="breadcrumb-item active">
-        <span class="fw-semibold" style="color: var(--ju-blue);">Notifications</span>
+        <span class="fw-semibold" style="color: var(--ju-blue-dark);">Notifications</span>
     </li>
 @endsection
 
@@ -19,58 +19,62 @@
 <style>
     /* ============================================
            PREMIUM JIMMA UNIVERSITY NOTIFICATIONS
-           DARK BLUE & GOLD Color Scheme - OFFICIAL
+           ROYAL BLUE (#002789) & GOLD (#C4A747) - OFFICIAL
            COLORFUL STAT CARDS | HEADER FILTERS
         ============================================ */
     
     :root {
-        /* DARK BLUE - Official Jimma University Primary Color */
-        --ju-blue: #0a2c6e;
-        --ju-blue-dark: #041c47;
+        /* ROYAL BLUE - Official Jimma University Primary Color - MATCHING LAYOUT */
+        --ju-blue: #002789;
+        --ju-blue-dark: #001a5c;
         --ju-blue-darker: #021230;
-        --ju-blue-light: #1e4a8a;
+        --ju-blue-light: #1a3a9a;
         --ju-blue-lighter: #3a6ab0;
-        --ju-blue-soft: rgba(10, 44, 110, 0.08);
-        --ju-blue-glow: rgba(10, 44, 110, 0.2);
-        --ju-blue-gradient: linear-gradient(145deg, #0a2c6e, #041c47);
+        --ju-blue-soft: #e6ebf7;
+        --ju-blue-muted: #d4e0f0;
+        --ju-blue-glow: rgba(0, 39, 137, 0.2);
+        --ju-blue-gradient: linear-gradient(145deg, #002789, #001a5c);
+        --ju-blue-gradient-light: linear-gradient(145deg, #002789, #1a3a9a);
         
-        /* Ethiopian Gold Accents - Official */
-        --ju-gold: #c4a747;
+        /* Ethiopian Gold Accents - Official - MATCHING LAYOUT */
+        --ju-gold: #C4A747;
         --ju-gold-dark: #a5862e;
-        --ju-gold-light: #d8be6e;
+        --ju-gold-light: #e5d6a6;
         --ju-gold-soft: rgba(196, 167, 71, 0.12);
-        --ju-gold-gradient: linear-gradient(145deg, #c4a747, #a5862e);
+        --ju-gold-glow: rgba(196, 167, 71, 0.25);
+        --ju-gold-gradient: linear-gradient(145deg, #C4A747, #a5862e);
         
         /* VIBRANT COLORS for Stat Cards */
-        --ju-total: #4361ee;
-        --ju-total-dark: #3a56d4;
-        --ju-total-light: #e2e8ff;
-        --ju-read: #10b981;
-        --ju-read-dark: #059669;
-        --ju-read-light: #d1fae5;
-        --ju-unread: #f59e0b;
-        --ju-unread-dark: #d97706;
-        --ju-unread-light: #fef3c7;
-        --ju-month: #8b5cf6;
-        --ju-month-dark: #7c3aed;
-        --ju-month-light: #ede9fe;
+        --ju-total: #002789;
+        --ju-total-dark: #001a5c;
+        --ju-total-light: #e6ebf7;
+        --ju-read: #28a745;
+        --ju-read-dark: #1e7e34;
+        --ju-read-light: #d4edda;
+        --ju-unread: #ffc107;
+        --ju-unread-dark: #d39e00;
+        --ju-unread-light: #fff3cd;
+        --ju-month: #C4A747;
+        --ju-month-dark: #a5862e;
+        --ju-month-light: #e5d6a6;
         
         /* Semantic Colors */
-        --ju-success: #10b981;
-        --ju-success-dark: #059669;
-        --ju-success-soft: rgba(16, 185, 129, 0.12);
-        --ju-warning: #f59e0b;
-        --ju-warning-dark: #d97706;
-        --ju-warning-soft: rgba(245, 158, 11, 0.12);
-        --ju-danger: #dc2626;
-        --ju-danger-dark: #b91c1c;
-        --ju-danger-soft: rgba(220, 38, 38, 0.12);
-        --ju-info: #0a2c6e;
-        --ju-info-soft: rgba(10, 44, 110, 0.08);
+        --ju-success: #28a745;
+        --ju-success-dark: #1e7e34;
+        --ju-success-soft: rgba(40, 167, 69, 0.12);
+        --ju-warning: #ffc107;
+        --ju-warning-dark: #d39e00;
+        --ju-warning-soft: rgba(255, 193, 7, 0.12);
+        --ju-danger: #dc3545;
+        --ju-danger-dark: #bd2130;
+        --ju-danger-soft: rgba(220, 53, 69, 0.12);
+        --ju-info: #002789;
+        --ju-info-soft: rgba(0, 39, 137, 0.08);
         
-        /* Neutral Colors */
+        /* Neutral Colors - Matching Layout */
         --ju-white: #ffffff;
-        --ju-offwhite: #f8fafc;
+        --ju-offwhite: #f9f9f9;
+        --ju-gray: #f0f0f0;
         --ju-gray-50: #f9fbfd;
         --ju-gray-100: #f1f5f9;
         --ju-gray-200: #e9edf2;
@@ -82,25 +86,31 @@
         --ju-gray-800: #334155;
         --ju-gray-900: #1e293b;
         
-        /* Shadows */
-        --shadow-sm: 0 4px 12px rgba(0,0,0,0.05);
-        --shadow: 0 8px 20px rgba(0,0,0,0.08);
-        --shadow-lg: 0 16px 32px rgba(0,0,0,0.12);
+        /* Shadows - Royal Blue Tinted */
+        --shadow-xs: 0 2px 4px rgba(0,39,137,0.02);
+        --shadow-sm: 0 4px 6px rgba(0,39,137,0.04);
+        --shadow: 0 6px 12px rgba(0,39,137,0.06);
+        --shadow-md: 0 8px 24px rgba(0,39,137,0.08);
+        --shadow-lg: 0 16px 32px rgba(0,39,137,0.1);
+        --shadow-xl: 0 24px 48px rgba(0,39,137,0.12);
+        --shadow-2xl: 0 32px 64px rgba(0,39,137,0.15);
         --shadow-gold: 0 8px 20px rgba(196,167,71,0.2);
         
-        /* Border Radius */
-        --radius-sm: 8px;
-        --radius: 12px;
-        --radius-md: 16px;
-        --radius-lg: 20px;
-        --radius-xl: 24px;
-        --radius-2xl: 28px;
+        /* Border Radius - Matching Layout */
+        --radius-sm: 0.25rem;
+        --radius: 0.375rem;
+        --radius-md: 0.5rem;
+        --radius-lg: 0.75rem;
+        --radius-xl: 1rem;
+        --radius-2xl: 1.25rem;
         --radius-full: 9999px;
         
-        /* Transitions */
-        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        --transition-bounce: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-        --transition-elastic: all 0.6s cubic-bezier(0.68, -0.6, 0.32, 1.6);
+        /* Transitions - Matching Layout */
+        --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        --transition-bounce: 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        --transition-elastic: 0.6s cubic-bezier(0.68, -0.6, 0.32, 1.6);
     }
 
     /* ============================================
@@ -114,7 +124,7 @@
 
     body {
         background: var(--ju-offwhite);
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        font-family: var(--font-primary);
         overflow-x: hidden;
     }
 
@@ -172,7 +182,7 @@
 
     .premium-stat-card:hover {
         transform: translateY(-8px);
-        box-shadow: var(--shadow-lg);
+        box-shadow: var(--shadow-2xl);
     }
 
     .premium-stat-card:hover::before {
@@ -181,16 +191,16 @@
 
     /* VIBRANT CARD COLORS */
     .premium-stat-card.total {
-        background: linear-gradient(145deg, var(--ju-total), var(--ju-total-dark));
+        background: linear-gradient(145deg, #002789, #001a5c);
     }
     .premium-stat-card.read {
-        background: linear-gradient(145deg, var(--ju-read), var(--ju-read-dark));
+        background: linear-gradient(145deg, #28a745, #1e7e34);
     }
     .premium-stat-card.unread {
-        background: linear-gradient(145deg, var(--ju-unread), var(--ju-unread-dark));
+        background: linear-gradient(145deg, #ffc107, #d39e00);
     }
     .premium-stat-card.month {
-        background: linear-gradient(145deg, var(--ju-month), var(--ju-month-dark));
+        background: linear-gradient(145deg, #C4A747, #a5862e);
     }
 
     .premium-stat-icon {
@@ -265,7 +275,7 @@
         left: 0;
         width: 100%;
         height: 4px;
-        background: linear-gradient(90deg, var(--ju-blue), var(--ju-gold), var(--ju-blue));
+        background: linear-gradient(90deg, #002789, var(--ju-gold), #002789);
         border-radius: var(--radius-xl) var(--radius-xl) 0 0;
     }
 
@@ -321,18 +331,18 @@
     }
 
     .premium-filter-badge:hover {
-        background: var(--ju-blue);
+        background: #002789;
         color: white;
-        border-color: var(--ju-blue);
+        border-color: #002789;
         transform: translateY(-2px);
-        box-shadow: 0 8px 16px rgba(10,44,110,0.2);
+        box-shadow: 0 8px 16px rgba(0,39,137,0.2);
     }
 
     .premium-filter-badge.active {
-        background: var(--ju-blue);
+        background: #002789;
         color: white;
-        border-color: var(--ju-blue);
-        box-shadow: 0 8px 16px rgba(10,44,110,0.2);
+        border-color: #002789;
+        box-shadow: 0 8px 16px rgba(0,39,137,0.2);
     }
 
     .premium-filter-badge.active i {
@@ -366,25 +376,25 @@
     }
 
     .premium-header-btn-sm-primary {
-        background: var(--ju-blue-gradient);
+        background: linear-gradient(145deg, #002789, #001a5c);
         color: white;
-        box-shadow: 0 8px 16px rgba(10,44,110,0.2);
+        box-shadow: 0 8px 16px rgba(0,39,137,0.2);
     }
 
     .premium-header-btn-sm-primary:hover {
-        background: var(--ju-blue-dark);
+        background: #001a5c;
         transform: translateY(-2px);
-        box-shadow: 0 12px 24px rgba(10,44,110,0.3);
+        box-shadow: 0 12px 24px rgba(0,39,137,0.3);
     }
 
     .premium-header-btn-sm-outline {
         background: transparent;
-        color: var(--ju-blue);
-        border: 2px solid var(--ju-blue);
+        color: #002789;
+        border: 2px solid #002789;
     }
 
     .premium-header-btn-sm-outline:hover {
-        background: var(--ju-blue);
+        background: #002789;
         color: white;
         transform: translateY(-2px);
     }
@@ -418,7 +428,7 @@
     .premium-header-title h3 {
         font-size: 1.5rem;
         font-weight: 800;
-        color: var(--ju-blue);
+        color: #002789;
         margin-bottom: 6px;
     }
 
@@ -437,11 +447,11 @@
         gap: 6px;
         padding: 6px 16px;
         background: var(--ju-unread-light);
-        color: var(--ju-unread-dark);
+        color: #d39e00;
         border-radius: var(--radius-full);
         font-weight: 700;
         font-size: 0.8rem;
-        border: 1px solid rgba(245,158,11,0.3);
+        border: 1px solid rgba(255,193,7,0.3);
     }
 
     /* ============================================
@@ -479,8 +489,8 @@
     }
 
     /* Notification Type Border Colors */
-    .premium-notification-item.announcement { border-left-color: var(--ju-blue); }
-    .premium-notification-item.event { border-left-color: #3b82f6; }
+    .premium-notification-item.announcement { border-left-color: #002789; }
+    .premium-notification-item.event { border-left-color: #1a3a9a; }
     .premium-notification-item.system { border-left-color: var(--ju-gray-500); }
     .premium-notification-item.alert { border-left-color: var(--ju-danger); }
     .premium-notification-item.info { border-left-color: var(--ju-info); }
@@ -488,12 +498,12 @@
     .premium-notification-item.success { border-left-color: var(--ju-success); }
 
     .premium-notification-item.unread {
-        background: linear-gradient(90deg, var(--ju-blue-soft), white);
+        background: linear-gradient(90deg, #e6ebf7, white);
         border-left-width: 6px;
     }
 
     .premium-notification-item.unread .premium-notification-title {
-        color: var(--ju-blue);
+        color: #002789;
         font-weight: 700;
     }
 
@@ -520,11 +530,11 @@
         transform: scale(1.1) rotate(5deg);
     }
 
-    .premium-notification-icon.blue-gradient { background: linear-gradient(145deg, var(--ju-blue), var(--ju-blue-light)); }
-    .premium-notification-icon.green-gradient { background: linear-gradient(145deg, var(--ju-read), var(--ju-read-dark)); }
-    .premium-notification-icon.gold-gradient { background: linear-gradient(145deg, var(--ju-gold), var(--ju-gold-dark)); }
-    .premium-notification-icon.purple-gradient { background: linear-gradient(145deg, var(--ju-month), var(--ju-month-dark)); }
-    .premium-notification-icon.red-gradient { background: linear-gradient(145deg, var(--ju-danger), #b91c1c); }
+    .premium-notification-icon.blue-gradient { background: linear-gradient(145deg, #002789, #001a5c); }
+    .premium-notification-icon.green-gradient { background: linear-gradient(145deg, #28a745, #1e7e34); }
+    .premium-notification-icon.gold-gradient { background: linear-gradient(145deg, #C4A747, #a5862e); }
+    .premium-notification-icon.purple-gradient { background: linear-gradient(145deg, #1a3a9a, #3a6ab0); }
+    .premium-notification-icon.red-gradient { background: linear-gradient(145deg, #dc3545, #bd2130); }
 
     .premium-notification-content {
         flex: 1;
@@ -568,13 +578,13 @@
     .premium-notification-badge.priority-1 {
         background: var(--ju-warning-soft);
         color: var(--ju-warning-dark);
-        border: 1px solid rgba(245,158,11,0.3);
+        border: 1px solid rgba(255,193,7,0.3);
     }
 
     .premium-notification-badge.priority-2 {
         background: var(--ju-danger-soft);
         color: var(--ju-danger-dark);
-        border: 1px solid rgba(220,38,38,0.3);
+        border: 1px solid rgba(220,53,69,0.3);
     }
 
     .premium-notification-meta {
@@ -621,11 +631,11 @@
     }
 
     .premium-notification-action-btn:hover {
-        background: var(--ju-blue);
+        background: #002789;
         color: white;
-        border-color: var(--ju-blue);
+        border-color: #002789;
         transform: translateY(-2px);
-        box-shadow: 0 8px 16px rgba(10,44,110,0.2);
+        box-shadow: 0 8px 16px rgba(0,39,137,0.2);
     }
 
     .premium-notification-action-btn i {
@@ -662,31 +672,31 @@
     }
 
     .premium-action-icon-btn:hover {
-        background: var(--ju-blue);
+        background: #002789;
         color: white;
-        border-color: var(--ju-blue);
+        border-color: #002789;
         transform: scale(1.1);
     }
 
     .premium-action-icon-btn.success:hover {
-        background: var(--ju-read);
-        border-color: var(--ju-read);
+        background: #28a745;
+        border-color: #28a745;
     }
 
     .premium-action-icon-btn.danger:hover {
-        background: var(--ju-danger);
-        border-color: var(--ju-danger);
+        background: #dc3545;
+        border-color: #dc3545;
     }
 
     .premium-unread-dot {
         width: 12px;
         height: 12px;
         border-radius: 50%;
-        background: var(--ju-unread);
+        background: #ffc107;
         position: absolute;
         top: 24px;
         right: 28px;
-        box-shadow: 0 0 0 2px white, 0 0 0 4px rgba(245,158,11,0.2);
+        box-shadow: 0 0 0 2px white, 0 0 0 4px rgba(255,193,7,0.2);
         animation: pulse-gold 2s infinite;
     }
 
@@ -703,7 +713,7 @@
         padding: 60px 40px;
         background: linear-gradient(145deg, white, var(--ju-gray-50));
         border-radius: var(--radius-xl);
-        border: 2px dashed var(--ju-blue-soft);
+        border: 2px dashed #e6ebf7;
     }
 
     .premium-empty-icon {
@@ -718,7 +728,7 @@
         width: 100%;
         height: 100%;
         border-radius: 50%;
-        background: rgba(10,44,110,0.08);
+        background: rgba(0,39,137,0.08);
         animation: pulse-circle 2s infinite;
     }
 
@@ -728,7 +738,7 @@
         left: 50%;
         transform: translate(-50%, -50%);
         font-size: 3rem;
-        color: var(--ju-blue);
+        color: #002789;
         z-index: 10;
     }
 
@@ -740,7 +750,7 @@
     .premium-empty-title {
         font-size: 1.6rem;
         font-weight: 800;
-        color: var(--ju-blue);
+        color: #002789;
         margin-bottom: 12px;
     }
 
@@ -756,19 +766,19 @@
         align-items: center;
         gap: 12px;
         padding: 14px 32px;
-        background: var(--ju-blue-gradient);
+        background: linear-gradient(145deg, #002789, #001a5c);
         color: white;
         border-radius: var(--radius-full);
         font-weight: 700;
         text-decoration: none;
         transition: var(--transition-bounce);
-        box-shadow: 0 8px 20px rgba(10,44,110,0.25);
+        box-shadow: 0 8px 20px rgba(0,39,137,0.25);
     }
 
     .premium-empty-btn:hover {
-        background: var(--ju-blue-dark);
+        background: #001a5c;
         transform: translateY(-3px);
-        box-shadow: 0 12px 28px rgba(10,44,110,0.35);
+        box-shadow: 0 12px 28px rgba(0,39,137,0.35);
     }
 
     /* ============================================
@@ -800,16 +810,16 @@
     }
 
     .premium-pagination .page-item.active .page-link {
-        background: var(--ju-blue);
+        background: #002789;
         color: white;
-        border-color: var(--ju-blue);
-        box-shadow: 0 8px 16px rgba(10,44,110,0.2);
+        border-color: #002789;
+        box-shadow: 0 8px 16px rgba(0,39,137,0.2);
     }
 
     .premium-pagination .page-link:hover:not(.active) {
-        background: rgba(10,44,110,0.08);
-        border-color: var(--ju-blue);
-        color: var(--ju-blue);
+        background: rgba(0,39,137,0.08);
+        border-color: #002789;
+        color: #002789;
         transform: translateY(-2px);
     }
 
@@ -834,15 +844,15 @@
     }
 
     .premium-toast-success {
-        border-left-color: var(--ju-read);
+        border-left-color: #28a745;
     }
 
     .premium-toast-info {
-        border-left-color: var(--ju-blue);
+        border-left-color: #002789;
     }
 
     .premium-toast-error {
-        border-left-color: var(--ju-danger);
+        border-left-color: #dc3545;
     }
 
     .premium-toast-icon {
@@ -993,7 +1003,7 @@
            COLORFUL STAT CARDS - Vibrant & Premium
         ============================================ -->
     <div class="premium-stats-grid" data-aos="fade-up" data-aos-duration="800">
-        <!-- Total Notifications - Blue -->
+        <!-- Total Notifications - Royal Blue -->
         <div class="premium-stat-card total" data-aos="zoom-in" data-aos-delay="100">
             <div class="premium-stat-icon">
                 <i class="fas fa-bell"></i>
@@ -1013,7 +1023,7 @@
             <div class="premium-stat-subtext">{{ $notifications->total() > 0 ? round((($notifications->total() - ($unreadCount ?? 0)) / $notifications->total()) * 100) : 0 }}% complete</div>
         </div>
         
-        <!-- Unread - Orange/Gold -->
+        <!-- Unread - Gold -->
         <div class="premium-stat-card unread" data-aos="zoom-in" data-aos-delay="300">
             <div class="premium-stat-icon">
                 <i class="fas fa-envelope"></i>
@@ -1023,7 +1033,7 @@
             <div class="premium-stat-subtext">Awaiting your attention</div>
         </div>
         
-        <!-- This Month - Purple -->
+        <!-- This Month - Gold Gradient -->
         <div class="premium-stat-card month" data-aos="zoom-in" data-aos-delay="400">
             <div class="premium-stat-icon">
                 <i class="fas fa-calendar-alt"></i>
@@ -1092,14 +1102,6 @@
                        class="premium-filter-badge {{ request('type') == 'info' ? 'active' : '' }}">
                         <i class="fas fa-info-circle"></i> Info
                     </a>
-                    <a href="{{ request()->fullUrlWithQuery(['type' => 'warning', 'page' => 1]) }}" 
-                       class="premium-filter-badge {{ request('type') == 'warning' ? 'active' : '' }}">
-                        <i class="fas fa-exclamation"></i> Warning
-                    </a>
-                    <a href="{{ request()->fullUrlWithQuery(['type' => 'success', 'page' => 1]) }}" 
-                       class="premium-filter-badge {{ request('type') == 'success' ? 'active' : '' }}">
-                        <i class="fas fa-check-circle"></i> Success
-                    </a>
                 </div>
             </div>
 
@@ -1130,9 +1132,9 @@
             </div>
         </div>
 
-        <!-- Compact Action Buttons - FIXED: Changed from POST to GET/PATCH based on route support -->
+        <!-- Compact Action Buttons -->
         <div class="premium-header-actions-compact">
-            <!-- Use PATCH method for mark all read (supported) -->
+            <!-- Use PATCH method for mark all read -->
             <form action="{{ route('notifications.mark-all-read') }}" method="POST" style="display: inline;">
                 @csrf
                 @method('PATCH')
@@ -1227,12 +1229,12 @@
                             
                             <div class="premium-notification-meta">
                                 <span class="premium-notification-time">
-                                    <i class="far fa-clock"></i>
+                                    <i class="far fa-clock" style="color: var(--ju-gold);"></i>
                                     {{ $userNotification->created_at->diffForHumans() }}
                                 </span>
                                 @if(!empty($notification->creator))
                                 <span>
-                                    <i class="fas fa-user"></i>
+                                    <i class="fas fa-user" style="color: var(--ju-gold);"></i>
                                     {{ $notification->creator->name }}
                                 </span>
                                 @endif
@@ -1408,7 +1410,7 @@
                 const title = notification.querySelector('.premium-notification-title');
                 if (title) {
                     title.style.fontWeight = '700';
-                    title.style.color = 'var(--ju-blue)';
+                    title.style.color = '#002789';
                 }
                 
                 // Replace action button
@@ -1543,7 +1545,7 @@
         if (type === 'error') icon = 'exclamation-circle';
         
         toast.innerHTML = `
-            <div class="premium-toast-icon" style="color: ${type === 'success' ? 'var(--ju-read)' : (type === 'info' ? 'var(--ju-blue)' : 'var(--ju-danger)')}">
+            <div class="premium-toast-icon" style="color: ${type === 'success' ? '#28a745' : (type === 'info' ? '#002789' : '#dc3545')}">
                 <i class="fas fa-${icon}"></i>
             </div>
             <div class="premium-toast-content">
@@ -1614,20 +1616,3 @@
 <!-- Add AOS CSS -->
 <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 @endsection
-
-@push('styles')
-<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-<style>
-    /* Override any remaining old styles */
-    .ju-card, .ju-card-header, .ju-card-body, .ju-card-title,
-    .stat-card, .notification-item, .notification-filter,
-    .btn-outline-success, .btn-outline-danger, .btn-outline-primary {
-        display: none !important;
-    }
-    
-    /* Ensure filter badges don't show old styles */
-    .notification-filter {
-        display: none !important;
-    }
-</style>
-@endpush

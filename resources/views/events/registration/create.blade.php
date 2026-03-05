@@ -1,3 +1,5 @@
+{{-- resources/views/events/registration/create.blade.php --}}
+{{-- This is the first page you shared --}}
 @extends('layouts.app')
 
 @section('title', 'Register for ' . $event->title . ' | Jimma University')
@@ -884,6 +886,37 @@
     a[data-bs-toggle="modal"]:hover::after {
         width: 100%;
     }
+    
+    /* Status Message Styles */
+    .status-message {
+        margin-top: 20px;
+        padding: 15px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .status-message.pending {
+        background: linear-gradient(145deg, #FFF4E5, #FFF9E6);
+        border-left: 6px solid #FFB300;
+    }
+    
+    .status-message i {
+        font-size: 2rem;
+        color: #FFB300;
+    }
+    
+    .status-message h4 {
+        color: #B85C00;
+        margin-bottom: 5px;
+        font-weight: 700;
+    }
+    
+    .status-message p {
+        color: #996633;
+        margin: 0;
+    }
 </style>
 
 <div class="container-fluid">
@@ -1035,6 +1068,15 @@
                             </div>
                         </div>
 
+                        <!-- IMPORTANT: Changed button text and added info message -->
+                        <div class="status-message pending mb-4">
+                            <i class="fas fa-clock"></i>
+                            <div>
+                                <h4>Registration Requires Admin Approval</h4>
+                                <p>Your registration will be submitted for admin review. You'll receive a confirmation email once approved.</p>
+                            </div>
+                        </div>
+
                         <!-- Submit Buttons -->
                         <div class="d-flex justify-content-between align-items-center">
                             <a href="{{ route('events.guest.show', $event->slug) }}" class="btn-ju-outline">
@@ -1049,8 +1091,8 @@
                             </button>
                             @else
                             <button type="submit" class="btn-ju">
-                                <i class="fas fa-check-circle"></i>
-                                Confirm Registration
+                                <i class="fas fa-paper-plane"></i>
+                                Submit for Approval
                                 <i class="fas fa-arrow-right"></i>
                             </button>
                             @endif
@@ -1058,7 +1100,7 @@
                         
                         <p class="text-muted small text-center mt-4 mb-0">
                             <i class="fas fa-lock me-1" style="color: var(--ju-primary-dark);"></i>
-                            Your information is securely processed and will only be used for event coordination.
+                            Your information is securely processed. Your registration will be pending admin approval.
                         </p>
                     </form>
                 </div>
@@ -1220,8 +1262,8 @@
                             <ol class="text-muted">
                                 <li>Registration is required for this event and confirms your intent to attend.</li>
                                 <li>You must be a valid member of Jimma University community (student, faculty, or staff) to register.</li>
-                                <li>A confirmation email will be sent to your university email address within 15 minutes.</li>
-                                <li>Your registration creates a binding commitment to attend the event.</li>
+                                <li>A confirmation email will be sent to your university email address within 15 minutes after admin approval.</li>
+                                <li>Your registration will be pending until approved by an administrator.</li>
                                 <li>Present your digital or printed confirmation at the event entrance.</li>
                             </ol>
                         </div>
@@ -1423,7 +1465,7 @@
             const submitBtn = $(this).find('button[type="submit"]');
             submitBtn.addClass('loading');
             const originalText = submitBtn.html();
-            submitBtn.html('<i class="fas fa-spinner fa-spin me-2"></i> Processing...');
+            submitBtn.html('<i class="fas fa-spinner fa-spin me-2"></i> Submitting for Approval...');
             
             // Prevent double submission
             $(this).find('button[type="submit"]').prop('disabled', true);

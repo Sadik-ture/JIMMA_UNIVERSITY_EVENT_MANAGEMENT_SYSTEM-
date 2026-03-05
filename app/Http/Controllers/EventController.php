@@ -1,5 +1,5 @@
 <?php
-// app/Http/Controllers/EventController.php - UPDATED VERSION
+// app/Http/Controllers/EventController.php
 
 namespace App\Http\Controllers;
 
@@ -8,35 +8,37 @@ use App\Models\Campus;
 use App\Models\Building;
 use App\Models\Venue;
 use App\Models\Speaker;
+use App\Models\Announcement;
+use App\Models\Notification;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class EventController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
     public function index(Request $request)
     {
         $query = Event::query()->with(['campusRelation', 'buildingRelation', 'venueRelation', 'speakers']);
         
-        // Search
         if ($request->filled('search')) {
             $query->search($request->search);
         }
         
-        // Filter by event type
         if ($request->filled('event_type')) {
             $query->where('event_type', $request->event_type);
         }
         
-        // Filter by campus
         if ($request->filled('campus_id')) {
             $query->where('campus_id', $request->campus_id);
         }
         
-        // Filter by status
         if ($request->filled('status')) {
             if ($request->status == 'upcoming') {
                 $query->upcoming();
@@ -44,41 +46,38 @@ class EventController extends Controller
                 $query->past();
             } elseif ($request->status == 'ongoing') {
                 $query->ongoing();
+            } elseif ($request->status == 'cancelled') {
+                $query->cancelled();
             }
         }
         
-        // Filter by featured
         if ($request->filled('featured') && $request->featured == '1') {
             $query->featured();
         }
         
-        // Filter by speaker
         if ($request->filled('speaker_id')) {
             $query->whereHas('speakers', function ($q) use ($request) {
                 $q->where('speakers.id', $request->speaker_id);
             });
         }
         
-        // Default: show upcoming and ongoing events
         if (!$request->filled('status')) {
             $query->where('end_date', '>=', now()->subDays(1));
         }
         
-        // Apply sorting
         $sort = $request->get('sort', 'start_date');
         $order = $request->get('order', 'asc');
         $query->orderBy($sort, $order);
         
         $events = $query->paginate(20)->withQueryString();
         
-        // Get statistics
         $totalCount = Event::count();
         $upcomingCount = Event::upcoming()->count();
         $ongoingCount = Event::ongoing()->count();
         $completedCount = Event::past()->count();
+        $cancelledCount = Event::cancelled()->count();
         $featuredCount = Event::featured()->count();
         
-        // Get filter options
         $campuses = Campus::active()->get();
         $buildings = Building::active()->get();
         $venues = Venue::available()->get();
@@ -90,6 +89,7 @@ class EventController extends Controller
             'upcomingCount', 
             'ongoingCount', 
             'completedCount',
+            'cancelledCount',
             'featuredCount',
             'campuses',
             'buildings',
@@ -98,9 +98,6 @@ class EventController extends Controller
         ));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         $campuses = Campus::active()->get();
@@ -114,21 +111,20 @@ class EventController extends Controller
             'sports' => 'Sports',
             'conference' => 'Conference',
             'workshop' => 'Workshop',
-            'seminar' => 'Seminar'
+            'seminar' => 'Seminar',
+            'exhibition' => 'Exhibition',
+            'outreach' => 'Outreach',
         ];
         
         return view('admin.events.create', compact('campuses', 'buildings', 'venues', 'speakers', 'eventTypes'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
-            'short_description' => 'nullable|string|max:200',
+            //'short_description' => 'nullable|string|max:200',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after:start_date',
             'campus_id' => 'nullable|exists:campuses,id',
@@ -137,7 +133,7 @@ class EventController extends Controller
             'campus' => 'nullable|string|max:255',
             'building' => 'nullable|string|max:255',
             'venue' => 'nullable|string|max:255',
-            'event_type' => 'required|string|in:academic,cultural,sports,conference,workshop,seminar',
+            'event_type' => 'required|string|in:academic,cultural,sports,conference,workshop,seminar,exhibition,outreach',
             'organizer' => 'required|string|max:255',
             'contact_email' => 'nullable|email',
             'contact_phone' => 'nullable|string|max:20',
@@ -173,7 +169,7 @@ class EventController extends Controller
             $validated['tags'] = array_slice($tags, 0, 10);
         }
 
-        // Get names for string fields if IDs are provided
+        // Set text fields from relations if needed
         if ($request->filled('campus_id') && empty($validated['campus'])) {
             $campus = Campus::find($request->campus_id);
             $validated['campus'] = $campus ? $campus->name : null;
@@ -189,15 +185,22 @@ class EventController extends Controller
             $validated['venue'] = $venue ? $venue->name : null;
         }
 
-        // Create event first
+        $validated['is_cancelled'] = false;
+        
+        // Create event WITHOUT image first
         $event = Event::create($validated);
 
-        // Handle image upload after event is created
+        // Handle image upload AFTER event is created
         if ($request->hasFile('image')) {
-            $event->uploadImage($request->file('image'));
+            try {
+                $event->uploadImage($request->file('image'));
+                Log::info('Image uploaded for new event: ' . $event->id);
+            } catch (\Exception $e) {
+                Log::error('Image upload failed: ' . $e->getMessage());
+            }
         }
 
-        // Handle speaker assignments
+        // Handle speakers
         if ($request->has('speakers') && is_array($request->speakers)) {
             $speakerData = array_filter($request->speakers, function ($speaker) {
                 return !empty($speaker['speaker_id']);
@@ -212,18 +215,18 @@ class EventController extends Controller
             ->with('success', 'Event created successfully!');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Event $event)
     {
-        $event->load(['campusRelation', 'buildingRelation', 'venueRelation', 'speakers']);
+        $event->load(['campusRelation', 'buildingRelation', 'venueRelation', 'speakers', 'cancelledBy']);
+        
+        // Log image info for debugging
+        if ($event->image) {
+            Log::info('Showing event ' . $event->id . ' with image: ' . $event->image);
+        }
+        
         return view('admin.events.show', compact('event'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Event $event)
     {
         $event->load(['campusRelation', 'buildingRelation', 'venueRelation', 'speakers']);
@@ -240,7 +243,9 @@ class EventController extends Controller
             'sports' => 'Sports',
             'conference' => 'Conference',
             'workshop' => 'Workshop',
-            'seminar' => 'Seminar'
+            'seminar' => 'Seminar',
+            'exhibition' => 'Exhibition',
+            'outreach' => 'Outreach',
         ];
         
         return view('admin.events.edit', compact(
@@ -254,9 +259,6 @@ class EventController extends Controller
         ));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Event $event)
     {
         $validated = $request->validate([
@@ -271,7 +273,7 @@ class EventController extends Controller
             'campus' => 'nullable|string|max:255',
             'building' => 'nullable|string|max:255',
             'venue' => 'nullable|string|max:255',
-            'event_type' => 'required|string|in:academic,cultural,sports,conference,workshop,seminar',
+            'event_type' => 'required|string|in:academic,cultural,sports,conference,workshop,seminar,exhibition,outreach',
             'organizer' => 'required|string|max:255',
             'contact_email' => 'nullable|email',
             'contact_phone' => 'nullable|string|max:20',
@@ -293,7 +295,7 @@ class EventController extends Controller
             'speakers.*.is_keynote' => 'nullable|boolean',
         ]);
 
-        // Update slug if title changed
+        // Handle slug update if title changed
         if ($event->title !== $validated['title']) {
             $slug = Str::slug($validated['title']);
             $counter = 1;
@@ -315,15 +317,20 @@ class EventController extends Controller
         // Handle image removal
         if ($request->has('remove_image') && $request->remove_image) {
             $event->deleteImage();
-            $validated['image'] = null;
+            // Don't set image in validated data, it will be null after deleteImage()
         }
 
         // Handle new image upload
         if ($request->hasFile('image')) {
-            $event->uploadImage($request->file('image'));
+            try {
+                $event->uploadImage($request->file('image'));
+                Log::info('Image updated for event: ' . $event->id);
+            } catch (\Exception $e) {
+                Log::error('Image update failed: ' . $e->getMessage());
+            }
         }
 
-        // Get names for string fields if IDs are provided
+        // Set text fields from relations if needed
         if ($request->filled('campus_id') && empty($validated['campus'])) {
             $campus = Campus::find($request->campus_id);
             $validated['campus'] = $campus ? $campus->name : null;
@@ -339,9 +346,10 @@ class EventController extends Controller
             $validated['venue'] = $venue ? $venue->name : null;
         }
 
+        // Update the event
         $event->update($validated);
 
-        // Handle speaker assignments
+        // Handle speakers
         if ($request->has('speakers') && is_array($request->speakers)) {
             $speakerData = array_filter($request->speakers, function ($speaker) {
                 return !empty($speaker['speaker_id']);
@@ -360,17 +368,10 @@ class EventController extends Controller
             ->with('success', 'Event updated successfully!');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Event $event)
     {
-        // Delete image if exists
         $event->deleteImage();
-        
-        // Detach speakers
         $event->speakers()->detach();
-        
         $event->delete();
 
         return redirect()->route('admin.events.index')
@@ -378,7 +379,156 @@ class EventController extends Controller
     }
 
     /**
-     * Toggle featured status
+     * Cancellation Methods
+     */
+    public function showCancellationForm(Event $event)
+    {
+        if ($event->is_cancelled) {
+            return redirect()->route('admin.events.show', $event)
+                ->with('error', 'This event is already cancelled.');
+        }
+        
+        return view('admin.events.cancel', compact('event'));
+    }
+
+    public function cancel(Request $request, Event $event)
+    {
+        if ($event->is_cancelled) {
+            return redirect()->route('admin.events.show', $event)
+                ->with('error', 'This event is already cancelled.');
+        }
+
+        $request->validate([
+            'cancellation_reason' => 'required|string|max:1000',
+            'additional_message' => 'nullable|string|max:500',
+            'send_announcement' => 'boolean',
+            'audience' => 'required_if:send_announcement,1|in:all,registered_only',
+        ]);
+
+        // Cancel the event
+        $event->cancel($request->cancellation_reason);
+
+        // Create cancellation announcement if requested
+        if ($request->boolean('send_announcement', true)) {
+            $announcement = $this->createCancellationAnnouncement($event, $request);
+            
+            return redirect()->route('admin.events.show', $event)
+                ->with('success', 'Event cancelled successfully. Cancellation announcement created and sent to attendees.');
+        }
+
+        return redirect()->route('admin.events.show', $event)
+            ->with('success', 'Event cancelled successfully.');
+    }
+
+    public function uncancel(Event $event)
+    {
+        if (!$event->is_cancelled) {
+            return redirect()->route('admin.events.show', $event)
+                ->with('error', 'This event is not cancelled.');
+        }
+
+        $event->uncancel();
+
+        return redirect()->route('admin.events.show', $event)
+            ->with('success', 'Event restored successfully.');
+    }
+
+    protected function createCancellationAnnouncement($event, $request)
+    {
+        $title = "CANCELLED: {$event->title}";
+        
+        $content = "<div class='cancellation-notice' style='padding: 20px; background: #fff3f3; border-left: 4px solid #dc3545; margin-bottom: 20px;'>";
+        $content .= "<h2 style='color: #dc3545;'><i class='fas fa-exclamation-triangle'></i> Event Cancellation Notice</h2>";
+        $content .= "<p>We regret to inform you that the following event has been cancelled:</p>";
+        $content .= "<h3>{$event->title}</h3>";
+        $content .= "<table style='width: 100%; margin: 15px 0; border-collapse: collapse;'>";
+        $content .= "<tr><td style='padding: 8px; background: #f8f9fa;'><strong>Original Date:</strong></td><td style='padding: 8px;'>{$event->start_date->format('l, F j, Y \a\t g:i A')}</td></tr>";
+        $content .= "<tr><td style='padding: 8px; background: #f8f9fa;'><strong>Location:</strong></td><td style='padding: 8px;'>{$event->venue_name}, {$event->campus_name}</td></tr>";
+        $content .= "<tr><td style='padding: 8px; background: #f8f9fa;'><strong>Organizer:</strong></td><td style='padding: 8px;'>{$event->organizer}</td></tr>";
+        $content .= "</table>";
+        
+        $content .= "<div class='alert alert-warning' style='padding: 15px; background: #fff3cd; border: 1px solid #ffeeba; border-radius: 5px; margin: 15px 0;'>";
+        $content .= "<strong>Reason for cancellation:</strong><br>";
+        $content .= "<p style='margin-top: 10px;'>{$request->cancellation_reason}</p>";
+        $content .= "</div>";
+        
+        if ($request->filled('additional_message')) {
+            $content .= "<div style='margin: 15px 0; padding: 15px; background: #e7f3ff; border-left: 4px solid #0a2c6e;'>";
+            $content .= "<strong>Additional Information:</strong><br>";
+            $content .= "<p style='margin-top: 10px;'>{$request->additional_message}</p>";
+            $content .= "</div>";
+        }
+        
+        $content .= "<p>We apologize for any inconvenience this cancellation may cause. If you have any questions, please contact the organizer:</p>";
+        $content .= "<p><strong>Email:</strong> <a href='mailto:{$event->contact_email}'>{$event->contact_email}</a><br>";
+        if ($event->contact_phone) {
+            $content .= "<strong>Phone:</strong> <a href='tel:{$event->contact_phone}'>{$event->contact_phone}</a>";
+        }
+        $content .= "</p>";
+        $content .= "</div>";
+
+        $announcement = Announcement::create([
+            'title' => $title,
+            'content' => $content,
+            'type' => 'urgent',
+            'audience' => $request->audience == 'registered_only' ? 'specific' : 'all',
+            'target_ids' => $request->audience == 'registered_only' 
+                ? $event->registrations()->whereIn('status', ['confirmed', 'pending'])->pluck('user_id')->toArray()
+                : null,
+            'created_by' => auth()->id(),
+            'is_published' => true,
+            'published_at' => now(),
+        ]);
+
+        $this->sendCancellationNotifications($event, $announcement, $request);
+
+        return $announcement;
+    }
+
+    protected function sendCancellationNotifications($event, $announcement, $request)
+    {
+        $users = [];
+        
+        if ($request->audience == 'registered_only') {
+            $users = $event->registrations()
+                ->whereIn('status', ['confirmed', 'pending'])
+                ->with('user')
+                ->get()
+                ->pluck('user');
+        } else {
+            $users = User::where('is_active', true)->get();
+        }
+
+        if ($users->isEmpty()) {
+            return;
+        }
+
+        $notification = Notification::create([
+            'title' => "🚫 EVENT CANCELLED: {$event->title}",
+            'message' => "The event '{$event->title}' has been cancelled. " . ($request->cancellation_reason ? "Reason: {$request->cancellation_reason}" : ""),
+            'type' => 'alert',
+            'priority' => 2,
+            'action_url' => route('announcements.show', $announcement->id),
+            'action_text' => 'View Cancellation Details',
+            'data' => [
+                'event_id' => $event->id,
+                'event_title' => $event->title,
+                'cancellation_reason' => $request->cancellation_reason,
+                'announcement_id' => $announcement->id
+            ],
+            'created_by' => auth()->id(),
+        ]);
+
+        foreach ($users as $user) {
+            $notification->users()->attach($user->id, [
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+        }
+    }
+
+    /**
+     * Toggle Methods
      */
     public function toggleFeatured(Event $event)
     {
@@ -388,9 +538,6 @@ class EventController extends Controller
             ->with('success', 'Featured status updated successfully.');
     }
 
-    /**
-     * Toggle public status
-     */
     public function togglePublic(Event $event)
     {
         $event->togglePublic();
@@ -400,7 +547,7 @@ class EventController extends Controller
     }
 
     /**
-     * Get buildings for a campus (AJAX)
+     * AJAX Methods
      */
     public function getBuildings($campusId)
     {
@@ -411,9 +558,6 @@ class EventController extends Controller
         return response()->json($buildings);
     }
 
-    /**
-     * Get venues for a building (AJAX)
-     */
     public function getVenues($buildingId)
     {
         $venues = Venue::where('building_id', $buildingId)
@@ -423,9 +567,6 @@ class EventController extends Controller
         return response()->json($venues);
     }
 
-    /**
-     * Get venue details (AJAX)
-     */
     public function getVenueDetails($venueId)
     {
         $venue = Venue::find($venueId);
@@ -443,8 +584,25 @@ class EventController extends Controller
         ]);
     }
 
+    public function getSpeakers()
+    {
+        $speakers = Speaker::active()->orderBy('name')->get(['id', 'name', 'title', 'organization']);
+        return response()->json($speakers);
+    }
+
+    public function getSpeakerDetails($speakerId)
+    {
+        $speaker = Speaker::find($speakerId);
+        
+        if (!$speaker) {
+            return response()->json(['error' => 'Speaker not found'], 404);
+        }
+        
+        return response()->json($speaker);
+    }
+
     /**
-     * Duplicate event
+     * Duplicate and Export
      */
     public function duplicate(Event $event)
     {
@@ -452,14 +610,15 @@ class EventController extends Controller
         $newEvent->title = $event->title . ' (Copy)';
         $newEvent->slug = Str::slug($newEvent->title);
         $newEvent->is_featured = false;
+        $newEvent->is_cancelled = false;
+        $newEvent->cancelled_at = null;
+        $newEvent->cancellation_reason = null;
+        $newEvent->cancelled_by = null;
         $newEvent->registered_attendees = 0;
-        
-        // Don't copy the image
         $newEvent->image = null;
         
         $newEvent->save();
 
-        // Copy speakers
         $speakerData = [];
         foreach ($event->speakers as $speaker) {
             $speakerData[] = [
@@ -483,14 +642,11 @@ class EventController extends Controller
             ->with('success', 'Event duplicated successfully. You can now edit the copy.');
     }
 
-    /**
-     * Export events
-     */
     public function export(Request $request)
     {
-        $events = Event::where('end_date', '>=', now())->with('speakers')->get();
+        $events = Event::with('speakers')->get();
         
-        $csvData = "Title,Description,Start Date,End Date,Campus,Building,Venue,Type,Organizer,Speakers,Max Attendees,Status\n";
+        $csvData = "Title,Description,Start Date,End Date,Campus,Building,Venue,Type,Organizer,Speakers,Max Attendees,Status,Is Cancelled\n";
         
         foreach ($events as $event) {
             $speakerNames = $event->speakers->pluck('name')->implode('; ');
@@ -506,7 +662,8 @@ class EventController extends Controller
             $csvData .= $event->organizer . ',';
             $csvData .= '"' . $speakerNames . '",';
             $csvData .= ($event->max_attendees ?: 'Unlimited') . ',';
-            $csvData .= ucfirst($event->status) . "\n";
+            $csvData .= ucfirst($event->cancellation_status) . ',';
+            $csvData .= ($event->is_cancelled ? 'Yes' : 'No') . "\n";
         }
         
         return response($csvData)

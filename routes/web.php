@@ -20,6 +20,8 @@ use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\EventSpeakerController;
+use App\Http\Controllers\Admin\AdminEventRegistrationController;
+
 
 // =============== PUBLIC ROUTES ===============
 Route::prefix('events')->name('events.guest.')->group(function () {
@@ -141,6 +143,15 @@ Route::middleware('auth')->group(function () {
         Route::resource('venues', VenueController::class);
         Route::post('venues/{venue}/toggle-availability', [VenueController::class, 'toggleAvailability'])
             ->name('venues.toggle-availability');
+
+            // Add these cancellation routes
+    Route::get('events/{event}/cancel', [EventController::class, 'showCancellationForm'])
+        ->name('events.show-cancellation-form');
+    Route::post('events/{event}/cancel', [EventController::class, 'cancel'])
+        ->name('events.cancel');
+    Route::post('events/{event}/uncancel', [EventController::class, 'uncancel'])
+        ->name('events.uncancel');
+
     });
 
     // =============== SPEAKER MANAGEMENT ===============
@@ -305,4 +316,53 @@ Route::get('/admin/buildings/get-by-campus/{campusId}', [BuildingController::cla
 // =============== FALLBACK ROUTE ===============
 Route::fallback(function () {
     return response()->view('errors.404', [], 404);
+});
+
+// Add these routes inside your admin group
+Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
+    
+    // Event Registrations Management
+    Route::get('registrations', [AdminEventRegistrationController::class, 'index'])
+        ->name('registrations.index');
+    Route::get('registrations/pending', [AdminEventRegistrationController::class, 'pending'])
+        ->name('registrations.pending');
+    Route::get('registrations/statistics', [AdminEventRegistrationController::class, 'statistics'])
+        ->name('registrations.statistics');
+    Route::get('registrations/export', [AdminEventRegistrationController::class, 'export'])
+        ->name('registrations.export');
+    
+    // Single Registration Routes
+    Route::get('registrations/{id}', [AdminEventRegistrationController::class, 'show'])
+        ->name('registrations.show');
+    Route::get('registrations/{id}/edit', [AdminEventRegistrationController::class, 'edit'])
+        ->name('registrations.edit');
+    Route::put('registrations/{id}', [AdminEventRegistrationController::class, 'update'])
+        ->name('registrations.update');
+    Route::get('registrations/{id}/confirm-form', [AdminEventRegistrationController::class, 'confirmForm'])
+        ->name('registrations.confirm-form');
+    Route::post('registrations/{id}/confirm', [AdminEventRegistrationController::class, 'confirm'])
+        ->name('registrations.confirm');
+    Route::post('registrations/{id}/cancel', [AdminEventRegistrationController::class, 'cancel'])
+        ->name('registrations.cancel');
+    Route::post('registrations/{id}/check-in', [AdminEventRegistrationController::class, 'checkIn'])
+        ->name('registrations.check-in');
+    
+    // Bulk Operations
+    Route::post('registrations/bulk-confirm', [AdminEventRegistrationController::class, 'bulkConfirm'])
+        ->name('registrations.bulk-confirm');
+    Route::post('registrations/bulk-checkin', [AdminEventRegistrationController::class, 'bulkCheckIn'])
+        ->name('registrations.bulk-checkin');
+    
+    // PDF Export
+    Route::get('registrations/{id}/export-pdf', [AdminEventRegistrationController::class, 'exportPdf'])
+        ->name('registrations.export-pdf');
+
+        Route::post('events/{eventId}/waitlist/move', [AdminEventRegistrationController::class, 'moveFromWaitlist'])
+    ->name('registrations.move-from-waitlist');
+
+    Route::get('registrations/{id}/cancel-page', [AdminEventRegistrationController::class, 'cancelPage'])
+    ->name('registrations.cancel-page');
+Route::post('registrations/{id}/cancel', [AdminEventRegistrationController::class, 'cancel'])
+    ->name('registrations.cancel');
+
 });

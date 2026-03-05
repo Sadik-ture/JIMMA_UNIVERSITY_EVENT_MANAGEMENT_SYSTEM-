@@ -8,15 +8,15 @@
 
 @section('breadcrumb-items')
     <li class="breadcrumb-item">
-        <a href="{{ route('dashboard') }}">Dashboard</a>
+        <a href="{{ route('dashboard') }}" class="text-decoration-none" style="color: #002789;">Dashboard</a>
     </li>
     <li class="breadcrumb-item">
-        <a href="{{ route('admin.events.index') }}">Events</a>
+        <a href="{{ route('admin.events.index') }}" class="text-decoration-none" style="color: #002789;">Events</a>
     </li>
     <li class="breadcrumb-item">
-        <a href="{{ route('admin.events.show', $event) }}">{{ Str::limit($event->title, 20) }}</a>
+        <a href="{{ route('admin.events.show', $event) }}" class="text-decoration-none" style="color: #002789;">{{ Str::limit($event->title, 20) }}</a>
     </li>
-    <li class="breadcrumb-item active">Edit Event</li>
+    <li class="breadcrumb-item active" style="color: #001a5c;">Edit Event</li>
 @endsection
 
 @section('content')
@@ -24,26 +24,26 @@
     <div class="row">
         <div class="col-12">
             <div class="ju-card shadow-sm">
-                <div class="ju-card-header d-flex align-items-center justify-content-between py-3">
+                <div class="ju-card-header d-flex align-items-center justify-content-between py-3" style="background: linear-gradient(135deg, #002789 0%, #001a5c 100%);">
                     <div class="d-flex align-items-center">
                         <div class="me-3">
-                            <span class="badge {{ $event->status_badge['class'] }} p-2">
-                                {{ $event->status_badge['text'] }}
+                            <span class="badge p-2" style="background: {{ $event->status == 'upcoming' ? '#e6ebf7' : ($event->status == 'ongoing' ? '#e3f1e3' : '#fbe9e7') }}; color: {{ $event->status == 'upcoming' ? '#002789' : ($event->status == 'ongoing' ? '#28a745' : '#dc3545') }};">
+                                {{ ucfirst($event->status) }}
                             </span>
                         </div>
                         <div>
-                            <h4 class="ju-card-title mb-0">
-                                <i class="fas fa-calendar-edit me-2 text-warning"></i>
+                            <h4 class="ju-card-title text-white mb-0">
+                                <i class="fas fa-calendar-edit me-2" style="color: #C4A747;"></i>
                                 Edit Event: {{ $event->title }}
                             </h4>
                         </div>
                     </div>
-                    <div class="text-muted">
+                    <div class="text-white-50">
                         <small>Last updated: {{ $event->updated_at->format('M d, Y') }}</small>
                     </div>
                 </div>
                 
-                <div class="ju-card-body">
+                <div class="ju-card-body" style="background: white;">
                     <form action="{{ route('admin.events.update', $event) }}" method="POST" enctype="multipart/form-data" id="eventForm">
                         @csrf
                         @method('PUT')
@@ -52,18 +52,18 @@
                             <div class="col-lg-8">
                                 <!-- Basic Information Card -->
                                 <div class="ju-sub-card mb-4">
-                                    <div class="ju-sub-card-header">
-                                        <h5 class="mb-0">
-                                            <i class="fas fa-info-circle me-2 text-info"></i>
+                                    <div class="ju-sub-card-header" style="background: linear-gradient(135deg, #002789 0%, #001a5c 100%);">
+                                        <h5 class="mb-0 text-white">
+                                            <i class="fas fa-info-circle me-2" style="color: #C4A747;"></i>
                                             Basic Information
                                         </h5>
                                     </div>
-                                    <div class="ju-sub-card-body">
+                                    <div class="ju-sub-card-body" style="background: white;">
                                         <div class="row g-3">
                                             <div class="col-md-12">
                                                 <div class="form-group">
-                                                    <label for="title" class="form-label required">
-                                                        <i class="fas fa-heading me-1 text-muted"></i>
+                                                    <label for="title" class="form-label required" style="color: #002789; font-weight: 500;">
+                                                        <i class="fas fa-heading me-1" style="color: #C4A747;"></i>
                                                         Event Title
                                                     </label>
                                                     <input type="text" 
@@ -72,10 +72,11 @@
                                                            name="title" 
                                                            value="{{ old('title', $event->title) }}" 
                                                            placeholder="Enter event title..."
+                                                           style="border-color: #d4e0f0;"
                                                            required>
                                                     @error('title')
                                                         <div class="invalid-feedback d-flex align-items-center">
-                                                            <i class="fas fa-exclamation-circle me-2"></i>
+                                                            <i class="fas fa-exclamation-circle me-2" style="color: #dc3545;"></i>
                                                             {{ $message }}
                                                         </div>
                                                     @enderror
@@ -84,21 +85,22 @@
                                             
                                             <div class="col-md-12">
                                                 <div class="form-group">
-                                                    <label for="short_description" class="form-label">
-                                                        <i class="fas fa-align-left me-1 text-muted"></i>
+                                                    <label for="short_description" class="form-label" style="color: #002789; font-weight: 500;">
+                                                        <i class="fas fa-align-left me-1" style="color: #C4A747;"></i>
                                                         Short Description (Optional)
                                                     </label>
                                                     <textarea class="form-control @error('short_description') is-invalid @enderror" 
                                                               id="short_description" 
                                                               name="short_description" 
                                                               rows="2" 
-                                                              placeholder="Brief summary of your event (max 200 characters)...">{{ old('short_description', $event->short_description) }}</textarea>
+                                                              placeholder="Brief summary of your event (max 200 characters)..."
+                                                              style="border-color: #d4e0f0;">{{ old('short_description', $event->short_description) }}</textarea>
                                                     <div class="form-text">
-                                                        <small>Brief summary that appears in event cards. Leave empty to use first 100 characters of main description.</small>
+                                                        <small class="text-muted">Brief summary that appears in event cards. Leave empty to use first 100 characters of main description.</small>
                                                     </div>
                                                     @error('short_description')
                                                         <div class="invalid-feedback d-flex align-items-center">
-                                                            <i class="fas fa-exclamation-circle me-2"></i>
+                                                            <i class="fas fa-exclamation-circle me-2" style="color: #dc3545;"></i>
                                                             {{ $message }}
                                                         </div>
                                                     @enderror
@@ -107,8 +109,8 @@
                                             
                                             <div class="col-md-12">
                                                 <div class="form-group">
-                                                    <label for="description" class="form-label required">
-                                                        <i class="fas fa-align-left me-1 text-muted"></i>
+                                                    <label for="description" class="form-label required" style="color: #002789; font-weight: 500;">
+                                                        <i class="fas fa-align-left me-1" style="color: #C4A747;"></i>
                                                         Full Description
                                                     </label>
                                                     <textarea class="form-control @error('description') is-invalid @enderror" 
@@ -116,13 +118,14 @@
                                                               name="description" 
                                                               rows="5" 
                                                               placeholder="Describe your event in detail..."
+                                                              style="border-color: #d4e0f0;"
                                                               required>{{ old('description', $event->description) }}</textarea>
                                                     <div class="form-text">
-                                                        <small>Provide a clear and detailed description of your event. HTML is allowed.</small>
+                                                        <small class="text-muted">Provide a clear and detailed description of your event. HTML is allowed.</small>
                                                     </div>
                                                     @error('description')
                                                         <div class="invalid-feedback d-flex align-items-center">
-                                                            <i class="fas fa-exclamation-circle me-2"></i>
+                                                            <i class="fas fa-exclamation-circle me-2" style="color: #dc3545;"></i>
                                                             {{ $message }}
                                                         </div>
                                                     @enderror
@@ -131,13 +134,14 @@
                                             
                                             <div class="col-md-6">
                                                 <div class="form-group">
-                                                    <label for="event_type" class="form-label required">
-                                                        <i class="fas fa-tag me-1 text-muted"></i>
+                                                    <label for="event_type" class="form-label required" style="color: #002789; font-weight: 500;">
+                                                        <i class="fas fa-tag me-1" style="color: #C4A747;"></i>
                                                         Event Type
                                                     </label>
                                                     <select class="form-select @error('event_type') is-invalid @enderror" 
                                                             id="event_type" 
                                                             name="event_type" 
+                                                            style="border-color: #d4e0f0;"
                                                             required>
                                                         <option value="">Select Event Type</option>
                                                         <option value="academic" {{ old('event_type', $event->event_type) == 'academic' ? 'selected' : '' }}>📚 Academic</option>
@@ -149,7 +153,7 @@
                                                     </select>
                                                     @error('event_type')
                                                         <div class="invalid-feedback d-flex align-items-center">
-                                                            <i class="fas fa-exclamation-circle me-2"></i>
+                                                            <i class="fas fa-exclamation-circle me-2" style="color: #dc3545;"></i>
                                                             {{ $message }}
                                                         </div>
                                                     @enderror
@@ -158,8 +162,8 @@
                                             
                                             <div class="col-md-6">
                                                 <div class="form-group">
-                                                    <label for="organizer" class="form-label required">
-                                                        <i class="fas fa-users me-1 text-muted"></i>
+                                                    <label for="organizer" class="form-label required" style="color: #002789; font-weight: 500;">
+                                                        <i class="fas fa-users me-1" style="color: #C4A747;"></i>
                                                         Organizer
                                                     </label>
                                                     <input type="text" 
@@ -168,10 +172,11 @@
                                                            name="organizer" 
                                                            value="{{ old('organizer', $event->organizer) }}" 
                                                            placeholder="Department, Club, or Organization..."
+                                                           style="border-color: #d4e0f0;"
                                                            required>
                                                     @error('organizer')
                                                         <div class="invalid-feedback d-flex align-items-center">
-                                                            <i class="fas fa-exclamation-circle me-2"></i>
+                                                            <i class="fas fa-exclamation-circle me-2" style="color: #dc3545;"></i>
                                                             {{ $message }}
                                                         </div>
                                                     @enderror
@@ -183,18 +188,18 @@
 
                                 <!-- Date & Time Card -->
                                 <div class="ju-sub-card mb-4">
-                                    <div class="ju-sub-card-header">
-                                        <h5 class="mb-0">
-                                            <i class="fas fa-clock me-2 text-warning"></i>
+                                    <div class="ju-sub-card-header" style="background: linear-gradient(135deg, #002789 0%, #001a5c 100%);">
+                                        <h5 class="mb-0 text-white">
+                                            <i class="fas fa-clock me-2" style="color: #C4A747;"></i>
                                             Date & Time
                                         </h5>
                                     </div>
-                                    <div class="ju-sub-card-body">
+                                    <div class="ju-sub-card-body" style="background: white;">
                                         <div class="row g-3">
                                             <div class="col-md-6">
                                                 <div class="form-group">
-                                                    <label for="start_date" class="form-label required">
-                                                        <i class="fas fa-play me-1 text-muted"></i>
+                                                    <label for="start_date" class="form-label required" style="color: #002789; font-weight: 500;">
+                                                        <i class="fas fa-play me-1" style="color: #C4A747;"></i>
                                                         Start Date & Time
                                                     </label>
                                                     <input type="datetime-local" 
@@ -202,10 +207,11 @@
                                                            id="start_date" 
                                                            name="start_date" 
                                                            value="{{ old('start_date', $event->start_date->format('Y-m-d\TH:i')) }}" 
+                                                           style="border-color: #d4e0f0;"
                                                            required>
                                                     @error('start_date')
                                                         <div class="invalid-feedback d-flex align-items-center">
-                                                            <i class="fas fa-exclamation-circle me-2"></i>
+                                                            <i class="fas fa-exclamation-circle me-2" style="color: #dc3545;"></i>
                                                             {{ $message }}
                                                         </div>
                                                     @enderror
@@ -214,8 +220,8 @@
                                             
                                             <div class="col-md-6">
                                                 <div class="form-group">
-                                                    <label for="end_date" class="form-label required">
-                                                        <i class="fas fa-stop me-1 text-muted"></i>
+                                                    <label for="end_date" class="form-label required" style="color: #002789; font-weight: 500;">
+                                                        <i class="fas fa-stop me-1" style="color: #C4A747;"></i>
                                                         End Date & Time
                                                     </label>
                                                     <input type="datetime-local" 
@@ -223,10 +229,11 @@
                                                            id="end_date" 
                                                            name="end_date" 
                                                            value="{{ old('end_date', $event->end_date->format('Y-m-d\TH:i')) }}" 
+                                                           style="border-color: #d4e0f0;"
                                                            required>
                                                     @error('end_date')
                                                         <div class="invalid-feedback d-flex align-items-center">
-                                                            <i class="fas fa-exclamation-circle me-2"></i>
+                                                            <i class="fas fa-exclamation-circle me-2" style="color: #dc3545;"></i>
                                                             {{ $message }}
                                                         </div>
                                                     @enderror
@@ -238,23 +245,24 @@
 
                                 <!-- Location Card -->
                                 <div class="ju-sub-card mb-4">
-                                    <div class="ju-sub-card-header">
-                                        <h5 class="mb-0">
-                                            <i class="fas fa-map-marker-alt me-2 text-danger"></i>
+                                    <div class="ju-sub-card-header" style="background: linear-gradient(135deg, #002789 0%, #001a5c 100%);">
+                                        <h5 class="mb-0 text-white">
+                                            <i class="fas fa-map-marker-alt me-2" style="color: #C4A747;"></i>
                                             Location
                                         </h5>
                                     </div>
-                                    <div class="ju-sub-card-body">
+                                    <div class="ju-sub-card-body" style="background: white;">
                                         <div class="row g-3">
                                             <div class="col-md-6">
                                                 <div class="form-group">
-                                                    <label for="campus_id" class="form-label">
-                                                        <i class="fas fa-university me-1 text-muted"></i>
+                                                    <label for="campus_id" class="form-label" style="color: #002789; font-weight: 500;">
+                                                        <i class="fas fa-university me-1" style="color: #C4A747;"></i>
                                                         Campus
                                                     </label>
                                                     <select class="form-select @error('campus_id') is-invalid @enderror" 
                                                             id="campus_id" 
-                                                            name="campus_id">
+                                                            name="campus_id"
+                                                            style="border-color: #d4e0f0;">
                                                         <option value="">Select Campus (Optional)</option>
                                                         @foreach($campuses as $campus)
                                                             <option value="{{ $campus->id }}" 
@@ -266,7 +274,7 @@
                                                     </select>
                                                     @error('campus_id')
                                                         <div class="invalid-feedback d-flex align-items-center">
-                                                            <i class="fas fa-exclamation-circle me-2"></i>
+                                                            <i class="fas fa-exclamation-circle me-2" style="color: #dc3545;"></i>
                                                             {{ $message }}
                                                         </div>
                                                     @enderror
@@ -275,13 +283,14 @@
                                             
                                             <div class="col-md-6">
                                                 <div class="form-group">
-                                                    <label for="building_id" class="form-label">
-                                                        <i class="fas fa-building me-1 text-muted"></i>
+                                                    <label for="building_id" class="form-label" style="color: #002789; font-weight: 500;">
+                                                        <i class="fas fa-building me-1" style="color: #C4A747;"></i>
                                                         Building
                                                     </label>
                                                     <select class="form-select @error('building_id') is-invalid @enderror" 
                                                             id="building_id" 
-                                                            name="building_id">
+                                                            name="building_id"
+                                                            style="border-color: #d4e0f0;">
                                                         <option value="">Select Building (Optional)</option>
                                                         @foreach($buildings as $building)
                                                             <option value="{{ $building->id }}" 
@@ -292,7 +301,7 @@
                                                     </select>
                                                     @error('building_id')
                                                         <div class="invalid-feedback d-flex align-items-center">
-                                                            <i class="fas fa-exclamation-circle me-2"></i>
+                                                            <i class="fas fa-exclamation-circle me-2" style="color: #dc3545;"></i>
                                                             {{ $message }}
                                                         </div>
                                                     @enderror
@@ -301,13 +310,14 @@
                                             
                                             <div class="col-md-8">
                                                 <div class="form-group">
-                                                    <label for="venue_id" class="form-label">
-                                                        <i class="fas fa-door-open me-1 text-muted"></i>
+                                                    <label for="venue_id" class="form-label" style="color: #002789; font-weight: 500;">
+                                                        <i class="fas fa-door-open me-1" style="color: #C4A747;"></i>
                                                         Venue/Room
                                                     </label>
                                                     <select class="form-select @error('venue_id') is-invalid @enderror" 
                                                             id="venue_id" 
-                                                            name="venue_id">
+                                                            name="venue_id"
+                                                            style="border-color: #d4e0f0;">
                                                         <option value="">Select Venue (Optional)</option>
                                                         @foreach($venues as $venue)
                                                             <option value="{{ $venue->id }}" 
@@ -318,7 +328,7 @@
                                                     </select>
                                                     @error('venue_id')
                                                         <div class="invalid-feedback d-flex align-items-center">
-                                                            <i class="fas fa-exclamation-circle me-2"></i>
+                                                            <i class="fas fa-exclamation-circle me-2" style="color: #dc3545;"></i>
                                                             {{ $message }}
                                                         </div>
                                                     @enderror
@@ -327,8 +337,8 @@
                                             
                                             <div class="col-md-4">
                                                 <div class="form-group">
-                                                    <label for="max_attendees" class="form-label">
-                                                        <i class="fas fa-users me-1 text-muted"></i>
+                                                    <label for="max_attendees" class="form-label" style="color: #002789; font-weight: 500;">
+                                                        <i class="fas fa-users me-1" style="color: #C4A747;"></i>
                                                         Capacity
                                                     </label>
                                                     <input type="number" 
@@ -337,10 +347,11 @@
                                                            name="max_attendees" 
                                                            value="{{ old('max_attendees', $event->max_attendees) }}" 
                                                            min="1"
-                                                           placeholder="Max attendees">
+                                                           placeholder="Max attendees"
+                                                           style="border-color: #d4e0f0;">
                                                     @error('max_attendees')
                                                         <div class="invalid-feedback d-flex align-items-center">
-                                                            <i class="fas fa-exclamation-circle me-2"></i>
+                                                            <i class="fas fa-exclamation-circle me-2" style="color: #dc3545;"></i>
                                                             {{ $message }}
                                                         </div>
                                                     @enderror
@@ -348,16 +359,16 @@
                                             </div>
                                             
                                             <div class="col-12">
-                                                <div class="venue-details-card d-none p-3 bg-light rounded border">
-                                                    <h6 class="mb-2">Venue Details</h6>
+                                                <div class="venue-details-card d-none p-3" style="background: #e6ebf7; border-radius: 8px; border: 1px solid #d4e0f0;">
+                                                    <h6 class="mb-2" style="color: #002789;">Venue Details</h6>
                                                     <div class="row">
                                                         <div class="col-md-6">
                                                             <small class="text-muted d-block">Type:</small>
-                                                            <span id="venue-type" class="fw-semibold">-</span>
+                                                            <span id="venue-type" class="fw-semibold" style="color: #001a5c;">-</span>
                                                         </div>
                                                         <div class="col-md-6">
                                                             <small class="text-muted d-block">Capacity:</small>
-                                                            <span id="venue-capacity" class="fw-semibold">-</span>
+                                                            <span id="venue-capacity" class="fw-semibold" style="color: #001a5c;">-</span>
                                                         </div>
                                                         <div class="col-12 mt-2">
                                                             <small class="text-muted d-block">Amenities:</small>
@@ -375,27 +386,29 @@
                             <div class="col-lg-4">
                                 <!-- Media Card with existing image -->
                                 <div class="ju-sub-card mb-4">
-                                    <div class="ju-sub-card-header">
-                                        <h5 class="mb-0">
-                                            <i class="fas fa-images me-2 text-success"></i>
+                                    <div class="ju-sub-card-header" style="background: linear-gradient(135deg, #002789 0%, #001a5c 100%);">
+                                        <h5 class="mb-0 text-white">
+                                            <i class="fas fa-images me-2" style="color: #C4A747;"></i>
                                             Event Image
                                         </h5>
                                     </div>
-                                    <div class="ju-sub-card-body">
+                                    <div class="ju-sub-card-body" style="background: white;">
                                         @if($event->hasImage())
                                         <div class="existing-image mb-3">
                                             <p class="small text-muted mb-2">Current Image:</p>
                                             <div class="position-relative" style="max-width: 200px;">
                                                 <img src="{{ $event->image_url }}" 
                                                      alt="Current event image" 
-                                                     class="img-fluid rounded border">
+                                                     class="img-fluid rounded border"
+                                                     style="border-color: #d4e0f0 !important;">
                                                 <div class="mt-2">
                                                     <div class="form-check">
                                                         <input class="form-check-input" 
                                                                type="checkbox" 
                                                                id="remove_image" 
                                                                name="remove_image" 
-                                                               value="1">
+                                                               value="1"
+                                                               style="border-color: #002789;">
                                                         <label class="form-check-label text-danger" for="remove_image">
                                                             <i class="fas fa-trash me-1"></i> Remove Image
                                                         </label>
@@ -403,46 +416,48 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <hr>
+                                        <hr style="border-color: #d4e0f0;">
                                         @endif
                                         
                                         <div class="form-group">
-                                            <label for="image" class="form-label">
-                                                <i class="fas fa-image me-1 text-muted"></i>
+                                            <label for="image" class="form-label" style="color: #002789; font-weight: 500;">
+                                                <i class="fas fa-image me-1" style="color: #C4A747;"></i>
                                                 {{ $event->hasImage() ? 'Replace Image' : 'Add Image' }}
                                             </label>
                                             <div class="image-upload-container">
                                                 <div class="upload-area border rounded p-4 text-center @error('image') border-danger @enderror"
-                                                     id="dropArea">
-                                                    <i class="fas fa-cloud-upload-alt fa-2x text-muted mb-3"></i>
-                                                    <p class="mb-2">Drag & drop your image here</p>
+                                                     id="dropArea"
+                                                     style="border-color: #d4e0f0 !important;">
+                                                    <i class="fas fa-cloud-upload-alt fa-2x mb-3" style="color: #C4A747;"></i>
+                                                    <p class="mb-2" style="color: #002789;">Drag & drop your image here</p>
                                                     <p class="text-muted small mb-3">or click to browse</p>
                                                     <input type="file" 
                                                            class="form-control d-none @error('image') is-invalid @enderror" 
                                                            id="image" 
                                                            name="image" 
                                                            accept="image/*">
-                                                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="document.getElementById('image').click()">
+                                                    <button type="button" class="btn" onclick="document.getElementById('image').click()" style="background: #002789; color: white; border: none;">
                                                         <i class="fas fa-upload me-1"></i> Choose File
                                                     </button>
                                                 </div>
                                                 @error('image')
                                                     <div class="invalid-feedback d-flex align-items-center mt-2">
-                                                        <i class="fas fa-exclamation-circle me-2"></i>
+                                                        <i class="fas fa-exclamation-circle me-2" style="color: #dc3545;"></i>
                                                         {{ $message }}
                                                     </div>
                                                 @enderror
                                                 
                                                 <div class="image-preview mt-3 d-none" id="imagePreview">
                                                     <div class="preview-container position-relative">
-                                                        <img id="previewImage" src="#" alt="Preview" class="img-fluid rounded border">
+                                                        <img id="previewImage" src="#" alt="Preview" class="img-fluid rounded border" style="border-color: #d4e0f0 !important;">
                                                         <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2" 
-                                                                onclick="removeImage()">
+                                                                onclick="removeImage()"
+                                                                style="border-radius: 50%; width: 30px; height: 30px; padding: 0;">
                                                             <i class="fas fa-times"></i>
                                                         </button>
                                                     </div>
                                                     <small class="text-muted d-block mt-2">
-                                                        <i class="fas fa-info-circle me-1"></i>
+                                                        <i class="fas fa-info-circle me-1" style="color: #002789;"></i>
                                                         Recommended: 1200x600px, Max: 5MB
                                                     </small>
                                                 </div>
@@ -453,16 +468,16 @@
 
                                 <!-- Contact Information Card -->
                                 <div class="ju-sub-card mb-4">
-                                    <div class="ju-sub-card-header">
-                                        <h5 class="mb-0">
-                                            <i class="fas fa-address-book me-2 text-purple"></i>
+                                    <div class="ju-sub-card-header" style="background: linear-gradient(135deg, #002789 0%, #001a5c 100%);">
+                                        <h5 class="mb-0 text-white">
+                                            <i class="fas fa-address-book me-2" style="color: #C4A747;"></i>
                                             Contact Information
                                         </h5>
                                     </div>
-                                    <div class="ju-sub-card-body">
+                                    <div class="ju-sub-card-body" style="background: white;">
                                         <div class="form-group mb-3">
-                                            <label for="contact_email" class="form-label">
-                                                <i class="fas fa-envelope me-1 text-muted"></i>
+                                            <label for="contact_email" class="form-label" style="color: #002789; font-weight: 500;">
+                                                <i class="fas fa-envelope me-1" style="color: #C4A747;"></i>
                                                 Contact Email
                                             </label>
                                             <input type="email" 
@@ -470,18 +485,19 @@
                                                    id="contact_email" 
                                                    name="contact_email" 
                                                    value="{{ old('contact_email', $event->contact_email) }}" 
-                                                   placeholder="event@ju.edu.et">
+                                                   placeholder="event@ju.edu.et"
+                                                   style="border-color: #d4e0f0;">
                                             @error('contact_email')
                                                 <div class="invalid-feedback d-flex align-items-center">
-                                                    <i class="fas fa-exclamation-circle me-2"></i>
+                                                    <i class="fas fa-exclamation-circle me-2" style="color: #dc3545;"></i>
                                                     {{ $message }}
                                                 </div>
                                             @enderror
                                         </div>
                                         
                                         <div class="form-group">
-                                            <label for="contact_phone" class="form-label">
-                                                <i class="fas fa-phone me-1 text-muted"></i>
+                                            <label for="contact_phone" class="form-label" style="color: #002789; font-weight: 500;">
+                                                <i class="fas fa-phone me-1" style="color: #C4A747;"></i>
                                                 Contact Phone
                                             </label>
                                             <input type="tel" 
@@ -489,10 +505,11 @@
                                                    id="contact_phone" 
                                                    name="contact_phone" 
                                                    value="{{ old('contact_phone', $event->contact_phone) }}" 
-                                                   placeholder="+251 47 111 0000">
+                                                   placeholder="+251 47 111 0000"
+                                                   style="border-color: #d4e0f0;">
                                             @error('contact_phone')
                                                 <div class="invalid-feedback d-flex align-items-center">
-                                                    <i class="fas fa-exclamation-circle me-2"></i>
+                                                    <i class="fas fa-exclamation-circle me-2" style="color: #dc3545;"></i>
                                                     {{ $message }}
                                                 </div>
                                             @enderror
@@ -502,22 +519,23 @@
 
                                 <!-- Settings Card -->
                                 <div class="ju-sub-card mb-4">
-                                    <div class="ju-sub-card-header">
-                                        <h5 class="mb-0">
-                                            <i class="fas fa-cog me-2 text-secondary"></i>
+                                    <div class="ju-sub-card-header" style="background: linear-gradient(135deg, #002789 0%, #001a5c 100%);">
+                                        <h5 class="mb-0 text-white">
+                                            <i class="fas fa-cog me-2" style="color: #C4A747;"></i>
                                             Event Settings
                                         </h5>
                                     </div>
-                                    <div class="ju-sub-card-body">
+                                    <div class="ju-sub-card-body" style="background: white;">
                                         <div class="form-check form-switch mb-3">
                                             <input class="form-check-input" 
                                                    type="checkbox" 
                                                    id="is_featured" 
                                                    name="is_featured" 
                                                    value="1"
-                                                   {{ old('is_featured', $event->is_featured) ? 'checked' : '' }}>
-                                            <label class="form-check-label" for="is_featured">
-                                                <i class="fas fa-star me-2 text-warning"></i>
+                                                   {{ old('is_featured', $event->is_featured) ? 'checked' : '' }}
+                                                   style="border-color: #002789; background-color: {{ old('is_featured', $event->is_featured) ? '#002789' : 'white' }};">
+                                            <label class="form-check-label" for="is_featured" style="color: #002789;">
+                                                <i class="fas fa-star me-2" style="color: #C4A747;"></i>
                                                 Featured Event
                                             </label>
                                             <small class="text-muted d-block mt-1">
@@ -531,9 +549,10 @@
                                                    id="is_public" 
                                                    name="is_public" 
                                                    value="1"
-                                                   {{ old('is_public', $event->is_public) ? 'checked' : '' }}>
-                                            <label class="form-check-label" for="is_public">
-                                                <i class="fas fa-globe me-2 text-primary"></i>
+                                                   {{ old('is_public', $event->is_public) ? 'checked' : '' }}
+                                                   style="border-color: #002789; background-color: {{ old('is_public', $event->is_public) ? '#002789' : 'white' }};">
+                                            <label class="form-check-label" for="is_public" style="color: #002789;">
+                                                <i class="fas fa-globe me-2" style="color: #C4A747;"></i>
                                                 Public Event
                                             </label>
                                             <small class="text-muted d-block mt-1">
@@ -547,9 +566,10 @@
                                                    id="requires_registration" 
                                                    name="requires_registration" 
                                                    value="1"
-                                                   {{ old('requires_registration', $event->requires_registration) ? 'checked' : '' }}>
-                                            <label class="form-check-label" for="requires_registration">
-                                                <i class="fas fa-user-plus me-2 text-success"></i>
+                                                   {{ old('requires_registration', $event->requires_registration) ? 'checked' : '' }}
+                                                   style="border-color: #002789; background-color: {{ old('requires_registration', $event->requires_registration) ? '#002789' : 'white' }};">
+                                            <label class="form-check-label" for="requires_registration" style="color: #002789;">
+                                                <i class="fas fa-user-plus me-2" style="color: #C4A747;"></i>
                                                 Requires Registration
                                             </label>
                                             <small class="text-muted d-block mt-1">
@@ -560,8 +580,8 @@
                                         <div class="registration-link-field mt-3 {{ old('requires_registration', $event->requires_registration) ? '' : 'd-none' }}" 
                                              id="registrationLinkField">
                                             <div class="form-group">
-                                                <label for="registration_link" class="form-label">
-                                                    <i class="fas fa-link me-1 text-muted"></i>
+                                                <label for="registration_link" class="form-label" style="color: #002789; font-weight: 500;">
+                                                    <i class="fas fa-link me-1" style="color: #C4A747;"></i>
                                                     Registration Link
                                                 </label>
                                                 <input type="url" 
@@ -569,10 +589,11 @@
                                                        id="registration_link" 
                                                        name="registration_link" 
                                                        value="{{ old('registration_link', $event->registration_link) }}" 
-                                                       placeholder="https://forms.example.com/event">
+                                                       placeholder="https://forms.example.com/event"
+                                                       style="border-color: #d4e0f0;">
                                                 @error('registration_link')
                                                     <div class="invalid-feedback d-flex align-items-center">
-                                                        <i class="fas fa-exclamation-circle me-2"></i>
+                                                        <i class="fas fa-exclamation-circle me-2" style="color: #dc3545;"></i>
                                                         {{ $message }}
                                                     </div>
                                                 @enderror
@@ -583,16 +604,16 @@
 
                                 <!-- Tags Card -->
                                 <div class="ju-sub-card">
-                                    <div class="ju-sub-card-header">
-                                        <h5 class="mb-0">
-                                            <i class="fas fa-tags me-2 text-orange"></i>
+                                    <div class="ju-sub-card-header" style="background: linear-gradient(135deg, #002789 0%, #001a5c 100%);">
+                                        <h5 class="mb-0 text-white">
+                                            <i class="fas fa-tags me-2" style="color: #C4A747;"></i>
                                             Tags & Categories
                                         </h5>
                                     </div>
-                                    <div class="ju-sub-card-body">
+                                    <div class="ju-sub-card-body" style="background: white;">
                                         <div class="form-group">
-                                            <label for="tags" class="form-label">
-                                                <i class="fas fa-hashtag me-1 text-muted"></i>
+                                            <label for="tags" class="form-label" style="color: #002789; font-weight: 500;">
+                                                <i class="fas fa-hashtag me-1" style="color: #C4A747;"></i>
                                                 Event Tags
                                             </label>
                                             @php
@@ -608,13 +629,14 @@
                                                    id="tags" 
                                                    name="tags" 
                                                    value="{{ old('tags', $tagsValue) }}" 
-                                                   placeholder="workshop, training, seminar, technology">
+                                                   placeholder="workshop, training, seminar, technology"
+                                                   style="border-color: #d4e0f0;">
                                             <small class="text-muted d-block mt-1">
                                                 Separate tags with commas (max 10 tags).
                                             </small>
                                             @error('tags')
                                                 <div class="invalid-feedback d-flex align-items-center">
-                                                    <i class="fas fa-exclamation-circle me-2"></i>
+                                                    <i class="fas fa-exclamation-circle me-2" style="color: #dc3545;"></i>
                                                     {{ $message }}
                                                 </div>
                                             @enderror
@@ -622,24 +644,12 @@
                                             <div class="tag-suggestions mt-3">
                                                 <small class="text-muted d-block mb-2">Suggested tags:</small>
                                                 <div class="d-flex flex-wrap gap-2">
-                                                    <span class="badge bg-light text-dark cursor-pointer tag-suggestion">
-                                                        academic
-                                                    </span>
-                                                    <span class="badge bg-light text-dark cursor-pointer tag-suggestion">
-                                                        workshop
-                                                    </span>
-                                                    <span class="badge bg-light text-dark cursor-pointer tag-suggestion">
-                                                        seminar
-                                                    </span>
-                                                    <span class="badge bg-light text-dark cursor-pointer tag-suggestion">
-                                                        conference
-                                                    </span>
-                                                    <span class="badge bg-light text-dark cursor-pointer tag-suggestion">
-                                                        cultural
-                                                    </span>
-                                                    <span class="badge bg-light text-dark cursor-pointer tag-suggestion">
-                                                        sports
-                                                    </span>
+                                                    <span class="badge tag-suggestion" style="background: #e6ebf7; color: #002789; cursor: pointer;">academic</span>
+                                                    <span class="badge tag-suggestion" style="background: #e6ebf7; color: #002789; cursor: pointer;">workshop</span>
+                                                    <span class="badge tag-suggestion" style="background: #e6ebf7; color: #002789; cursor: pointer;">seminar</span>
+                                                    <span class="badge tag-suggestion" style="background: #e6ebf7; color: #002789; cursor: pointer;">conference</span>
+                                                    <span class="badge tag-suggestion" style="background: #e6ebf7; color: #002789; cursor: pointer;">cultural</span>
+                                                    <span class="badge tag-suggestion" style="background: #e6ebf7; color: #002789; cursor: pointer;">sports</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -654,20 +664,21 @@
                         <!-- Form Actions -->
                         <div class="row mt-4">
                             <div class="col-12">
-                                <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded border">
+                                <div class="d-flex justify-content-between align-items-center p-3 rounded border" style="background: #e6ebf7; border-color: #d4e0f0 !important;">
                                     <div>
                                         <small class="text-muted">
-                                            <i class="fas fa-exclamation-circle me-1"></i>
+                                            <i class="fas fa-exclamation-circle me-1" style="color: #002789;"></i>
                                             Fields marked with <span class="text-danger">*</span> are required.
                                         </small>
                                     </div>
                                     <div class="d-flex gap-2">
                                         <a href="{{ route('admin.events.show', $event) }}" 
-                                           class="btn btn-outline-secondary">
+                                           class="btn" 
+                                           style="border: 1px solid #002789; color: #002789; background: white;">
                                             <i class="fas fa-times me-2"></i>
                                             Cancel
                                         </a>
-                                        <button type="submit" class="btn btn-ju-primary">
+                                        <button type="submit" class="btn" style="background: linear-gradient(135deg, #002789 0%, #001a5c 100%); color: white; border: none;">
                                             <i class="fas fa-save me-2"></i>
                                             Update Event
                                         </button>
@@ -692,13 +703,13 @@
     
     .ju-sub-card {
         background: #fff;
-        border: 1px solid #e0e0e0;
+        border: 1px solid #d4e0f0;
         border-radius: 10px;
         overflow: hidden;
     }
     
     .ju-sub-card-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #002789 0%, #001a5c 100%);
         color: white;
         padding: 12px 20px;
         border-bottom: 1px solid rgba(255,255,255,0.1);
@@ -708,49 +719,21 @@
         padding: 20px;
     }
     
-    .btn-ju-primary {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border: none;
-        color: white;
-        padding: 0.5rem 1.5rem;
-        transition: all 0.3s ease;
-    }
-    
-    .btn-ju-primary:hover {
-        background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        color: white;
-    }
-    
-    .btn-outline-ju-primary {
-        border: 2px solid #667eea;
-        color: #667eea;
-        background: transparent;
-        padding: 0.5rem 1.5rem;
-    }
-    
-    .btn-outline-ju-primary:hover {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-color: transparent;
-        color: white;
-    }
-    
     .upload-area {
-        border: 2px dashed #dee2e6;
+        border: 2px dashed #d4e0f0;
         border-radius: 8px;
         transition: all 0.3s ease;
         cursor: pointer;
     }
     
     .upload-area:hover {
-        border-color: #667eea;
-        background-color: rgba(102, 126, 234, 0.05);
+        border-color: #002789;
+        background-color: rgba(0, 39, 137, 0.05);
     }
     
     .upload-area.dragover {
-        border-color: #667eea;
-        background-color: rgba(102, 126, 234, 0.1);
+        border-color: #002789;
+        background-color: rgba(0, 39, 137, 0.1);
     }
     
     .image-preview img {
@@ -768,6 +751,8 @@
     .amenity-badge {
         font-size: 11px;
         padding: 2px 8px;
+        background: #e6ebf7 !important;
+        color: #002789 !important;
     }
     
     .tag-suggestion {
@@ -776,7 +761,7 @@
     }
     
     .tag-suggestion:hover {
-        background-color: #667eea !important;
+        background: #002789 !important;
         color: white !important;
     }
     
@@ -798,6 +783,17 @@
         align-items: center;
         justify-content: center;
         border-radius: 50%;
+    }
+    
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #002789;
+        box-shadow: 0 0 0 0.2rem rgba(0, 39, 137, 0.1);
+    }
+    
+    .form-check-input:checked {
+        background-color: #002789;
+        border-color: #002789;
     }
 </style>
 @endpush
@@ -938,7 +934,7 @@
                         if (data.amenities && data.amenities.length > 0) {
                             data.amenities.forEach(amenity => {
                                 const badge = document.createElement('span');
-                                badge.className = 'badge bg-light text-dark amenity-badge me-1 mb-1';
+                                badge.className = 'badge amenity-badge me-1 mb-1';
                                 badge.textContent = amenity;
                                 amenitiesList.appendChild(badge);
                             });

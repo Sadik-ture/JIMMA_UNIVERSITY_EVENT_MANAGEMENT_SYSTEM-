@@ -1,29 +1,24 @@
 <?php
-
+// database/migrations/2026_03_05_000001_rename_featured_image_to_image_in_events_table.php
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::table('events', function (Blueprint $table) {
-            $table->string('featured_image')->nullable()->after('description');
-            $table->json('gallery_images')->nullable()->after('featured_image');
+            // Rename featured_image to image
+            $table->renameColumn('featured_image', 'image');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::table('events', function (Blueprint $table) {
-            $table->dropColumn(['featured_image', 'gallery_images']);
+            // Rename back if needed
+            $table->renameColumn('image', 'featured_image');
         });
     }
 };

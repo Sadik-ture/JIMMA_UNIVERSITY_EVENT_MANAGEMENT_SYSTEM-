@@ -19,42 +19,44 @@
 <style>
     /* ============================================
            PREMIUM JIMMA UNIVERSITY EVENT REGISTRATION
-           DARK BLUE & GOLD Color Scheme - OFFICIAL
+           ROYAL BLUE (#002789) & GOLD (#C4A747) - OFFICIAL
            Perfectly Fitted Cards | Fixed Layout
         ============================================ */
     
     :root {
-        /* DARK BLUE - Official Jimma University Primary Color */
-        --ju-blue: #0a2c6e;
-        --ju-blue-dark: #041c47;
+        /* ROYAL BLUE - Official Jimma University Primary Color - MATCHING LAYOUT */
+        --ju-blue: #002789;              /* Official Royal Blue */
+        --ju-blue-dark: #001a5c;          /* Darker shade for gradients */
         --ju-blue-darker: #021230;
-        --ju-blue-light: #1e4a8a;
+        --ju-blue-light: #1a3a9a;          /* Lighter shade for accents */
         --ju-blue-lighter: #3a6ab0;
-        --ju-blue-soft: rgba(10, 44, 110, 0.08);
-        --ju-blue-glow: rgba(10, 44, 110, 0.2);
-        --ju-blue-gradient: linear-gradient(145deg, #0a2c6e, #041c47);
-        --ju-blue-gradient-light: linear-gradient(145deg, #0a2c6e, #1e4a8a);
+        --ju-blue-soft: rgba(0, 39, 137, 0.08);
+        --ju-blue-glow: rgba(0, 39, 137, 0.2);
+        --ju-blue-gradient: linear-gradient(145deg, #002789, #001a5c);
+        --ju-blue-gradient-light: linear-gradient(145deg, #002789, #1a3a9a);
         
-        /* Ethiopian Gold Accents - Official */
-        --ju-gold: #c4a747;
+        /* Ethiopian Gold Accents - Official - MATCHING LAYOUT */
+        --ju-gold: #C4A747;                /* Official Gold accent */
         --ju-gold-dark: #a5862e;
         --ju-gold-darker: #7e6623;
-        --ju-gold-light: #d8be6e;
+        --ju-gold-light: #e5d6a6;
         --ju-gold-soft: rgba(196, 167, 71, 0.12);
         --ju-gold-glow: rgba(196, 167, 71, 0.25);
-        --ju-gold-gradient: linear-gradient(145deg, #c4a747, #a5862e);
+        --ju-gold-gradient: linear-gradient(145deg, #C4A747, #a5862e);
         
-        /* Semantic Colors */
-        --ju-success: #10b981;
-        --ju-success-dark: #059669;
-        --ju-warning: #f59e0b;
-        --ju-warning-dark: #d97706;
-        --ju-danger: #dc2626;
-        --ju-danger-dark: #b91c1c;
+        /* Semantic Colors - Matching Layout Success/Error colors */
+        --ju-success: #28a745;
+        --ju-success-dark: #1e7e34;
+        --ju-warning: #ffc107;
+        --ju-warning-dark: #d39e00;
+        --ju-danger: #dc3545;
+        --ju-danger-dark: #bd2130;
+        --ju-info: #17a2b8;
         
-        /* Neutral Colors */
+        /* Neutral Colors - Matching Layout */
         --ju-white: #ffffff;
-        --ju-offwhite: #f8fafc;
+        --ju-offwhite: #f9f9f9;
+        --ju-gray: #f0f0f0;
         --ju-gray-50: #f9fbfd;
         --ju-gray-100: #f1f5f9;
         --ju-gray-200: #e9edf2;
@@ -66,27 +68,33 @@
         --ju-gray-800: #334155;
         --ju-gray-900: #1e293b;
         
-        /* Shadows - Dark Blue Tinted */
-        --shadow-sm: 0 4px 12px rgba(10,44,110,0.08);
-        --shadow: 0 8px 20px rgba(10,44,110,0.12);
-        --shadow-lg: 0 16px 32px rgba(10,44,110,0.16);
+        /* Shadows - Royal Blue Tinted - Matching Layout */
+        --shadow-xs: 0 2px 4px rgba(0,39,137,0.02);
+        --shadow-sm: 0 4px 6px rgba(0,39,137,0.04);
+        --shadow: 0 6px 12px rgba(0,39,137,0.06);
+        --shadow-md: 0 8px 24px rgba(0,39,137,0.08);
+        --shadow-lg: 0 16px 32px rgba(0,39,137,0.1);
+        --shadow-xl: 0 24px 48px rgba(0,39,137,0.12);
+        --shadow-2xl: 0 32px 64px rgba(0,39,137,0.15);
         --shadow-gold: 0 8px 20px rgba(196,167,71,0.2);
         --shadow-gold-lg: 0 16px 32px rgba(196,167,71,0.25);
         
-        /* Border Radius - Consistent */
-        --radius-sm: 8px;
-        --radius: 12px;
-        --radius-md: 16px;
-        --radius-lg: 20px;
-        --radius-xl: 24px;
-        --radius-2xl: 28px;
-        --radius-3xl: 32px;
+        /* Border Radius - Consistent - Matching Layout */
+        --radius-sm: 0.25rem;
+        --radius: 0.375rem;
+        --radius-md: 0.5rem;
+        --radius-lg: 0.75rem;
+        --radius-xl: 1rem;
+        --radius-2xl: 1.25rem;
+        --radius-3xl: 1.5rem;
         --radius-full: 9999px;
         
-        /* Transitions */
-        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        --transition-bounce: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-        --transition-elastic: all 0.6s cubic-bezier(0.68, -0.6, 0.32, 1.6);
+        /* Transitions - Matching Layout */
+        --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        --transition-bounce: 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        --transition-elastic: 0.6s cubic-bezier(0.68, -0.6, 0.32, 1.6);
     }
 
     /* ============================================
@@ -100,7 +108,7 @@
 
     body {
         background: var(--ju-offwhite);
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        font-family: var(--font-primary);
         overflow-x: hidden;
     }
 
@@ -109,11 +117,11 @@
     }
 
     /* ============================================
-           PREMIUM HERO SECTION - Dark Blue Excellence
+           PREMIUM HERO SECTION - Royal Blue Excellence
         ============================================ */
     .premium-hero-card {
         position: relative;
-        background: linear-gradient(145deg, var(--ju-blue), var(--ju-blue-dark));
+        background: linear-gradient(145deg, #002789, #001a5c);
         padding: 60px 50px;
         border-radius: var(--radius-3xl);
         overflow: hidden;
@@ -231,7 +239,7 @@
 
     .premium-hero-btn-primary {
         background: white;
-        color: var(--ju-blue);
+        color: #002789;
         box-shadow: 0 10px 25px rgba(0,0,0,0.2);
     }
 
@@ -249,7 +257,7 @@
 
     .premium-hero-btn-outline:hover {
         background: white;
-        color: var(--ju-blue);
+        color: #002789;
         border-color: white;
         transform: translateY(-3px);
     }
@@ -276,7 +284,7 @@
     }
 
     /* ============================================
-           PREMIUM STATS CARDS - Dark Blue Theme
+           PREMIUM STATS CARDS - Royal Blue Theme
         ============================================ */
     .premium-stats-section {
         margin-bottom: 50px;
@@ -288,13 +296,13 @@
         align-items: center;
         margin-bottom: 24px;
         padding-bottom: 16px;
-        border-bottom: 2px solid rgba(10,44,110,0.1);
+        border-bottom: 2px solid rgba(0,39,137,0.1);
     }
 
     .premium-section-title {
         font-size: 1.6rem;
         font-weight: 800;
-        color: var(--ju-blue);
+        color: #002789;
         margin: 0;
         letter-spacing: -0.5px;
         display: flex;
@@ -352,7 +360,7 @@
         left: 0;
         width: 100%;
         height: 3px;
-        background: linear-gradient(90deg, var(--ju-blue), var(--ju-gold));
+        background: linear-gradient(90deg, #002789, var(--ju-gold));
         transform: scaleX(0);
         transform-origin: left;
         transition: transform 0.5s ease;
@@ -361,7 +369,7 @@
     .premium-stat-card:hover {
         transform: translateY(-5px);
         box-shadow: var(--shadow);
-        border-color: var(--ju-blue-soft);
+        border-color: rgba(0,39,137,0.2);
     }
 
     .premium-stat-card:hover::before {
@@ -386,16 +394,16 @@
     }
 
     .premium-stat-icon.primary { 
-        background: linear-gradient(145deg, var(--ju-blue), var(--ju-blue-light)); 
+        background: linear-gradient(145deg, #002789, #1a3a9a); 
     }
     .premium-stat-icon.success { 
-        background: linear-gradient(145deg, #10b981, #059669); 
+        background: linear-gradient(145deg, #28a745, #1e7e34); 
     }
     .premium-stat-icon.warning { 
-        background: linear-gradient(145deg, #f59e0b, #d97706); 
+        background: linear-gradient(145deg, #ffc107, #d39e00); 
     }
     .premium-stat-icon.info { 
-        background: linear-gradient(145deg, var(--ju-blue-light), var(--ju-blue-lighter)); 
+        background: linear-gradient(145deg, #1a3a9a, #3a6ab0); 
     }
 
     .premium-stat-content {
@@ -405,7 +413,7 @@
     .premium-stat-number {
         font-size: 2.2rem;
         font-weight: 800;
-        color: var(--ju-blue);
+        color: #002789;
         margin: 0;
         line-height: 1;
         font-family: 'Montserrat', sans-serif;
@@ -430,7 +438,7 @@
         font-size: 0.7rem;
         font-weight: 600;
         color: var(--ju-gold-dark);
-        background: var(--ju-gold-soft);
+        background: rgba(196,167,71,0.1);
         padding: 4px 12px;
         border-radius: var(--radius-full);
         border: 1px solid rgba(196,167,71,0.3);
@@ -459,7 +467,7 @@
         left: 0;
         width: 100%;
         height: 4px;
-        background: linear-gradient(90deg, var(--ju-blue), var(--ju-gold), var(--ju-blue));
+        background: linear-gradient(90deg, #002789, var(--ju-gold), #002789);
         border-radius: var(--radius-xl) var(--radius-xl) 0 0;
     }
 
@@ -534,12 +542,12 @@
 
     .premium-input:focus {
         outline: none;
-        border-color: var(--ju-blue);
-        box-shadow: 0 0 0 4px rgba(10,44,110,0.1);
+        border-color: #002789;
+        box-shadow: 0 0 0 4px rgba(0,39,137,0.1);
     }
 
     .premium-input:focus + .premium-input-icon {
-        color: var(--ju-blue);
+        color: #002789;
         transform: translateY(-50%) scale(1.1);
     }
 
@@ -554,7 +562,7 @@
         transition: var(--transition);
         height: 52px;
         appearance: none;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%230a2c6e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23002789' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
         background-repeat: no-repeat;
         background-position: right 16px center;
         background-size: 16px;
@@ -562,8 +570,8 @@
 
     .premium-select:focus {
         outline: none;
-        border-color: var(--ju-blue);
-        box-shadow: 0 0 0 4px rgba(10,44,110,0.1);
+        border-color: #002789;
+        box-shadow: 0 0 0 4px rgba(0,39,137,0.1);
     }
 
     .premium-filter-actions {
@@ -590,16 +598,16 @@
     }
 
     .premium-filter-apply {
-        background: var(--ju-blue-gradient);
+        background: linear-gradient(145deg, #002789, #001a5c);
         color: white;
-        box-shadow: 0 8px 16px rgba(10,44,110,0.2);
+        box-shadow: 0 8px 16px rgba(0,39,137,0.2);
         flex: 1;
     }
 
     .premium-filter-apply:hover {
-        background: var(--ju-blue-dark);
+        background: #001a5c;
         transform: translateY(-2px);
-        box-shadow: 0 12px 24px rgba(10,44,110,0.3);
+        box-shadow: 0 12px 24px rgba(0,39,137,0.3);
     }
 
     .premium-filter-reset {
@@ -611,8 +619,8 @@
     }
 
     .premium-filter-reset:hover {
-        border-color: var(--ju-blue);
-        color: var(--ju-blue);
+        border-color: #002789;
+        color: #002789;
         transform: rotate(180deg);
     }
 
@@ -632,10 +640,10 @@
         align-items: center;
         gap: 8px;
         padding: 8px 16px;
-        background: var(--ju-blue-soft);
+        background: rgba(0,39,137,0.08);
         border-radius: var(--radius-full);
         font-size: 0.85rem;
-        color: var(--ju-blue);
+        color: #002789;
         font-weight: 600;
     }
 
@@ -672,7 +680,7 @@
 
     /* ============================================
            PREMIUM EVENTS GRID - 3 Cards Per Row
-           DARK BLUE THEME - PERFECT FIT
+           ROYAL BLUE THEME - PERFECT FIT
         ============================================ */
     .premium-events-section {
         margin-bottom: 50px;
@@ -684,7 +692,7 @@
         align-items: center;
         margin-bottom: 24px;
         padding-bottom: 16px;
-        border-bottom: 2px solid rgba(10,44,110,0.1);
+        border-bottom: 2px solid rgba(0,39,137,0.1);
         flex-wrap: wrap;
         gap: 16px;
     }
@@ -698,20 +706,20 @@
     .premium-header-icon {
         width: 56px;
         height: 56px;
-        background: rgba(10,44,110,0.08);
+        background: rgba(0,39,137,0.08);
         border-radius: var(--radius);
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 1.5rem;
-        color: var(--ju-blue);
-        border: 1px solid rgba(10,44,110,0.15);
+        color: #002789;
+        border: 1px solid rgba(0,39,137,0.15);
     }
 
     .premium-header-title {
         font-size: 1.8rem;
         font-weight: 800;
-        color: var(--ju-blue);
+        color: #002789;
         margin: 0;
         letter-spacing: -1px;
     }
@@ -723,7 +731,7 @@
     }
 
     .premium-header-subtitle strong {
-        color: var(--ju-blue);
+        color: #002789;
     }
 
     .premium-header-subtitle span {
@@ -736,8 +744,8 @@
         gap: 10px;
         padding: 12px 28px;
         background: transparent;
-        color: var(--ju-blue);
-        border: 2px solid var(--ju-blue);
+        color: #002789;
+        border: 2px solid #002789;
         border-radius: var(--radius-full);
         font-weight: 700;
         font-size: 0.95rem;
@@ -746,10 +754,10 @@
     }
 
     .premium-my-events-btn:hover {
-        background: var(--ju-blue);
+        background: #002789;
         color: white;
         transform: translateY(-2px);
-        box-shadow: 0 8px 16px rgba(10,44,110,0.2);
+        box-shadow: 0 8px 16px rgba(0,39,137,0.2);
     }
 
     .premium-my-events-btn i {
@@ -798,7 +806,7 @@
     .premium-event-card:hover {
         transform: translateY(-6px);
         box-shadow: var(--shadow);
-        border-color: var(--ju-blue);
+        border-color: #002789;
     }
 
     /* CARD HEADER - FIXED HEIGHT */
@@ -824,7 +832,7 @@
     .premium-image-fallback {
         width: 100%;
         height: 100%;
-        background: linear-gradient(145deg, var(--ju-blue), var(--ju-blue-dark));
+        background: linear-gradient(145deg, #002789, #001a5c);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -870,17 +878,17 @@
     }
 
     .premium-badge-featured {
-        background: var(--ju-gold-gradient);
+        background: linear-gradient(145deg, #C4A747, #a5862e);
         color: white;
     }
 
     .premium-badge-registered {
-        background: linear-gradient(145deg, #10b981, #059669);
+        background: linear-gradient(145deg, #28a745, #1e7e34);
         color: white;
     }
 
     .premium-badge-full {
-        background: linear-gradient(145deg, #dc2626, #b91c1c);
+        background: linear-gradient(145deg, #dc3545, #bd2130);
         color: white;
     }
 
@@ -894,7 +902,7 @@
         border-radius: var(--radius-full);
         font-size: 0.75rem;
         font-weight: 700;
-        color: var(--ju-blue);
+        color: #002789;
         border: 1px solid rgba(255,255,255,0.8);
         box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         display: inline-flex;
@@ -936,7 +944,7 @@
     }
 
     .premium-event-title a:hover {
-        color: var(--ju-blue);
+        color: #002789;
     }
 
     .premium-event-description {
@@ -979,7 +987,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        color: var(--ju-blue);
+        color: #002789;
         font-size: 0.9rem;
         border: 1px solid var(--ju-gray-200);
         flex-shrink: 0;
@@ -987,9 +995,9 @@
     }
 
     .premium-event-card:hover .premium-meta-icon {
-        background: var(--ju-blue);
+        background: #002789;
         color: white;
-        border-color: var(--ju-blue);
+        border-color: #002789;
         transform: scale(1.1);
     }
 
@@ -1066,15 +1074,15 @@
         position: relative;
     }
 
-    .premium-progress-bar.success { background: linear-gradient(90deg, #10b981, #34d399); }
-    .premium-progress-bar.warning { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
-    .premium-progress-bar.danger { background: linear-gradient(90deg, #dc2626, #f87171); }
+    .premium-progress-bar.success { background: linear-gradient(90deg, #28a745, #34ce57); }
+    .premium-progress-bar.warning { background: linear-gradient(90deg, #ffc107, #ffdb6e); }
+    .premium-progress-bar.danger { background: linear-gradient(90deg, #dc3545, #e4606d); }
 
     .premium-progress-tooltip {
         position: absolute;
         right: 0;
         top: -25px;
-        background: var(--ju-blue);
+        background: #002789;
         color: white;
         padding: 2px 8px;
         border-radius: 4px;
@@ -1111,12 +1119,12 @@
     .premium-attendance-icon {
         width: 44px;
         height: 44px;
-        background: rgba(10,44,110,0.08);
+        background: rgba(0,39,137,0.08);
         border-radius: var(--radius-full);
         display: flex;
         align-items: center;
         justify-content: center;
-        color: var(--ju-blue);
+        color: #002789;
         font-size: 1rem;
         border: 2px solid white;
         box-shadow: 0 4px 10px rgba(0,0,0,0.05);
@@ -1126,7 +1134,7 @@
 
     .premium-event-card:hover .premium-attendance-icon {
         background: var(--ju-gold);
-        color: var(--ju-blue-dark);
+        color: #001a5c;
         transform: rotate(360deg);
     }
 
@@ -1138,7 +1146,7 @@
     .premium-attendance-count {
         font-size: 1.1rem;
         font-weight: 800;
-        color: var(--ju-blue);
+        color: #002789;
         line-height: 1;
     }
 
@@ -1177,50 +1185,51 @@
     }
 
     .premium-btn-primary {
-        background: var(--ju-blue-gradient);
+        background: linear-gradient(145deg, #002789, #001a5c);
         color: white;
-        box-shadow: 0 8px 16px rgba(10,44,110,0.2);
+        box-shadow: 0 8px 16px rgba(0,39,137,0.2);
     }
 
     .premium-btn-primary:hover {
-        background: var(--ju-blue-dark);
+        background: #001a5c;
         transform: translateY(-2px);
-        box-shadow: 0 12px 24px rgba(10,44,110,0.3);
+        box-shadow: 0 12px 24px rgba(0,39,137,0.3);
     }
 
     .premium-btn-success {
-        background: linear-gradient(145deg, #10b981, #059669);
+        background: linear-gradient(145deg, #28a745, #1e7e34);
         color: white;
-        box-shadow: 0 8px 16px rgba(16,185,129,0.2);
+        box-shadow: 0 8px 16px rgba(40,167,69,0.2);
     }
 
     .premium-btn-success:hover {
-        background: #059669;
+        background: #1e7e34;
         transform: translateY(-2px);
-        box-shadow: 0 12px 24px rgba(16,185,129,0.3);
+        box-shadow: 0 12px 24px rgba(40,167,69,0.3);
     }
 
     .premium-btn-warning {
-        background: linear-gradient(145deg, #f59e0b, #d97706);
-        color: white;
-        box-shadow: 0 8px 16px rgba(245,158,11,0.2);
+        background: linear-gradient(145deg, #ffc107, #d39e00);
+        color: #001a5c;
+        box-shadow: 0 8px 16px rgba(255,193,7,0.2);
     }
 
     .premium-btn-warning:hover {
-        background: #d97706;
+        background: #d39e00;
         transform: translateY(-2px);
-        box-shadow: 0 12px 24px rgba(245,158,11,0.3);
+        box-shadow: 0 12px 24px rgba(255,193,7,0.3);
+        color: #001a5c;
     }
 
     .premium-btn-outline {
         background: transparent;
-        color: var(--ju-blue);
-        border: 2px solid var(--ju-blue);
+        color: #002789;
+        border: 2px solid #002789;
         box-shadow: none;
     }
 
     .premium-btn-outline:hover {
-        background: var(--ju-blue);
+        background: #002789;
         color: white;
         transform: translateY(-2px);
     }
@@ -1235,14 +1244,14 @@
     }
 
     .premium-btn-icon:hover {
-        background: var(--ju-blue);
+        background: #002789;
         color: white;
-        border-color: var(--ju-blue);
+        border-color: #002789;
         transform: translateY(-2px) rotate(360deg);
     }
 
     /* ============================================
-           PREMIUM EMPTY STATE - Dark Blue
+           PREMIUM EMPTY STATE - Royal Blue
         ============================================ */
     .premium-empty-state {
         grid-column: 1 / -1;
@@ -1250,7 +1259,7 @@
         padding: 80px 40px;
         background: white;
         border-radius: var(--radius-xl);
-        border: 2px dashed rgba(10,44,110,0.2);
+        border: 2px dashed rgba(0,39,137,0.2);
         box-shadow: var(--shadow-sm);
     }
 
@@ -1266,7 +1275,7 @@
         width: 100%;
         height: 100%;
         border-radius: 50%;
-        background: rgba(10,44,110,0.08);
+        background: rgba(0,39,137,0.08);
         animation: pulseCircle 2s infinite;
     }
 
@@ -1276,7 +1285,7 @@
         left: 50%;
         transform: translate(-50%, -50%);
         font-size: 3rem;
-        color: var(--ju-blue);
+        color: #002789;
         z-index: 10;
     }
 
@@ -1288,7 +1297,7 @@
     .premium-empty-title {
         font-size: 1.8rem;
         font-weight: 800;
-        color: var(--ju-blue);
+        color: #002789;
         margin-bottom: 16px;
     }
 
@@ -1304,23 +1313,23 @@
         align-items: center;
         gap: 12px;
         padding: 14px 32px;
-        background: var(--ju-blue-gradient);
+        background: linear-gradient(145deg, #002789, #001a5c);
         color: white;
         border-radius: var(--radius-full);
         font-weight: 700;
         text-decoration: none;
         transition: var(--transition-bounce);
-        box-shadow: 0 8px 20px rgba(10,44,110,0.25);
+        box-shadow: 0 8px 20px rgba(0,39,137,0.25);
     }
 
     .premium-empty-btn:hover {
-        background: var(--ju-blue-dark);
+        background: #001a5c;
         transform: translateY(-3px);
-        box-shadow: 0 12px 28px rgba(10,44,110,0.35);
+        box-shadow: 0 12px 28px rgba(0,39,137,0.35);
     }
 
     /* ============================================
-           PREMIUM PAGINATION - Dark Blue
+           PREMIUM PAGINATION - Royal Blue
         ============================================ */
     .premium-pagination-wrapper {
         margin-top: 40px;
@@ -1346,21 +1355,21 @@
     }
 
     .premium-pagination .page-item.active .page-link {
-        background: var(--ju-blue);
+        background: #002789;
         color: white;
-        border-color: var(--ju-blue);
-        box-shadow: 0 8px 16px rgba(10,44,110,0.2);
+        border-color: #002789;
+        box-shadow: 0 8px 16px rgba(0,39,137,0.2);
     }
 
     .premium-pagination .page-link:hover:not(.active) {
-        background: rgba(10,44,110,0.08);
-        border-color: var(--ju-blue);
-        color: var(--ju-blue);
+        background: rgba(0,39,137,0.08);
+        border-color: #002789;
+        color: #002789;
         transform: translateY(-2px);
     }
 
     /* ============================================
-           PREMIUM HOW IT WORKS - Dark Blue
+           PREMIUM HOW IT WORKS - Royal Blue
         ============================================ */
     .premium-how-it-works {
         margin-top: 60px;
@@ -1398,7 +1407,7 @@
     .premium-step-card:hover {
         transform: translateY(-8px);
         box-shadow: var(--shadow);
-        border-color: var(--ju-blue-soft);
+        border-color: rgba(0,39,137,0.2);
     }
 
     .premium-step-number {
@@ -1412,14 +1421,14 @@
     }
 
     .premium-step-card:hover .premium-step-number {
-        color: var(--ju-gold-soft);
+        color: rgba(196,167,71,0.2);
         transform: scale(1.2);
     }
 
     .premium-step-icon {
         width: 80px;
         height: 80px;
-        background: linear-gradient(145deg, var(--ju-blue), var(--ju-blue-light));
+        background: linear-gradient(145deg, #002789, #1a3a9a);
         border-radius: 50%;
         display: flex;
         align-items: center;
@@ -1427,7 +1436,7 @@
         margin: 0 auto 20px;
         color: white;
         font-size: 2rem;
-        box-shadow: 0 10px 20px rgba(10,44,110,0.2);
+        box-shadow: 0 10px 20px rgba(0,39,137,0.2);
         transition: var(--transition-bounce);
     }
 
@@ -1439,7 +1448,7 @@
     .premium-step-title {
         font-size: 1.2rem;
         font-weight: 700;
-        color: var(--ju-blue);
+        color: #002789;
         margin-bottom: 12px;
     }
 
@@ -1467,13 +1476,13 @@
         left: 0;
         width: 100%;
         height: 4px;
-        background: linear-gradient(90deg, var(--ju-blue), var(--ju-gold));
+        background: linear-gradient(90deg, #002789, var(--ju-gold));
     }
 
     .premium-cta-title {
         font-size: 1.6rem;
         font-weight: 800;
-        color: var(--ju-blue);
+        color: #002789;
         margin-bottom: 8px;
     }
 
@@ -1502,25 +1511,25 @@
     }
 
     .premium-cta-btn-primary {
-        background: var(--ju-blue-gradient);
+        background: linear-gradient(145deg, #002789, #001a5c);
         color: white;
-        box-shadow: 0 10px 25px rgba(10,44,110,0.2);
+        box-shadow: 0 10px 25px rgba(0,39,137,0.2);
     }
 
     .premium-cta-btn-primary:hover {
-        background: var(--ju-blue-dark);
+        background: #001a5c;
         transform: translateY(-3px);
-        box-shadow: 0 15px 35px rgba(10,44,110,0.3);
+        box-shadow: 0 15px 35px rgba(0,39,137,0.3);
     }
 
     .premium-cta-btn-outline {
         background: transparent;
-        color: var(--ju-blue);
-        border: 2px solid var(--ju-blue);
+        color: #002789;
+        border: 2px solid #002789;
     }
 
     .premium-cta-btn-outline:hover {
-        background: var(--ju-blue);
+        background: #002789;
         color: white;
         transform: translateY(-3px);
     }
@@ -1578,11 +1587,36 @@
     .hover-scale:hover {
         transform: scale(1.05);
     }
+
+    /* ============================================
+           ROYAL BLUE UTILITY CLASSES
+        ============================================ */
+    .bg-ju-blue {
+        background-color: #002789 !important;
+    }
+    .bg-ju-blue-dark {
+        background-color: #001a5c !important;
+    }
+    .bg-ju-gold {
+        background-color: #C4A747 !important;
+    }
+    .text-ju-blue {
+        color: #002789 !important;
+    }
+    .text-ju-gold {
+        color: #C4A747 !important;
+    }
+    .border-ju-blue {
+        border-color: #002789 !important;
+    }
+    .border-ju-gold {
+        border-color: #C4A747 !important;
+    }
 </style>
 
 <div class="container-fluid px-lg-5">
     <!-- ============================================
-           PREMIUM HERO SECTION - Dark Blue Excellence
+           PREMIUM HERO SECTION - Royal Blue Excellence
         ============================================ -->
     <div class="row mb-5">
         <div class="col-12">
@@ -1623,7 +1657,7 @@
     </div>
 
     <!-- ============================================
-           PREMIUM STATISTICS SECTION - Dark Blue Theme
+           PREMIUM STATISTICS SECTION - Royal Blue Theme
         ============================================ -->
     @auth
     <div class="premium-stats-section" data-aos="fade-up" data-aos-duration="800">
@@ -1789,7 +1823,7 @@
 
     <!-- ============================================
            PREMIUM EVENTS GRID - 3 Cards Per Row
-           DARK BLUE THEME - PERFECT FIT
+           ROYAL BLUE THEME - PERFECT FIT
         ============================================ -->
     <div class="premium-events-section">
         <div class="premium-events-header">
@@ -2027,7 +2061,7 @@
     </div>
 
     <!-- ============================================
-           PREMIUM HOW IT WORKS - Dark Blue Theme
+           PREMIUM HOW IT WORKS - Royal Blue Theme
         ============================================ -->
     @guest
     <div class="premium-how-it-works" data-aos="fade-up" data-aos-duration="800">
@@ -2160,12 +2194,3 @@
 <!-- Add AOS CSS -->
 <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 @endsection
-
-@push('styles')
-<style>
-    /* Override any remaining green theme styles */
-    .ju-hero-card, .ju-stat-card, .ju-event-card, .ju-step-card {
-        display: none;
-    }
-</style>
-@endpush

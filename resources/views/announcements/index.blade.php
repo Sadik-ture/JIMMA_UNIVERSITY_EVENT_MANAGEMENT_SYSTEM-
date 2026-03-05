@@ -14,62 +14,66 @@
 <style>
     /* ============================================
            PREMIUM JIMMA UNIVERSITY ANNOUNCEMENTS
-           DARK BLUE & GOLD Color Scheme - OFFICIAL
+           ROYAL BLUE (#002789) & GOLD (#C4A747) - OFFICIAL
            VIBRANT COLORFUL STAT CARDS
            3 CARDS PER ROW - HORIZONTAL GRID
         ============================================ */
     
     :root {
-        /* DARK BLUE - Official Jimma University Primary Color */
-        --ju-blue: #0a2c6e;
-        --ju-blue-dark: #041c47;
+        /* ROYAL BLUE - Official Jimma University Primary Color - MATCHING LAYOUT */
+        --ju-blue: #002789;
+        --ju-blue-dark: #001a5c;
         --ju-blue-darker: #021230;
-        --ju-blue-light: #1e4a8a;
+        --ju-blue-light: #1a3a9a;
         --ju-blue-lighter: #3a6ab0;
-        --ju-blue-soft: rgba(10, 44, 110, 0.08);
-        --ju-blue-glow: rgba(10, 44, 110, 0.2);
-        --ju-blue-gradient: linear-gradient(145deg, #0a2c6e, #041c47);
+        --ju-blue-soft: #e6ebf7;
+        --ju-blue-muted: #d4e0f0;
+        --ju-blue-glow: rgba(0, 39, 137, 0.2);
+        --ju-blue-gradient: linear-gradient(145deg, #002789, #001a5c);
+        --ju-blue-gradient-light: linear-gradient(145deg, #002789, #1a3a9a);
         
-        /* Ethiopian Gold Accents - Official */
-        --ju-gold: #c4a747;
+        /* Ethiopian Gold Accents - Official - MATCHING LAYOUT */
+        --ju-gold: #C4A747;
         --ju-gold-dark: #a5862e;
-        --ju-gold-light: #d8be6e;
+        --ju-gold-light: #e5d6a6;
         --ju-gold-soft: rgba(196, 167, 71, 0.12);
-        --ju-gold-gradient: linear-gradient(145deg, #c4a747, #a5862e);
+        --ju-gold-glow: rgba(196, 167, 71, 0.25);
+        --ju-gold-gradient: linear-gradient(145deg, #C4A747, #a5862e);
         
         /* VIBRANT COLORS for Stat Cards - BOLD & COLORFUL */
-        --ju-total: #4361ee;        /* Vibrant Blue */
-        --ju-total-dark: #3a56d4;
-        --ju-published: #10b981;     /* Vibrant Green */
-        --ju-published-dark: #059669;
-        --ju-active: #8b5cf6;        /* Vibrant Purple */
-        --ju-active-dark: #7c3aed;
-        --ju-views: #f59e0b;         /* Vibrant Orange/Gold */
-        --ju-views-dark: #d97706;
+        --ju-total: #002789;        /* Royal Blue */
+        --ju-total-dark: #001a5c;
+        --ju-published: #28a745;     /* Vibrant Green */
+        --ju-published-dark: #1e7e34;
+        --ju-active: #C4A747;        /* Gold */
+        --ju-active-dark: #a5862e;
+        --ju-views: #dc3545;          /* Vibrant Red */
+        --ju-views-dark: #bd2130;
         
         /* Announcement Type Colors */
-        --ju-event: #3498db;
-        --ju-campus: #2ecc71;
-        --ju-general: #9b59b6;
-        --ju-urgent: #e74c3c;
-        --ju-urgent-soft: rgba(231, 76, 60, 0.12);
+        --ju-event: #002789;          /* Royal Blue */
+        --ju-campus: #28a745;         /* Green */
+        --ju-general: #C4A747;        /* Gold */
+        --ju-urgent: #dc3545;          /* Red */
+        --ju-urgent-soft: rgba(220, 53, 69, 0.12);
         
         /* Semantic Colors */
-        --ju-success: #10b981;
-        --ju-success-dark: #059669;
-        --ju-success-soft: rgba(16, 185, 129, 0.12);
-        --ju-warning: #f59e0b;
-        --ju-warning-dark: #d97706;
-        --ju-warning-soft: rgba(245, 158, 11, 0.12);
-        --ju-danger: #dc2626;
-        --ju-danger-dark: #b91c1c;
-        --ju-danger-soft: rgba(220, 38, 38, 0.12);
-        --ju-info: #0a2c6e;
-        --ju-info-soft: rgba(10, 44, 110, 0.08);
+        --ju-success: #28a745;
+        --ju-success-dark: #1e7e34;
+        --ju-success-soft: rgba(40, 167, 69, 0.12);
+        --ju-warning: #ffc107;
+        --ju-warning-dark: #d39e00;
+        --ju-warning-soft: rgba(255, 193, 7, 0.12);
+        --ju-danger: #dc3545;
+        --ju-danger-dark: #bd2130;
+        --ju-danger-soft: rgba(220, 53, 69, 0.12);
+        --ju-info: #002789;
+        --ju-info-soft: rgba(0, 39, 137, 0.08);
         
-        /* Neutral Colors */
+        /* Neutral Colors - Matching Layout */
         --ju-white: #ffffff;
-        --ju-offwhite: #f8fafc;
+        --ju-offwhite: #f9f9f9;
+        --ju-gray: #f0f0f0;
         --ju-gray-50: #f9fbfd;
         --ju-gray-100: #f1f5f9;
         --ju-gray-200: #e9edf2;
@@ -81,25 +85,31 @@
         --ju-gray-800: #334155;
         --ju-gray-900: #1e293b;
         
-        /* Shadows */
-        --shadow-sm: 0 4px 12px rgba(0,0,0,0.05);
-        --shadow: 0 8px 20px rgba(0,0,0,0.08);
-        --shadow-lg: 0 16px 32px rgba(0,0,0,0.12);
+        /* Shadows - Royal Blue Tinted */
+        --shadow-xs: 0 2px 4px rgba(0,39,137,0.02);
+        --shadow-sm: 0 4px 6px rgba(0,39,137,0.04);
+        --shadow: 0 6px 12px rgba(0,39,137,0.06);
+        --shadow-md: 0 8px 24px rgba(0,39,137,0.08);
+        --shadow-lg: 0 16px 32px rgba(0,39,137,0.1);
+        --shadow-xl: 0 24px 48px rgba(0,39,137,0.12);
+        --shadow-2xl: 0 32px 64px rgba(0,39,137,0.15);
         --shadow-gold: 0 8px 20px rgba(196,167,71,0.2);
         
-        /* Border Radius */
-        --radius-sm: 8px;
-        --radius: 12px;
-        --radius-md: 16px;
-        --radius-lg: 20px;
-        --radius-xl: 24px;
-        --radius-2xl: 28px;
+        /* Border Radius - Matching Layout */
+        --radius-sm: 0.25rem;
+        --radius: 0.375rem;
+        --radius-md: 0.5rem;
+        --radius-lg: 0.75rem;
+        --radius-xl: 1rem;
+        --radius-2xl: 1.25rem;
         --radius-full: 9999px;
         
-        /* Transitions */
-        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        --transition-bounce: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-        --transition-elastic: all 0.6s cubic-bezier(0.68, -0.6, 0.32, 1.6);
+        /* Transitions - Matching Layout */
+        --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        --transition-bounce: 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        --transition-elastic: 0.6s cubic-bezier(0.68, -0.6, 0.32, 1.6);
     }
 
     /* ============================================
@@ -151,7 +161,7 @@
 
     .premium-stat-card:hover {
         transform: translateY(-8px);
-        box-shadow: var(--shadow-lg);
+        box-shadow: var(--shadow-2xl);
     }
 
     .premium-stat-card:hover::before {
@@ -160,16 +170,16 @@
 
     /* VIBRANT CARD COLORS - BOLD & BEAUTIFUL */
     .premium-stat-card.total {
-        background: linear-gradient(145deg, #4361ee, #3a56d4);
+        background: linear-gradient(145deg, #002789, #001a5c);
     }
     .premium-stat-card.published {
-        background: linear-gradient(145deg, #10b981, #059669);
+        background: linear-gradient(145deg, #28a745, #1e7e34);
     }
     .premium-stat-card.active {
-        background: linear-gradient(145deg, #8b5cf6, #7c3aed);
+        background: linear-gradient(145deg, #C4A747, #a5862e);
     }
     .premium-stat-card.views {
-        background: linear-gradient(145deg, #f59e0b, #d97706);
+        background: linear-gradient(145deg, #dc3545, #bd2130);
     }
 
     .premium-stat-icon {
@@ -244,7 +254,7 @@
         left: 0;
         width: 100%;
         height: 4px;
-        background: linear-gradient(90deg, var(--ju-blue), var(--ju-gold), var(--ju-blue));
+        background: linear-gradient(90deg, #002789, var(--ju-gold), #002789);
         border-radius: var(--radius-xl) var(--radius-xl) 0 0;
     }
 
@@ -299,18 +309,18 @@
     }
 
     .premium-filter-badge:hover {
-        background: var(--ju-blue);
+        background: #002789;
         color: white;
-        border-color: var(--ju-blue);
+        border-color: #002789;
         transform: translateY(-2px);
-        box-shadow: 0 8px 16px rgba(10,44,110,0.2);
+        box-shadow: 0 8px 16px rgba(0,39,137,0.2);
     }
 
     .premium-filter-badge.active {
-        background: var(--ju-blue);
+        background: #002789;
         color: white;
-        border-color: var(--ju-blue);
-        box-shadow: 0 8px 16px rgba(10,44,110,0.2);
+        border-color: #002789;
+        box-shadow: 0 8px 16px rgba(0,39,137,0.2);
     }
 
     .premium-filter-badge.active i {
@@ -339,25 +349,25 @@
     }
 
     .premium-header-btn-sm-primary {
-        background: var(--ju-blue-gradient);
+        background: linear-gradient(145deg, #002789, #001a5c);
         color: white;
-        box-shadow: 0 8px 16px rgba(10,44,110,0.2);
+        box-shadow: 0 8px 16px rgba(0,39,137,0.2);
     }
 
     .premium-header-btn-sm-primary:hover {
-        background: var(--ju-blue-dark);
+        background: #001a5c;
         transform: translateY(-2px);
-        box-shadow: 0 12px 24px rgba(10,44,110,0.3);
+        box-shadow: 0 12px 24px rgba(0,39,137,0.3);
     }
 
     .premium-header-btn-sm-outline {
         background: transparent;
-        color: var(--ju-blue);
-        border: 2px solid var(--ju-blue);
+        color: #002789;
+        border: 2px solid #002789;
     }
 
     .premium-header-btn-sm-outline:hover {
-        background: var(--ju-blue);
+        background: #002789;
         color: white;
         transform: translateY(-2px);
     }
@@ -377,7 +387,7 @@
     .premium-header-title h3 {
         font-size: 1.5rem;
         font-weight: 800;
-        color: var(--ju-blue);
+        color: #002789;
         margin-bottom: 6px;
     }
 
@@ -394,12 +404,12 @@
         align-items: center;
         gap: 6px;
         padding: 6px 16px;
-        background: var(--ju-active-soft);
-        color: var(--ju-active-dark);
+        background: var(--ju-gold-soft);
+        color: var(--ju-gold-dark);
         border-radius: var(--radius-full);
         font-weight: 700;
         font-size: 0.8rem;
-        border: 1px solid rgba(139,92,246,0.3);
+        border: 1px solid rgba(196,167,71,0.3);
     }
 
     /* ============================================
@@ -447,18 +457,18 @@
         border-color: var(--ju-blue-soft);
     }
 
-    .premium-announcement-card.event { border-left-color: var(--ju-event); }
-    .premium-announcement-card.campus { border-left-color: var(--ju-campus); }
-    .premium-announcement-card.general { border-left-color: var(--ju-general); }
+    .premium-announcement-card.event { border-left-color: #002789; }
+    .premium-announcement-card.campus { border-left-color: #28a745; }
+    .premium-announcement-card.general { border-left-color: #C4A747; }
     .premium-announcement-card.urgent { 
-        border-left-color: var(--ju-urgent); 
+        border-left-color: #dc3545; 
         border-left-width: 6px;
         animation: premium-pulse 2s infinite;
     }
 
     @keyframes premium-pulse {
-        0%, 100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.4); }
-        50% { box-shadow: 0 0 0 8px rgba(231, 76, 60, 0.1); }
+        0%, 100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4); }
+        50% { box-shadow: 0 0 0 8px rgba(220, 53, 69, 0.1); }
     }
 
     .premium-card-header {
@@ -479,10 +489,10 @@
         transition: var(--transition-bounce);
     }
 
-    .premium-card-icon.event { background: linear-gradient(145deg, #3498db, #2980b9); }
-    .premium-card-icon.campus { background: linear-gradient(145deg, #2ecc71, #27ae60); }
-    .premium-card-icon.general { background: linear-gradient(145deg, #9b59b6, #8e44ad); }
-    .premium-card-icon.urgent { background: linear-gradient(145deg, #e74c3c, #c0392b); }
+    .premium-card-icon.event { background: linear-gradient(145deg, #002789, #001a5c); }
+    .premium-card-icon.campus { background: linear-gradient(145deg, #28a745, #1e7e34); }
+    .premium-card-icon.general { background: linear-gradient(145deg, #C4A747, #a5862e); }
+    .premium-card-icon.urgent { background: linear-gradient(145deg, #dc3545, #bd2130); }
 
     .premium-announcement-card:hover .premium-card-icon {
         transform: scale(1.1) rotate(5deg);
@@ -513,7 +523,7 @@
     }
 
     .premium-card-title a:hover {
-        color: var(--ju-blue);
+        color: #002789;
     }
 
     .premium-card-excerpt {
@@ -548,9 +558,9 @@
         border-radius: var(--radius-full);
         font-size: 0.7rem;
         font-weight: 700;
-        background: var(--ju-info-soft);
-        color: var(--ju-blue);
-        border: 1px solid rgba(10,44,110,0.3);
+        background: #e6ebf7;
+        color: #002789;
+        border: 1px solid rgba(0,39,137,0.3);
     }
 
     .premium-views-count {
@@ -586,20 +596,21 @@
     }
 
     .premium-action-btn:hover {
-        background: var(--ju-blue);
+        background: #002789;
         color: white;
-        border-color: var(--ju-blue);
+        border-color: #002789;
         transform: scale(1.1);
     }
 
     .premium-action-btn.warning:hover {
-        background: var(--ju-warning);
-        border-color: var(--ju-warning);
+        background: #ffc107;
+        border-color: #ffc107;
+        color: #001a5c;
     }
 
     .premium-action-btn.danger:hover {
-        background: var(--ju-danger);
-        border-color: var(--ju-danger);
+        background: #dc3545;
+        border-color: #dc3545;
     }
 
     .card-status-badge {
@@ -622,9 +633,9 @@
     }
 
     .premium-status-badge.draft {
-        background: var(--ju-warning-soft);
-        color: var(--ju-warning-dark);
-        border: 1px solid rgba(245,158,11,0.3);
+        background: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeaa7;
     }
 
     .premium-status-badge.expired {
@@ -670,11 +681,11 @@
         border-left-width: 6px;
     }
 
-    .premium-list-item.event { border-left-color: var(--ju-event); }
-    .premium-list-item.campus { border-left-color: var(--ju-campus); }
-    .premium-list-item.general { border-left-color: var(--ju-general); }
+    .premium-list-item.event { border-left-color: #002789; }
+    .premium-list-item.campus { border-left-color: #28a745; }
+    .premium-list-item.general { border-left-color: #C4A747; }
     .premium-list-item.urgent { 
-        border-left-color: var(--ju-urgent); 
+        border-left-color: #dc3545; 
         border-left-width: 6px;
         animation: premium-pulse 2s infinite;
     }
@@ -696,20 +707,43 @@
         flex-shrink: 0;
     }
 
-    .premium-list-icon.event { background: linear-gradient(145deg, #3498db, #2980b9); }
-    .premium-list-icon.campus { background: linear-gradient(145deg, #2ecc71, #27ae60); }
-    .premium-list-icon.general { background: linear-gradient(145deg, #9b59b6, #8e44ad); }
-    .premium-list-icon.urgent { background: linear-gradient(145deg, #e74c3c, #c0392b); }
+    .premium-list-icon.event { background: linear-gradient(145deg, #002789, #001a5c); }
+    .premium-list-icon.campus { background: linear-gradient(145deg, #28a745, #1e7e34); }
+    .premium-list-icon.general { background: linear-gradient(145deg, #C4A747, #a5862e); }
+    .premium-list-icon.urgent { background: linear-gradient(145deg, #dc3545, #bd2130); }
 
     .premium-list-content {
         flex: 1;
+    }
+
+    .premium-announcement-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 8px;
+    }
+
+    .premium-announcement-title-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
     }
 
     .premium-list-title {
         font-size: 1.2rem;
         font-weight: 700;
         color: var(--ju-gray-800);
-        margin-bottom: 8px;
+        margin: 0;
+    }
+
+    .premium-list-title a {
+        color: inherit;
+        text-decoration: none;
+    }
+
+    .premium-list-title a:hover {
+        color: #002789;
     }
 
     .premium-list-meta {
@@ -762,15 +796,15 @@
     }
 
     .premium-view-btn.active {
-        background: var(--ju-blue);
+        background: #002789;
         color: white;
-        border-color: var(--ju-blue);
+        border-color: #002789;
     }
 
     .premium-view-btn:hover:not(.active) {
-        background: var(--ju-blue-soft);
-        color: var(--ju-blue);
-        border-color: var(--ju-blue);
+        background: #e6ebf7;
+        color: #002789;
+        border-color: #002789;
     }
 
     /* ============================================
@@ -782,7 +816,7 @@
         padding: 60px 40px;
         background: linear-gradient(145deg, white, var(--ju-gray-50));
         border-radius: var(--radius-xl);
-        border: 2px dashed var(--ju-blue-soft);
+        border: 2px dashed #e6ebf7;
     }
 
     .premium-empty-icon {
@@ -797,7 +831,7 @@
         width: 100%;
         height: 100%;
         border-radius: 50%;
-        background: rgba(10,44,110,0.08);
+        background: rgba(0,39,137,0.08);
         animation: pulse-circle 2s infinite;
     }
 
@@ -807,7 +841,7 @@
         left: 50%;
         transform: translate(-50%, -50%);
         font-size: 3rem;
-        color: var(--ju-blue);
+        color: #002789;
         z-index: 10;
     }
 
@@ -819,7 +853,7 @@
     .premium-empty-title {
         font-size: 1.6rem;
         font-weight: 800;
-        color: var(--ju-blue);
+        color: #002789;
         margin-bottom: 12px;
     }
 
@@ -835,19 +869,19 @@
         align-items: center;
         gap: 12px;
         padding: 14px 32px;
-        background: var(--ju-blue-gradient);
+        background: linear-gradient(145deg, #002789, #001a5c);
         color: white;
         border-radius: var(--radius-full);
         font-weight: 700;
         text-decoration: none;
         transition: var(--transition-bounce);
-        box-shadow: 0 8px 20px rgba(10,44,110,0.25);
+        box-shadow: 0 8px 20px rgba(0,39,137,0.25);
     }
 
     .premium-empty-btn:hover {
-        background: var(--ju-blue-dark);
+        background: #001a5c;
         transform: translateY(-3px);
-        box-shadow: 0 12px 28px rgba(10,44,110,0.35);
+        box-shadow: 0 12px 28px rgba(0,39,137,0.35);
     }
 
     /* ============================================
@@ -881,16 +915,16 @@
     }
 
     .premium-pagination .page-item.active .page-link {
-        background: var(--ju-blue);
+        background: #002789;
         color: white;
-        border-color: var(--ju-blue);
-        box-shadow: 0 8px 16px rgba(10,44,110,0.2);
+        border-color: #002789;
+        box-shadow: 0 8px 16px rgba(0,39,137,0.2);
     }
 
     .premium-pagination .page-link:hover:not(.active) {
-        background: rgba(10,44,110,0.08);
-        border-color: var(--ju-blue);
-        color: var(--ju-blue);
+        background: rgba(0,39,137,0.08);
+        border-color: #002789;
+        color: #002789;
         transform: translateY(-2px);
     }
 
@@ -915,11 +949,11 @@
     }
 
     .premium-toast-success {
-        border-left-color: var(--ju-published);
+        border-left-color: #28a745;
     }
 
     .premium-toast-info {
-        border-left-color: var(--ju-blue);
+        border-left-color: #002789;
     }
 
     @keyframes slideInRight {
@@ -931,6 +965,44 @@
             transform: translateX(0);
             opacity: 1;
         }
+    }
+
+    /* ============================================
+           DROPDOWN STYLES
+        ============================================ */
+    .dropdown-menu {
+        border: 1px solid var(--ju-gray-200);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow);
+        padding: 8px;
+    }
+
+    .dropdown-item {
+        border-radius: var(--radius);
+        padding: 10px 16px;
+        font-size: 0.9rem;
+        color: var(--ju-gray-700);
+        transition: var(--transition);
+    }
+
+    .dropdown-item:hover {
+        background: #e6ebf7;
+        color: #002789;
+    }
+
+    .dropdown-item i {
+        color: var(--ju-gold);
+        margin-right: 8px;
+    }
+
+    .dropdown-toggle::after {
+        display: none;
+    }
+
+    .form-control:focus {
+        border-color: #002789;
+        box-shadow: 0 0 0 4px rgba(0,39,137,0.1);
+        outline: none;
     }
 
     /* ============================================
@@ -971,7 +1043,7 @@
         ============================================ -->
     @if(auth()->check() && auth()->user()->hasPermission('view_announcement_stats'))
     <div class="premium-stats-grid" data-aos="fade-up" data-aos-duration="800">
-        <!-- Total Announcements - VIBRANT BLUE -->
+        <!-- Total Announcements - ROYAL BLUE -->
         <div class="premium-stat-card total" data-aos="zoom-in" data-aos-delay="100">
             <div class="premium-stat-icon">
                 <i class="fas fa-bullhorn"></i>
@@ -981,7 +1053,7 @@
             <div class="premium-stat-subtext">All time</div>
         </div>
         
-        <!-- Published - VIBRANT GREEN -->
+        <!-- Published - GREEN -->
         <div class="premium-stat-card published" data-aos="zoom-in" data-aos-delay="200">
             <div class="premium-stat-icon">
                 <i class="fas fa-check-circle"></i>
@@ -991,7 +1063,7 @@
             <div class="premium-stat-subtext">{{ $stats['totalAnnouncements'] > 0 ? round(($stats['publishedAnnouncements'] / $stats['totalAnnouncements']) * 100) : 0 }}% of total</div>
         </div>
         
-        <!-- Active - VIBRANT PURPLE -->
+        <!-- Active - GOLD -->
         <div class="premium-stat-card active" data-aos="zoom-in" data-aos-delay="300">
             <div class="premium-stat-icon">
                 <i class="fas fa-clock"></i>
@@ -1001,7 +1073,7 @@
             <div class="premium-stat-subtext">Currently available</div>
         </div>
         
-        <!-- Total Views - VIBRANT GOLD/ORANGE -->
+        <!-- Total Views - RED -->
         <div class="premium-stat-card views" data-aos="zoom-in" data-aos-delay="400">
             <div class="premium-stat-icon">
                 <i class="fas fa-chart-line"></i>
@@ -1196,10 +1268,10 @@
                     <i class="fas fa-sort me-1"></i>Sort
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="{{ request()->fullUrlWithQuery(['sort' => 'newest']) }}">Newest First</a></li>
-                    <li><a class="dropdown-item" href="{{ request()->fullUrlWithQuery(['sort' => 'oldest']) }}">Oldest First</a></li>
-                    <li><a class="dropdown-item" href="{{ request()->fullUrlWithQuery(['sort' => 'views']) }}">Most Viewed</a></li>
-                    <li><a class="dropdown-item" href="{{ request()->fullUrlWithQuery(['sort' => 'urgent']) }}">Urgent First</a></li>
+                    <li><a class="dropdown-item" href="{{ request()->fullUrlWithQuery(['sort' => 'newest']) }}"><i class="fas fa-clock"></i> Newest First</a></li>
+                    <li><a class="dropdown-item" href="{{ request()->fullUrlWithQuery(['sort' => 'oldest']) }}"><i class="fas fa-history"></i> Oldest First</a></li>
+                    <li><a class="dropdown-item" href="{{ request()->fullUrlWithQuery(['sort' => 'views']) }}"><i class="fas fa-eye"></i> Most Viewed</a></li>
+                    <li><a class="dropdown-item" href="{{ request()->fullUrlWithQuery(['sort' => 'urgent']) }}"><i class="fas fa-exclamation-triangle"></i> Urgent First</a></li>
                 </ul>
             </div>
 
@@ -1226,7 +1298,12 @@
         @if($announcements->count() > 0)
         <div class="premium-announcements-grid">
             @foreach($announcements as $announcement)
-            <div class="premium-announcement-card {{ $announcement->type }}"
+            @php
+                $type = $announcement->type ?? 'general';
+                $icon = $type == 'event' ? 'fa-calendar-alt' : ($type == 'campus' ? 'fa-university' : ($type == 'urgent' ? 'fa-exclamation-triangle' : 'fa-bullhorn'));
+                $audienceLabel = $announcement->audience == 'students' ? 'Students' : ($announcement->audience == 'faculty' ? 'Faculty' : ($announcement->audience == 'staff' ? 'Staff' : 'Everyone'));
+            @endphp
+            <div class="premium-announcement-card {{ $type }}"
                  data-aos="fade-up" 
                  data-aos-delay="{{ ($loop->index % 3) * 50 }}"
                  data-aos-duration="600">
@@ -1248,20 +1325,8 @@
                 @endif
 
                 <div class="premium-card-header">
-                    <div class="premium-card-icon {{ $announcement->type }}">
-                        @switch($announcement->type)
-                        @case('event')
-                        <i class="fas fa-calendar-alt"></i>
-                        @break
-                        @case('campus')
-                        <i class="fas fa-university"></i>
-                        @break
-                        @case('urgent')
-                        <i class="fas fa-exclamation-triangle"></i>
-                        @break
-                        @default
-                        <i class="fas fa-bullhorn"></i>
-                        @endswitch
+                    <div class="premium-card-icon {{ $type }}">
+                        <i class="fas {{ $icon }}"></i>
                     </div>
                 </div>
 
@@ -1278,8 +1343,7 @@
 
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <span class="premium-audience-badge">
-                            <i class="fas fa-users"></i>
-                            {{ $announcement->getAudienceLabel() }}
+                            <i class="fas fa-users"></i> {{ $audienceLabel }}
                         </span>
                         <span class="premium-views-count">
                             <i class="fas fa-eye"></i> {{ number_format($announcement->views) }}
@@ -1291,12 +1355,12 @@
                     <div class="premium-card-footer">
                         <div>
                             <small class="text-muted">
-                                <i class="fas fa-user me-1"></i>
+                                <i class="fas fa-user me-1" style="color: var(--ju-gold);"></i>
                                 {{ $announcement->creator->name ?? 'System' }}
                             </small>
                             <br>
                             <small class="text-muted">
-                                <i class="fas fa-calendar me-1"></i>
+                                <i class="fas fa-calendar me-1" style="color: var(--ju-gold);"></i>
                                 {{ $announcement->created_at->format('M d, Y') }}
                             </small>
                         </div>
@@ -1380,17 +1444,17 @@
 <div class="modal fade" id="premiumExportModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" style="border-radius: var(--radius-xl); border: none; box-shadow: var(--shadow-lg);">
-            <div class="modal-header" style="background: linear-gradient(145deg, var(--ju-blue), var(--ju-blue-dark)); border-bottom: none; padding: 20px 24px;">
+            <div class="modal-header" style="background: linear-gradient(145deg, #002789, #001a5c); border-bottom: none; padding: 20px 24px;">
                 <h5 class="modal-title text-white">
                     <i class="fas fa-download me-2"></i>Export Announcements
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body" style="padding: 28px;">
-                <div class="alert alert-info d-flex align-items-center gap-3 mb-4" style="background: var(--ju-info-soft); border: 1px solid rgba(10,44,110,0.15); border-radius: var(--radius-lg);">
+                <div class="alert alert-info d-flex align-items-center gap-3 mb-4" style="background: #e6ebf7; border: 1px solid rgba(0,39,137,0.15); border-radius: var(--radius-lg);">
                     <i class="fas fa-info-circle fa-lg" style="color: var(--ju-gold);"></i>
                     <div>
-                        <strong style="color: var(--ju-blue);">Export feature coming soon!</strong><br>
+                        <strong style="color: #002789;">Export feature coming soon!</strong><br>
                         <span style="color: var(--ju-gray-600);">This feature is currently under development. You can view statistics from the Statistics page.</span>
                     </div>
                 </div>
@@ -1468,17 +1532,10 @@
 
     function createGridCard(announcement, index) {
         const card = document.createElement('div');
-        card.className = `premium-announcement-card ${announcement.type}`;
+        card.className = `premium-announcement-card ${announcement.type || 'general'}`;
         card.setAttribute('data-aos', 'fade-up');
         card.setAttribute('data-aos-delay', (index % 3) * 50);
         card.setAttribute('data-aos-duration', '600');
-        
-        let statusBadge = '';
-        if (!announcement.is_published) {
-            statusBadge = `<div class="card-status-badge"><span class="premium-status-badge draft"><i class="fas fa-clock"></i> Draft</span></div>`;
-        } else if (announcement.expires_at && new Date(announcement.expires_at) < new Date()) {
-            statusBadge = `<div class="card-status-badge"><span class="premium-status-badge expired"><i class="fas fa-history"></i> Expired</span></div>`;
-        }
         
         let icon = 'fa-bullhorn';
         if (announcement.type === 'event') icon = 'fa-calendar-alt';
@@ -1490,6 +1547,13 @@
         else if (announcement.audience === 'faculty') audienceLabel = 'Faculty';
         else if (announcement.audience === 'staff') audienceLabel = 'Staff';
         
+        let statusBadge = '';
+        if (!announcement.is_published) {
+            statusBadge = `<div class="card-status-badge"><span class="premium-status-badge draft"><i class="fas fa-clock"></i> Draft</span></div>`;
+        } else if (announcement.expires_at && new Date(announcement.expires_at) < new Date()) {
+            statusBadge = `<div class="card-status-badge"><span class="premium-status-badge expired"><i class="fas fa-history"></i> Expired</span></div>`;
+        }
+        
         let expirationHtml = '';
         if (announcement.expires_at) {
             expirationHtml = `<div class="premium-expiration"><i class="fas fa-clock"></i> Expires: ${new Date(announcement.expires_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>`;
@@ -1498,7 +1562,7 @@
         card.innerHTML = `
             ${statusBadge}
             <div class="premium-card-header">
-                <div class="premium-card-icon ${announcement.type}">
+                <div class="premium-card-icon ${announcement.type || 'general'}">
                     <i class="fas ${icon}"></i>
                 </div>
             </div>
@@ -1556,7 +1620,7 @@
 
     function createListItem(announcement, index) {
         const item = document.createElement('div');
-        item.className = `premium-list-item ${announcement.type}`;
+        item.className = `premium-list-item ${announcement.type || 'general'}`;
         
         let icon = 'fa-bullhorn';
         if (announcement.type === 'event') icon = 'fa-calendar-alt';
@@ -1582,7 +1646,7 @@
         
         item.innerHTML = `
             <div class="premium-list-row">
-                <div class="premium-list-icon ${announcement.type}">
+                <div class="premium-list-icon ${announcement.type || 'general'}">
                     <i class="fas ${icon}"></i>
                 </div>
                 <div class="premium-list-content">
@@ -1695,7 +1759,7 @@
         if (type === 'info') icon = 'info-circle';
         
         toast.innerHTML = `
-            <div class="premium-toast-icon" style="color: ${type === 'success' ? 'var(--ju-published)' : 'var(--ju-blue)'}">
+            <div class="premium-toast-icon" style="color: ${type === 'success' ? '#28a745' : '#002789'}">
                 <i class="fas fa-${icon}"></i>
             </div>
             <div class="premium-toast-content">
@@ -1764,8 +1828,8 @@
     }
 
     .dropdown-item:hover {
-        background: var(--ju-blue-soft);
-        color: var(--ju-blue);
+        background: #e6ebf7;
+        color: #002789;
     }
 
     .dropdown-item i {
@@ -1778,8 +1842,8 @@
     }
 
     .form-control:focus {
-        border-color: var(--ju-blue);
-        box-shadow: 0 0 0 4px rgba(10,44,110,0.1);
+        border-color: #002789;
+        box-shadow: 0 0 0 4px rgba(0,39,137,0.1);
         outline: none;
     }
 </style>

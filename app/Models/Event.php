@@ -10,16 +10,19 @@ use Illuminate\Support\Str;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class Event extends Model
 {
     use HasFactory, SoftDeletes;
 
+    const STATUS_CANCELLED = 'cancelled';
+
     protected $fillable = [
         'title',
         'slug',
         'description',
-        'short_description',
+       // 'short_description',
         'start_date',
         'end_date',
         'campus_id',
@@ -41,6 +44,10 @@ class Event extends Model
         'registered_attendees',
         'is_featured',
         'is_public',
+        'is_cancelled',
+        'cancellation_reason',
+        'cancelled_at',
+        'cancelled_by',
         'requires_registration',
         'registration_link',
         'tags',
@@ -48,6 +55,7 @@ class Event extends Model
         'status',
         'additional_venue_info',
         'views_count',
+        'gallery_images',
     ];
 
     protected $casts = [
@@ -55,8 +63,11 @@ class Event extends Model
         'end_date' => 'datetime',
         'is_featured' => 'boolean',
         'is_public' => 'boolean',
+        'is_cancelled' => 'boolean',
+        'cancelled_at' => 'datetime',
         'requires_registration' => 'boolean',
         'tags' => 'array',
+        'gallery_images' => 'array',
         'additional_venue_info' => 'array',
         'max_attendees' => 'integer',
         'registered_attendees' => 'integer',
@@ -75,13 +86,16 @@ class Event extends Model
         'available_seats',
         'attendance_percentage',
         'remaining_seats',
-        'status',
+        'status_display',
+        'cancellation_status',
         'venue_name',
         'building_name',
         'campus_name',
         'speakers_list',
         'speakers_count',
         'has_speakers',
+        'event_type_icon',
+        'event_type_color',
     ];
 
     /**
@@ -103,15 +117,21 @@ class Event extends Model
         });
 
         static::deleting(function ($event) {
-            // Delete image when event is deleted
             if ($event->image) {
                 Storage::disk('public')->delete($event->image);
+            }
+        });
+
+        static::retrieved(function ($event) {
+            // Log image path for debugging (remove in production)
+            if ($event->image) {
+                Log::info('Event ' . $event->id . ' image path: ' . $event->image);
             }
         });
     }
 
     /**
-     * Get the speakers for this event.
+     * Relationships
      */
     public function speakers()
     {
@@ -123,9 +143,6 @@ class Event extends Model
                     ->orderBy('order');
     }
 
-    /**
-     * Get keynote speakers.
-     */
     public function keynoteSpeakers()
     {
         return $this->belongsToMany(Speaker::class, 'event_speaker')
@@ -135,9 +152,6 @@ class Event extends Model
                     ->orderBy('order');
     }
 
-    /**
-     * Get moderators.
-     */
     public function moderators()
     {
         return $this->belongsToMany(Speaker::class, 'event_speaker')
@@ -147,9 +161,6 @@ class Event extends Model
                     ->orderBy('order');
     }
 
-    /**
-     * Get panelists.
-     */
     public function panelists()
     {
         return $this->belongsToMany(Speaker::class, 'event_speaker')
@@ -159,98 +170,207 @@ class Event extends Model
                     ->orderBy('order');
     }
 
-    /**
-     * Get speakers list attribute.
-     */
-    public function getSpeakersListAttribute()
-    {
-        if ($this->speakers->isNotEmpty()) {
-            return $this->speakers;
-        }
-        
-        // Fallback to legacy speaker data
-        $speakers = [];
-        if (!empty($this->speaker_names)) {
-            foreach ($this->speaker_names as $index => $name) {
-                $speakers[] = (object)[
-                    'name' => $name,
-                    'title' => $this->speaker_titles[$index] ?? null,
-                    'bio' => $this->speaker_bios[$index] ?? null,
-                    'photo' => $this->speaker_photos[$index] ?? null,
-                    'organization' => $this->speaker_organizations[$index] ?? null,
-                ];
-            }
-        }
-        
-        return collect($speakers);
-    }
-
-    /**
-     * Get speakers count attribute.
-     */
-    public function getSpeakersCountAttribute()
-    {
-        return $this->speakers()->count();
-    }
-
-    /**
-     * Get has speakers attribute.
-     */
-    public function getHasSpeakersAttribute()
-    {
-        return $this->speakers_count > 0;
-    }
-
-    /**
-     * Get the campus that owns the event.
-     */
     public function campusRelation()
     {
         return $this->belongsTo(Campus::class, 'campus_id');
     }
 
-    /**
-     * Get the building that owns the event.
-     */
     public function buildingRelation()
     {
         return $this->belongsTo(Building::class, 'building_id');
     }
 
-    /**
-     * Get the venue that owns the event.
-     */
     public function venueRelation()
     {
         return $this->belongsTo(Venue::class, 'venue_id');
     }
 
-    /**
-     * Get event registrations.
-     */
     public function registrations()
     {
         return $this->hasMany(EventRegistration::class);
     }
 
-    /**
-     * Get confirmed registrations.
-     */
     public function confirmedRegistrations()
     {
         return $this->hasMany(EventRegistration::class)->where('status', 'confirmed');
     }
 
-    /**
-     * Get waitlists.
-     */
     public function waitlists()
     {
         return $this->hasMany(Waitlist::class);
     }
 
+    public function cancelledBy()
+    {
+        return $this->belongsTo(User::class, 'cancelled_by');
+    }
+
     /**
-     * Check if a user is registered for this event.
+     * Cancellation Methods
+     */
+    public function cancel($reason = null)
+    {
+        $this->is_cancelled = true;
+        $this->cancellation_reason = $reason;
+        $this->cancelled_at = now();
+        $this->cancelled_by = auth()->id();
+        $this->save();
+        
+        // Create cancellation announcement automatically
+        $this->createCancellationAnnouncement($reason);
+        
+        return $this;
+    }
+
+    public function uncancel()
+    {
+        $this->is_cancelled = false;
+        $this->cancellation_reason = null;
+        $this->cancelled_at = null;
+        $this->cancelled_by = null;
+        $this->save();
+        
+        return $this;
+    }
+
+    public function isCancelled()
+    {
+        return $this->is_cancelled;
+    }
+
+    protected function createCancellationAnnouncement($reason)
+    {
+        $title = "CANCELLED: {$this->title}";
+        $content = "<div class='cancellation-notice'>";
+        $content .= "<h2><i class='fas fa-exclamation-triangle text-danger'></i> Event Cancelled</h2>";
+        $content .= "<p>We regret to inform you that the following event has been cancelled:</p>";
+        $content .= "<h3>{$this->title}</h3>";
+        $content .= "<p><strong>Originally scheduled for:</strong> {$this->start_date->format('l, F j, Y \a\t g:i A')}</p>";
+        $content .= "<p><strong>Location:</strong> {$this->venue_name}, {$this->campus_name}</p>";
+        
+        if ($reason) {
+            $content .= "<div class='alert alert-warning'><strong>Reason for cancellation:</strong><br>{$reason}</div>";
+        }
+        
+        $content .= "<p>We apologize for any inconvenience this may cause. Please contact the organizer for more information.</p>";
+        $content .= "<p><strong>Organizer:</strong> {$this->organizer}</p>";
+        
+        if ($this->contact_email) {
+            $content .= "<p><strong>Contact:</strong> <a href='mailto:{$this->contact_email}'>{$this->contact_email}</a></p>";
+        }
+        
+        $content .= "</div>";
+        
+        $announcement = new Announcement();
+        $announcement->title = $title;
+        $announcement->content = $content;
+        $announcement->type = 'urgent';
+        $announcement->audience = 'all';
+        $announcement->created_by = auth()->id();
+        $announcement->is_published = true;
+        $announcement->published_at = now();
+        $announcement->save();
+        
+        $this->notifyAttendeesOfCancellation($announcement, $reason);
+        
+        return $announcement;
+    }
+
+    protected function notifyAttendeesOfCancellation($announcement, $reason)
+    {
+        $registeredUsers = $this->registrations()
+            ->whereIn('status', ['confirmed', 'pending'])
+            ->with('user')
+            ->get()
+            ->pluck('user');
+        
+        if ($registeredUsers->isEmpty()) {
+            return;
+        }
+        
+        foreach ($registeredUsers as $user) {
+            $notification = new Notification();
+            $notification->title = "⚠️ EVENT CANCELLED: {$this->title}";
+            $notification->message = "The event you registered for has been cancelled." . ($reason ? " Reason: {$reason}" : "");
+            $notification->type = 'alert';
+            $notification->priority = 2;
+            $notification->action_url = route('announcements.show', $announcement->id);
+            $notification->action_text = 'View Cancellation Details';
+            $notification->data = [
+                'event_id' => $this->id,
+                'event_title' => $this->title,
+                'cancellation_reason' => $reason,
+                'announcement_id' => $announcement->id
+            ];
+            $notification->created_by = auth()->id();
+            $notification->save();
+            
+            $notification->users()->attach($user->id, [
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+        }
+    }
+
+    /**
+     * Scope Queries
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('is_cancelled', false)
+                    ->where('is_published', true)
+                    ->where(function($q) {
+                        $q->whereNull('expires_at')
+                          ->orWhere('expires_at', '>', now());
+                    });
+    }
+
+    public function scopeUpcoming($query)
+    {
+        return $query->where('is_cancelled', false)
+                    ->where('start_date', '>', now());
+    }
+
+    public function scopeOngoing($query)
+    {
+        return $query->where('is_cancelled', false)
+                    ->where('start_date', '<=', now())
+                    ->where('end_date', '>=', now());
+    }
+
+    public function scopePast($query)
+    {
+        return $query->where('is_cancelled', false)
+                    ->where('end_date', '<', now());
+    }
+
+    public function scopeNotCancelled($query)
+    {
+        return $query->where('is_cancelled', false);
+    }
+
+    public function scopeCancelled($query)
+    {
+        return $query->where('is_cancelled', true);
+    }
+
+    public function scopeFeatured($query)
+    {
+        return $query->where('is_featured', true);
+    }
+
+    public function scopeSearch($query, $search)
+    {
+        return $query->where(function($q) use ($search) {
+            $q->where('title', 'like', "%{$search}%")
+              ->orWhere('description', 'like', "%{$search}%")
+              ->orWhere('short_description', 'like', "%{$search}%")
+              ->orWhere('organizer', 'like', "%{$search}%");
+        });
+    }
+
+    /**
+     * Check Methods
      */
     public function isRegisteredByUser($userId = null)
     {
@@ -266,9 +386,6 @@ class Event extends Model
             ->exists();
     }
 
-    /**
-     * Check if a user is on the waitlist for this event.
-     */
     public function isOnWaitlistByUser($userId = null)
     {
         $userId = $userId ?? Auth::id();
@@ -283,9 +400,6 @@ class Event extends Model
             ->exists();
     }
 
-    /**
-     * Get user's waitlist position.
-     */
     public function getUserWaitlistPosition($userId = null)
     {
         $userId = $userId ?? Auth::id();
@@ -302,9 +416,6 @@ class Event extends Model
         return $waitlist ? $waitlist->position : null;
     }
 
-    /**
-     * Add a user to the waitlist.
-     */
     public function addToWaitlist($userId = null)
     {
         $userId = $userId ?? Auth::id();
@@ -313,12 +424,10 @@ class Event extends Model
             return null;
         }
         
-        // Check if already on waitlist
         if ($this->isOnWaitlistByUser($userId)) {
             return null;
         }
         
-        // Get next position
         $nextPosition = $this->waitlists()->whereNull('converted_at')->max('position') ?? 0;
         $nextPosition++;
         
@@ -329,9 +438,6 @@ class Event extends Model
         ]);
     }
 
-    /**
-     * Fill seats from waitlist when spots become available.
-     */
     public function fillFromWaitlist($numberOfSpots = 1)
     {
         $movedUsers = [];
@@ -344,7 +450,6 @@ class Event extends Model
             ->get();
         
         foreach ($waitlistEntries as $waitlistEntry) {
-            // Create registration
             $registration = EventRegistration::create([
                 'event_id' => $this->id,
                 'user_id' => $waitlistEntry->user_id,
@@ -353,10 +458,8 @@ class Event extends Model
                 'confirmed_at' => now(),
             ]);
             
-            // Update registered attendees count
             $this->increment('registered_attendees', 1);
             
-            // Mark waitlist as converted
             $waitlistEntry->update([
                 'converted_at' => now(),
             ]);
@@ -368,8 +471,72 @@ class Event extends Model
     }
 
     /**
-     * Check if event is full.
+     * Toggle Methods
      */
+    public function toggleFeatured()
+    {
+        $this->is_featured = !$this->is_featured;
+        $this->save();
+    }
+
+    public function togglePublic()
+    {
+        $this->is_public = !$this->is_public;
+        $this->save();
+    }
+
+    public function isRegistrationOpen()
+    {
+        if ($this->is_cancelled) {
+            return false;
+        }
+        
+        if (!$this->requires_registration) {
+            return false;
+        }
+        
+        if ($this->max_attendees && $this->registered_attendees >= $this->max_attendees) {
+            return false;
+        }
+        
+        return $this->start_date > now();
+    }
+
+    /**
+     * Attribute Getters
+     */
+    public function getSpeakersListAttribute()
+    {
+        if ($this->speakers->isNotEmpty()) {
+            return $this->speakers;
+        }
+        
+        $speakers = [];
+        if (!empty($this->speaker_names)) {
+            foreach ($this->speaker_names as $index => $name) {
+                $speakers[] = (object)[
+                    'name' => $name,
+                    'title' => $this->speaker_titles[$index] ?? null,
+                    'bio' => $this->speaker_bios[$index] ?? null,
+                    'photo' => $this->speaker_photos[$index] ?? null,
+                    'organization' => $this->speaker_organizations[$index] ?? null,
+                ];
+            }
+        }
+        
+        return collect($speakers);
+    }
+
+    public function getSpeakersCountAttribute()
+    {
+        return $this->speakers()->count();
+    }
+
+    public function getHasSpeakersAttribute()
+    {
+        return $this->speakers_count > 0;
+    }
+
     public function getIsFullAttribute()
     {
         if (!$this->max_attendees) {
@@ -379,9 +546,6 @@ class Event extends Model
         return $this->registered_attendees >= $this->max_attendees;
     }
 
-    /**
-     * Get available seats.
-     */
     public function getAvailableSeatsAttribute()
     {
         if (!$this->max_attendees) {
@@ -391,57 +555,12 @@ class Event extends Model
         return max(0, $this->max_attendees - $this->registered_attendees);
     }
 
-    /**
-     * Scope a query to only include upcoming events.
-     */
-    public function scopeUpcoming($query)
+    public function getStatusDisplayAttribute()
     {
-        return $query->where('start_date', '>', now());
-    }
-
-    /**
-     * Scope a query to only include ongoing events.
-     */
-    public function scopeOngoing($query)
-    {
-        return $query->where('start_date', '<=', now())
-                    ->where('end_date', '>=', now());
-    }
-
-    /**
-     * Scope a query to only include past events.
-     */
-    public function scopePast($query)
-    {
-        return $query->where('end_date', '<', now());
-    }
-
-    /**
-     * Scope a query to only include featured events.
-     */
-    public function scopeFeatured($query)
-    {
-        return $query->where('is_featured', true);
-    }
-
-    /**
-     * Scope a query to search in title and description.
-     */
-    public function scopeSearch($query, $search)
-    {
-        return $query->where(function($q) use ($search) {
-            $q->where('title', 'like', "%{$search}%")
-              ->orWhere('description', 'like', "%{$search}%")
-              ->orWhere('short_description', 'like', "%{$search}%")
-              ->orWhere('organizer', 'like', "%{$search}%");
-        });
-    }
-
-    /**
-     * Get event status.
-     */
-    public function getStatusAttribute()
-    {
+        if ($this->is_cancelled) {
+            return 'cancelled';
+        }
+        
         $now = now();
         
         if ($now < $this->start_date) {
@@ -453,9 +572,27 @@ class Event extends Model
         }
     }
 
-    /**
-     * Get the formatted date range.
-     */
+    public function getCancellationStatusAttribute()
+    {
+        return $this->is_cancelled ? 'cancelled' : $this->status_display;
+    }
+
+    public function getStatusBadgeAttribute()
+    {
+        if ($this->is_cancelled) {
+            return ['class' => 'bg-danger', 'text' => 'Cancelled'];
+        }
+        
+        $status = $this->status_display;
+        $badges = [
+            'upcoming' => ['class' => 'bg-primary', 'text' => 'Upcoming'],
+            'ongoing' => ['class' => 'bg-success', 'text' => 'Ongoing'],
+            'completed' => ['class' => 'bg-secondary', 'text' => 'Completed']
+        ];
+        
+        return $badges[$status] ?? ['class' => 'bg-secondary', 'text' => 'Unknown'];
+    }
+
     public function getFormattedDateRangeAttribute()
     {
         if ($this->start_date->format('Y-m-d') === $this->end_date->format('Y-m-d')) {
@@ -465,9 +602,6 @@ class Event extends Model
         return $this->start_date->format('M d') . ' - ' . $this->end_date->format('M d, Y');
     }
 
-    /**
-     * Get venue name safely.
-     */
     public function getVenueNameAttribute()
     {
         if ($this->venueRelation && $this->venueRelation->exists) {
@@ -481,9 +615,6 @@ class Event extends Model
         return 'Not specified';
     }
 
-    /**
-     * Get building name safely.
-     */
     public function getBuildingNameAttribute()
     {
         if ($this->buildingRelation && $this->buildingRelation->exists) {
@@ -497,9 +628,6 @@ class Event extends Model
         return 'Not specified';
     }
 
-    /**
-     * Get campus name safely.
-     */
     public function getCampusNameAttribute()
     {
         if ($this->campusRelation && $this->campusRelation->exists) {
@@ -513,9 +641,6 @@ class Event extends Model
         return 'Not specified';
     }
 
-    /**
-     * Get venue details safely (returns either object or string).
-     */
     public function getVenueDetailsAttribute()
     {
         if ($this->venueRelation && $this->venueRelation->exists) {
@@ -525,9 +650,6 @@ class Event extends Model
         return $this->venue;
     }
 
-    /**
-     * Get building details safely (returns either object or string).
-     */
     public function getBuildingDetailsAttribute()
     {
         if ($this->buildingRelation && $this->buildingRelation->exists) {
@@ -537,9 +659,6 @@ class Event extends Model
         return $this->building;
     }
 
-    /**
-     * Get campus details safely (returns either object or string).
-     */
     public function getCampusDetailsAttribute()
     {
         if ($this->campusRelation && $this->campusRelation->exists) {
@@ -549,43 +668,6 @@ class Event extends Model
         return $this->campus;
     }
 
-    /**
-     * Toggle featured status.
-     */
-    public function toggleFeatured()
-    {
-        $this->is_featured = !$this->is_featured;
-        $this->save();
-    }
-
-    /**
-     * Toggle public status.
-     */
-    public function togglePublic()
-    {
-        $this->is_public = !$this->is_public;
-        $this->save();
-    }
-
-    /**
-     * Check if registration is open.
-     */
-    public function isRegistrationOpen()
-    {
-        if (!$this->requires_registration) {
-            return false;
-        }
-        
-        if ($this->max_attendees && $this->registered_attendees >= $this->max_attendees) {
-            return false;
-        }
-        
-        return $this->start_date > now();
-    }
-
-    /**
-     * Get remaining seats.
-     */
     public function getRemainingSeatsAttribute()
     {
         if (!$this->max_attendees) {
@@ -595,9 +677,6 @@ class Event extends Model
         return max(0, $this->max_attendees - $this->registered_attendees);
     }
 
-    /**
-     * Get attendance percentage.
-     */
     public function getAttendancePercentageAttribute()
     {
         if (!$this->max_attendees) {
@@ -607,9 +686,6 @@ class Event extends Model
         return ($this->registered_attendees / $this->max_attendees) * 100;
     }
 
-    /**
-     * Get formatted tags.
-     */
     public function getFormattedTagsAttribute()
     {
         if (empty($this->tags) || !is_array($this->tags)) {
@@ -620,59 +696,108 @@ class Event extends Model
     }
 
     /**
-     * Get image URL.
+     * FIXED: Comprehensive image URL handling
      */
     public function getImageUrlAttribute()
     {
+        // If no image, return default
         if (!$this->image) {
             return asset('images/default-event.jpg');
         }
         
-        // Check if it's already a URL
+        // If it's already a full URL, return it
         if (filter_var($this->image, FILTER_VALIDATE_URL)) {
             return $this->image;
         }
         
-        // Check if file exists in storage
+        // If it's a storage path (starts with 'events/')
         if (Storage::disk('public')->exists($this->image)) {
             return Storage::url($this->image);
         }
         
+        // If it's a full storage URL already
+        if (str_contains($this->image, '/storage/')) {
+            return $this->image;
+        }
+        
+        // Check if the path already includes 'storage/'
+        if (str_starts_with($this->image, 'storage/')) {
+            if (file_exists(public_path($this->image))) {
+                return asset($this->image);
+            }
+        }
+        
+        // Check if it's in the public/events folder
+        if (file_exists(public_path('events/' . $this->image))) {
+            return asset('events/' . $this->image);
+        }
+        
+        // Check if it's in the public/uploads/events folder
+        if (file_exists(public_path('uploads/events/' . $this->image))) {
+            return asset('uploads/events/' . $this->image);
+        }
+        
+        // Try to extract just the filename and look in common locations
+        $filename = basename($this->image);
+        
+        // Check storage/events
+        if (Storage::disk('public')->exists('events/' . $filename)) {
+            // Update the path for future requests
+            $this->image = 'events/' . $filename;
+            $this->saveQuietly(); // Save without triggering events
+            return Storage::url('events/' . $filename);
+        }
+        
+        // Check public/events
+        if (file_exists(public_path('events/' . $filename))) {
+            $this->image = 'events/' . $filename;
+            $this->saveQuietly();
+            return asset('events/' . $filename);
+        }
+        
+        // Check storage root
+        if (Storage::disk('public')->exists($filename)) {
+            $this->image = $filename;
+            $this->saveQuietly();
+            return Storage::url($filename);
+        }
+        
+        // Log the issue for debugging
+        Log::warning('Image not found for event ' . $this->id . ': ' . $this->image);
+        
+        // Default fallback
         return asset('images/default-event.jpg');
     }
 
-    /**
-     * Get image path for storage.
-     */
     public function getImagePathAttribute()
     {
         if (!$this->image) {
             return null;
         }
         
-        return 'public/' . $this->image;
+        if (Storage::disk('public')->exists($this->image)) {
+            return Storage::path('public/' . $this->image);
+        }
+        
+        return null;
     }
 
-    /**
-     * Get event type icon.
-     */
     public function getEventTypeIconAttribute()
     {
         $icons = [
             'academic' => 'graduation-cap',
             'cultural' => 'music',
             'sports' => 'futbol',
-            'conference' => 'comments',
+            'conference' => 'microphone',
             'workshop' => 'tools',
-            'seminar' => 'chalkboard-teacher'
+            'seminar' => 'chalkboard-teacher',
+            'exhibition' => 'images',
+            'outreach' => 'heart',
         ];
         
         return $icons[$this->event_type] ?? 'calendar-day';
     }
 
-    /**
-     * Get event type color.
-     */
     public function getEventTypeColorAttribute()
     {
         $colors = [
@@ -681,71 +806,77 @@ class Event extends Model
             'sports' => 'danger',
             'conference' => 'info',
             'workshop' => 'warning',
-            'seminar' => 'dark'
+            'seminar' => 'dark',
+            'exhibition' => 'secondary',
+            'outreach' => 'success',
         ];
         
         return $colors[$this->event_type] ?? 'secondary';
     }
 
     /**
-     * Delete the event image from storage.
+     * Image Methods
      */
     public function deleteImage()
     {
-        if ($this->image && Storage::disk('public')->exists($this->image)) {
-            Storage::disk('public')->delete($this->image);
+        if ($this->image) {
+            // Try to delete from storage
+            if (Storage::disk('public')->exists($this->image)) {
+                Storage::disk('public')->delete($this->image);
+            }
+            
+            // Also try to delete from public path
+            $publicPath = public_path('storage/' . $this->image);
+            if (file_exists($publicPath)) {
+                @unlink($publicPath);
+            }
+            
             $this->image = null;
             $this->save();
         }
     }
 
-    /**
-     * Upload a new image for the event.
-     */
     public function uploadImage($file)
     {
         // Delete old image if exists
         $this->deleteImage();
         
-        // Generate unique filename
+        // Generate a unique filename
         $filename = 'event-' . $this->id . '-' . time() . '.' . $file->getClientOriginalExtension();
         
-        // Store the file
+        // Store in the 'events' directory within the public disk
         $path = $file->storeAs('events', $filename, 'public');
         
-        // Update the event with new image path
+        // Update the image column with the path
         $this->image = $path;
         $this->save();
+        
+        // Log successful upload
+        Log::info('Image uploaded for event ' . $this->id . ': ' . $path);
         
         return $path;
     }
 
-    /**
-     * Get status badge class.
-     */
-    public function getStatusBadgeAttribute()
-    {
-        $status = $this->getStatusAttribute();
-        
-        $badges = [
-            'upcoming' => ['class' => 'bg-primary', 'text' => 'Upcoming'],
-            'ongoing' => ['class' => 'bg-success', 'text' => 'Ongoing'],
-            'completed' => ['class' => 'bg-secondary', 'text' => 'Completed']
-        ];
-        
-        return $badges[$status] ?? ['class' => 'bg-secondary', 'text' => 'Unknown'];
-    }
-
-    /**
-     * Check if the event has an image.
-     */
     public function hasImage()
     {
         return !empty($this->image);
     }
 
     /**
-     * Sync speakers with pivot data.
+     * Save quietly without triggering events
+     */
+  /**
+ * Save quietly without triggering events
+ */
+public function saveQuietly(array $options = [])
+{
+    return static::withoutEvents(function () use ($options) {
+        return $this->save($options);
+    });
+}
+
+    /**
+     * Speaker Sync
      */
     public function syncSpeakers($speakerData)
     {

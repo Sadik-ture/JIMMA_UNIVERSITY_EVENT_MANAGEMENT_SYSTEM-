@@ -1,11 +1,14 @@
 <?php
-// app/Http/Controllers/EventRegistrationController.php - COMPLETE FIXED VERSION
+// app/Http/Controllers/EventRegistrationController.php
 
 namespace App\Http\Controllers;
 
 use App\Models\Event;
 use App\Models\EventRegistration;
 use App\Models\Waitlist;
+use App\Models\Notification; // Add this import
+use App\Models\Role;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -49,7 +52,7 @@ class EventRegistrationController extends Controller
         $registeredEventIds = [];
         if (Auth::check()) {
             $registeredEventIds = EventRegistration::where('user_id', Auth::id())
-                ->whereIn('status', ['confirmed', 'pending'])
+                ->whereIn('status', ['confirmed', 'pending', 'waitlisted'])
                 ->pluck('event_id')
                 ->toArray();
         }
@@ -58,7 +61,7 @@ class EventRegistrationController extends Controller
     }
 
     /**
-     * Show event registration form - FIXED VERSION
+     * Show event registration form
      */
     public function create(Event $event)
     {
@@ -68,7 +71,7 @@ class EventRegistrationController extends Controller
                 ->with('error', 'This event does not require registration or is not public.');
         }
         
-        // Check if already registered - FIX: Use proper query
+        // Check if already registered
         if (Auth::check()) {
             $existingRegistration = EventRegistration::where('event_id', $event->id)
                 ->where('user_id', Auth::id())
@@ -93,7 +96,7 @@ class EventRegistrationController extends Controller
     }
 
     /**
-     * Register for an event - FIXED VERSION with proper duplicate checking
+     * Register for an event - UPDATED to set status as 'pending'
      */
     public function store(Request $request, Event $event)
     {
@@ -119,10 +122,10 @@ class EventRegistrationController extends Controller
                 ->with('error', 'This event does not require registration.');
         }
         
-        // CRITICAL FIX: Check if already registered (including ALL statuses)
+        // Check if already registered
         $existingRegistration = EventRegistration::where('event_id', $event->id)
             ->where('user_id', $userId)
-            ->first(); // Don't filter by status - check any registration exists
+            ->first();
             
         if ($existingRegistration) {
             if ($existingRegistration->status === 'cancelled') {
@@ -132,13 +135,13 @@ class EventRegistrationController extends Controller
             
             $message = $existingRegistration->status === 'waitlisted' 
                 ? 'You are already on the waitlist for this event.'
-                : 'You are already registered for this event.';
+                : 'You are already registered for this event. Your registration is ' . $existingRegistration->status . '.';
                 
             return redirect()->route('my-events.index')
                 ->with('info', $message);
         }
         
-        // Check if on waitlist (using the waitlist table directly)
+        // Check if on waitlist
         $existingWaitlist = Waitlist::where('event_id', $event->id)
             ->where('user_id', $userId)
             ->whereNull('converted_at')
@@ -173,7 +176,7 @@ class EventRegistrationController extends Controller
         DB::beginTransaction();
         
         try {
-            // Double-check for any race condition - check again inside transaction
+            // Double-check for any race condition
             $finalCheck = EventRegistration::where('event_id', $event->id)
                 ->where('user_id', $userId)
                 ->first();
@@ -184,31 +187,34 @@ class EventRegistrationController extends Controller
                     ->with('info', 'You are already registered for this event.');
             }
             
-            // Create registration
+            // Create registration with status = 'pending' (not 'confirmed')
             $registration = EventRegistration::create([
                 'event_id' => $event->id,
                 'user_id' => $userId,
                 'guest_count' => $validated['guest_count'],
                 'additional_info' => $validated['additional_info'],
-                'status' => 'confirmed',
-                'confirmed_at' => now(),
+                'status' => 'pending', // Changed from 'confirmed' to 'pending'
+                'confirmed_at' => null, // Not confirmed yet
                 'registration_date' => now(),
             ]);
             
-            // Update registered attendees count
-            if ($event->max_attendees) {
-                $event->increment('registered_attendees', $validated['guest_count']);
-            }
+            // DO NOT increment registered_attendees count here
+            // That will happen when admin confirms the registration
+            
+            // Create notification for user that registration is pending
+            $this->createPendingNotification($registration);
+            
+            // Notify admins about pending registration
+            $this->notifyAdminsOfPendingRegistration($registration);
             
             DB::commit();
             
             return redirect()->route('my-events.index')
-                ->with('success', 'Successfully registered for ' . $event->title . '. Your registration number is: ' . $registration->registration_number);
+                ->with('success', 'Your registration has been submitted and is pending admin approval. You will be notified once confirmed. Registration number: ' . $registration->registration_number);
                 
         } catch (\Exception $e) {
             DB::rollBack();
             
-            // Check if it's a duplicate entry error
             if ($e instanceof \Illuminate\Database\UniqueConstraintViolationException) {
                 return redirect()->route('my-events.index')
                     ->with('info', 'You are already registered for this event.');
@@ -220,7 +226,7 @@ class EventRegistrationController extends Controller
     }
 
     /**
-     * Update a cancelled registration to confirmed
+     * Update a cancelled registration to pending
      */
     private function updateCancelledRegistration(Request $request, Event $event, EventRegistration $registration)
     {
@@ -243,21 +249,18 @@ class EventRegistrationController extends Controller
             $registration->update([
                 'guest_count' => $validated['guest_count'],
                 'additional_info' => $validated['additional_info'],
-                'status' => 'confirmed',
-                'confirmed_at' => now(),
+                'status' => 'pending',
+                'confirmed_at' => null,
                 'cancelled_at' => null,
                 'cancellation_reason' => null,
             ]);
             
-            // Update registered attendees count
-            if ($event->max_attendees) {
-                $event->increment('registered_attendees', $validated['guest_count']);
-            }
+            // DO NOT increment registered_attendees count here
             
             DB::commit();
             
             return redirect()->route('my-events.index')
-                ->with('success', 'Your registration for ' . $event->title . ' has been reactivated.');
+                ->with('success', 'Your registration for ' . $event->title . ' has been reactivated and is pending admin approval.');
                 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -333,8 +336,8 @@ class EventRegistrationController extends Controller
                 'cancellation_reason' => 'Cancelled by user',
             ]);
             
-            // Update registered attendees count
-            if ($event->max_attendees) {
+            // Update registered attendees count only if it was confirmed
+            if ($registration->status === 'confirmed' && $event->max_attendees) {
                 $event->decrement('registered_attendees', $guestCount);
             }
             
@@ -367,6 +370,7 @@ class EventRegistrationController extends Controller
         
         $waitlistEntries = Waitlist::where('event_id', $event->id)
             ->whereNull('converted_at')
+            ->with('user')
             ->orderBy('position')
             ->limit($numberOfSpots)
             ->get();
@@ -568,66 +572,65 @@ class EventRegistrationController extends Controller
     }
 
     /**
-     * Organizer: Update participant status
+     * Helper: Create pending notification for user
      */
-    public function updateStatus(EventRegistration $registration, Request $request)
+    private function createPendingNotification($registration)
     {
-        if (!Auth::user()->hasPermission('manage_events')) {
-            abort(403, 'Unauthorized action.');
+        $notification = Notification::create([
+            'title' => 'Registration Pending Approval',
+            'message' => "Your registration for '{$registration->event->title}' has been submitted and is awaiting admin approval. You will be notified once confirmed.",
+            'type' => 'info',
+            'priority' => 1,
+            'action_url' => route('my-events.index'),
+            'action_text' => 'View My Registrations',
+            'data' => [
+                'registration_id' => $registration->id,
+                'event_id' => $registration->event_id,
+                'registration_number' => $registration->registration_number,
+            ],
+            'created_by' => $registration->user_id,
+        ]);
+
+        $notification->users()->attach($registration->user_id, [
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
+    }
+
+    /**
+     * Helper: Notify admins about pending registration
+     */
+    private function notifyAdminsOfPendingRegistration($registration)
+    {
+        // Get all admin users
+        $adminRoles = Role::whereIn('slug', ['super-admin', 'admin'])->pluck('id');
+        $admins = User::whereIn('role_id', $adminRoles)->where('is_active', true)->get();
+        
+        if ($admins->isEmpty()) {
+            return;
         }
         
-        $validated = $request->validate([
-            'status' => 'required|in:confirmed,pending,cancelled',
-            'notes' => 'nullable|string',
+        $notification = Notification::create([
+            'title' => 'New Pending Registration',
+            'message' => "{$registration->user->name} has registered for '{$registration->event->title}' and is pending approval.",
+            'type' => 'info',
+            'priority' => 2,
+            'action_url' => route('admin.registrations.pending'),
+            'action_text' => 'Review Pending Registrations',
+            'data' => [
+                'registration_id' => $registration->id,
+                'event_id' => $registration->event_id,
+                'user_id' => $registration->user_id,
+                'registration_number' => $registration->registration_number,
+            ],
+            'created_by' => $registration->user_id,
         ]);
         
-        $oldStatus = $registration->status;
-        $guestCount = $registration->guest_count;
-        $event = $registration->event;
-        
-        DB::beginTransaction();
-        
-        try {
-            $registration->update([
-                'status' => $validated['status'],
-                'notes' => $validated['notes'] ?? $registration->notes,
+        foreach ($admins as $admin) {
+            $notification->users()->attach($admin->id, [
+                'created_at' => now(),
+                'updated_at' => now()
             ]);
-            
-            // If status changed from confirmed to cancelled, free up seats
-            if ($oldStatus === 'confirmed' && $validated['status'] === 'cancelled') {
-                if ($event->max_attendees) {
-                    $event->decrement('registered_attendees', $guestCount);
-                    $this->fillFromWaitlist($event, $guestCount);
-                }
-            }
-            
-            // If status changed from cancelled to confirmed, add back seats
-            if ($oldStatus === 'cancelled' && $validated['status'] === 'confirmed') {
-                if ($event->max_attendees) {
-                    // Check if enough seats available
-                    if ($guestCount > $event->available_seats) {
-                        DB::rollBack();
-                        return redirect()->back()
-                            ->with('error', 'Not enough seats available. Available: ' . $event->available_seats);
-                    }
-                    $event->increment('registered_attendees', $guestCount);
-                }
-                $registration->update([
-                    'confirmed_at' => now(),
-                    'cancelled_at' => null,
-                    'cancellation_reason' => null,
-                ]);
-            }
-            
-            DB::commit();
-            
-            return redirect()->back()
-                ->with('success', 'Participant status updated successfully.');
-                
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return redirect()->back()
-                ->with('error', 'Failed to update status: ' . $e->getMessage());
         }
     }
 }

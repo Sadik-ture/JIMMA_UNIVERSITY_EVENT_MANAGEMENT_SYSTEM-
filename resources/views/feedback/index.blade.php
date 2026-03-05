@@ -13,39 +13,61 @@
 <style>
     /* ============================================
        JIMMA UNIVERSITY OFFICIAL BLUE SCHEME
-       Matching the main layout exactly
+       Royal Blue (#002789) & Gold (#C4A747) - Matching Layout Exactly
     ============================================ */
     :root {
-        --ju-blue: #0a2c6e;
-        --ju-blue-dark: #06204d;
-        --ju-blue-light: #1e3a8a;
-        --ju-blue-soft: #e6edf7;
-        --ju-gold: #c4a747;
+        --ju-blue: #002789;
+        --ju-blue-dark: #001a5c;
+        --ju-blue-darker: #021230;
+        --ju-blue-light: #1a3a9a;
+        --ju-blue-lighter: #3a6ab0;
+        --ju-blue-soft: #e6ebf7;
+        --ju-blue-glow: rgba(0, 39, 137, 0.2);
+        --ju-blue-gradient: linear-gradient(145deg, #002789, #001a5c);
+        
+        --ju-gold: #C4A747;
+        --ju-gold-dark: #a5862e;
         --ju-gold-light: #e5d6a6;
-        --ju-gold-dark: #b8960f;
+        --ju-gold-soft: rgba(196, 167, 71, 0.12);
+        --ju-gold-gradient: linear-gradient(145deg, #C4A747, #a5862e);
+        
         --ju-white: #ffffff;
         --ju-offwhite: #f9f9f9;
         --ju-gray: #f0f0f0;
         --ju-gray-dark: #333333;
+        --ju-gray-600: #64748b;
         
-        --gradient-primary: linear-gradient(145deg, #0a2c6e 0%, #06204d 100%);
-        --gradient-gold: linear-gradient(145deg, #c4a747 0%, #b8960f 100%);
-        --shadow-sm: 0 4px 6px rgba(10,44,110,0.04);
-        --shadow: 0 6px 12px rgba(10,44,110,0.06);
-        --shadow-md: 0 8px 24px rgba(10,44,110,0.08);
-        --shadow-lg: 0 16px 32px rgba(10,44,110,0.1);
-        --shadow-xl: 0 24px 48px rgba(10,44,110,0.12);
+        --shadow-xs: 0 2px 4px rgba(0,39,137,0.02);
+        --shadow-sm: 0 4px 6px rgba(0,39,137,0.04);
+        --shadow: 0 6px 12px rgba(0,39,137,0.06);
+        --shadow-md: 0 8px 24px rgba(0,39,137,0.08);
+        --shadow-lg: 0 16px 32px rgba(0,39,137,0.1);
+        --shadow-xl: 0 24px 48px rgba(0,39,137,0.12);
+        --shadow-2xl: 0 32px 64px rgba(0,39,137,0.15);
+        --shadow-gold: 0 8px 20px rgba(196,167,71,0.2);
+        
+        --radius-sm: 0.25rem;
+        --radius: 0.375rem;
+        --radius-md: 0.5rem;
+        --radius-lg: 0.75rem;
+        --radius-xl: 1rem;
+        --radius-2xl: 1.25rem;
+        --radius-full: 9999px;
+        
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        --transition-elastic: all 0.6s cubic-bezier(0.68, -0.6, 0.32, 1.6);
     }
 
     /* ============================================
-       ENHANCED STAT CARDS - JU BLUE THEME
+       ENHANCED STAT CARDS - ROYAL BLUE THEME
     ============================================ */
     .ju-stat-card {
         background: var(--ju-white);
         border: 1px solid var(--ju-gray);
-        border-radius: 1rem;
+        border-radius: var(--radius-xl);
         box-shadow: var(--shadow);
-        transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        transition: var(--transition-bounce);
         position: relative;
         overflow: hidden;
         height: 100%;
@@ -58,12 +80,12 @@
         left: 0;
         right: 0;
         height: 4px;
-        background: var(--gradient-primary);
+        background: var(--ju-blue-gradient);
     }
 
     .ju-stat-card:hover {
         transform: translateY(-8px);
-        box-shadow: var(--shadow-xl);
+        box-shadow: var(--shadow-2xl);
         border-color: var(--ju-blue);
     }
 
@@ -71,17 +93,17 @@
         width: 60px;
         height: 60px;
         background: var(--ju-blue-soft);
-        border-radius: 12px;
+        border-radius: var(--radius-lg);
         display: flex;
         align-items: center;
         justify-content: center;
         color: var(--ju-blue);
         font-size: 1.8rem;
-        transition: all 0.3s ease;
+        transition: var(--transition-bounce);
     }
 
     .ju-stat-card:hover .stat-icon {
-        background: var(--ju-blue);
+        background: var(--ju-blue-gradient);
         color: var(--ju-white);
         transform: rotate(8deg) scale(1.1);
     }
@@ -107,7 +129,7 @@
     .ju-stat-card .stat-trend {
         font-size: 0.8rem;
         padding: 0.25rem 0.75rem;
-        border-radius: 20px;
+        border-radius: var(--radius-full);
         background: var(--ju-blue-soft);
         color: var(--ju-blue);
         display: inline-flex;
@@ -116,18 +138,18 @@
     }
 
     /* ============================================
-       ENHANCED STATUS BADGES - JU BLUE SCHEME
+       ENHANCED STATUS BADGES - ROYAL BLUE SCHEME
     ============================================ */
     .ju-status-badge {
         padding: 0.5rem 1rem;
-        border-radius: 40px;
+        border-radius: var(--radius-full);
         font-size: 0.8rem;
         font-weight: 600;
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
         border: 1px solid transparent;
-        transition: all 0.3s ease;
+        transition: var(--transition);
         letter-spacing: 0.3px;
     }
 
@@ -142,7 +164,7 @@
     }
 
     .ju-status-reviewed {
-        background: linear-gradient(135deg, #e6edf7, #d4e1f0);
+        background: linear-gradient(135deg, var(--ju-blue-soft), #d4e0f0);
         color: var(--ju-blue);
         border-color: var(--ju-blue-soft);
     }
@@ -160,24 +182,24 @@
     }
 
     /* ============================================
-       ENHANCED TYPE BADGES - JU BLUE SCHEME
+       ENHANCED TYPE BADGES - ROYAL BLUE SCHEME
     ============================================ */
     .ju-type-badge {
         padding: 0.5rem 1rem;
-        border-radius: 40px;
+        border-radius: var(--radius-full);
         font-size: 0.8rem;
         font-weight: 600;
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
         border: 1px solid transparent;
-        transition: all 0.3s ease;
+        transition: var(--transition);
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
 
     .ju-type-event {
-        background: linear-gradient(135deg, #e6edf7, #d4e1f0);
+        background: linear-gradient(135deg, var(--ju-blue-soft), #d4e0f0);
         color: var(--ju-blue);
         border-color: var(--ju-blue-soft);
     }
@@ -229,19 +251,19 @@
         background: var(--ju-gold-light);
         color: var(--ju-blue-dark);
         padding: 0.25rem 0.75rem;
-        border-radius: 20px;
+        border-radius: var(--radius-full);
         font-size: 0.75rem;
         font-weight: 700;
         margin-left: 0.5rem;
     }
 
     /* ============================================
-       FILTER SECTION - JU BLUE THEME
+       FILTER SECTION - ROYAL BLUE THEME
     ============================================ */
     .ju-filter-section {
         background: var(--ju-white);
         border: 1px solid var(--ju-gray);
-        border-radius: 1rem;
+        border-radius: var(--radius-xl);
         box-shadow: var(--shadow);
         padding: 1.5rem;
     }
@@ -257,12 +279,12 @@
 
     .ju-filter-select {
         border: 2px solid var(--ju-gray);
-        border-radius: 40px;
+        border-radius: var(--radius-full);
         padding: 0.6rem 1.2rem;
         font-size: 0.9rem;
         color: var(--ju-gray-dark);
         background: var(--ju-white);
-        transition: all 0.3s ease;
+        transition: var(--transition);
         cursor: pointer;
     }
 
@@ -272,7 +294,7 @@
 
     .ju-filter-select:focus {
         border-color: var(--ju-blue);
-        box-shadow: 0 0 0 4px rgba(10, 44, 110, 0.1);
+        box-shadow: 0 0 0 4px rgba(0, 39, 137, 0.1);
         outline: none;
     }
 
@@ -282,16 +304,16 @@
 
     .ju-search-input {
         border: 2px solid var(--ju-gray);
-        border-radius: 40px;
+        border-radius: var(--radius-full);
         padding: 0.6rem 1.2rem 0.6rem 2.8rem;
         font-size: 0.9rem;
         width: 100%;
-        transition: all 0.3s ease;
+        transition: var(--transition);
     }
 
     .ju-search-input:focus {
         border-color: var(--ju-blue);
-        box-shadow: 0 0 0 4px rgba(10, 44, 110, 0.1);
+        box-shadow: 0 0 0 4px rgba(0, 39, 137, 0.1);
         outline: none;
     }
 
@@ -305,12 +327,12 @@
     }
 
     /* ============================================
-       ENHANCED TABLE - JU BLUE THEME
+       ENHANCED TABLE - ROYAL BLUE THEME
     ============================================ */
     .ju-table-container {
         background: var(--ju-white);
         border: 1px solid var(--ju-gray);
-        border-radius: 1rem;
+        border-radius: var(--radius-xl);
         overflow: hidden;
         box-shadow: var(--shadow);
     }
@@ -321,7 +343,7 @@
     }
 
     .ju-table thead th {
-        background: var(--gradient-primary);
+        background: var(--ju-blue-gradient);
         color: var(--ju-white);
         font-weight: 600;
         font-size: 0.85rem;
@@ -333,20 +355,20 @@
     }
 
     .ju-table thead th:first-child {
-        border-radius: 1rem 0 0 0;
+        border-radius: var(--radius-xl) 0 0 0;
     }
 
     .ju-table thead th:last-child {
-        border-radius: 0 1rem 0 0;
+        border-radius: 0 var(--radius-xl) 0 0;
     }
 
     .ju-table tbody tr {
-        transition: all 0.3s ease;
+        transition: var(--transition);
         border-bottom: 1px solid var(--ju-gray);
     }
 
     .ju-table tbody tr:hover {
-        background: linear-gradient(90deg, var(--ju-blue-soft), rgba(230, 237, 247, 0.3));
+        background: linear-gradient(90deg, var(--ju-blue-soft), rgba(230, 235, 247, 0.3));
         transform: translateX(5px);
         box-shadow: var(--shadow);
     }
@@ -388,14 +410,14 @@
     .ju-action-btn {
         width: 36px;
         height: 36px;
-        border-radius: 10px;
+        border-radius: var(--radius);
         display: inline-flex;
         align-items: center;
         justify-content: center;
         border: 1px solid var(--ju-gray);
         background: var(--ju-white);
         color: var(--ju-gray-dark);
-        transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        transition: var(--transition-bounce);
         margin: 0 2px;
     }
 
@@ -440,14 +462,14 @@
         border: none;
         background: transparent;
         color: var(--ju-gray-dark);
-        border-radius: 10px;
+        border-radius: var(--radius);
         padding: 0.6rem 1rem;
         font-weight: 500;
-        transition: all 0.3s ease;
+        transition: var(--transition);
     }
 
     .ju-pagination .page-item.active .page-link {
-        background: var(--gradient-primary);
+        background: var(--ju-blue-gradient);
         color: var(--ju-white);
         box-shadow: var(--shadow);
     }
@@ -459,13 +481,13 @@
     }
 
     /* ============================================
-       EMPTY STATE - JU BLUE THEME
+       EMPTY STATE - ROYAL BLUE THEME
     ============================================ */
     .ju-empty-state {
         padding: 4rem 2rem;
         text-align: center;
         background: linear-gradient(135deg, var(--ju-white), var(--ju-offwhite));
-        border-radius: 1rem;
+        border-radius: var(--radius-xl);
         border: 2px dashed var(--ju-blue-soft);
     }
 
@@ -500,7 +522,7 @@
         min-width: 350px;
         background: var(--ju-white);
         border-left: 4px solid;
-        border-radius: 12px;
+        border-radius: var(--radius-lg);
         box-shadow: var(--shadow-xl);
         padding: 1rem 1.25rem;
         animation: slideInRight 0.3s ease-out;
@@ -577,7 +599,7 @@
                 <small class="text-muted">{{ now()->format('F d, Y - h:i A') }}</small>
             </div>
             <div style="width: 1px; height: 40px; background: var(--ju-gray);"></div>
-            <div style="background: var(--ju-blue-soft); padding: 0.5rem 1.2rem; border-radius: 40px;">
+            <div style="background: var(--ju-blue-soft); padding: 0.5rem 1.2rem; border-radius: var(--radius-full);">
                 <i class="fas fa-university me-2" style="color: var(--ju-blue);"></i>
                 <span style="color: var(--ju-blue); font-weight: 600;">Jimma University</span>
             </div>
@@ -585,7 +607,7 @@
     </div>
 
     <!-- ============================================
-         STATISTICS CARDS - JU BLUE THEME
+         STATISTICS CARDS - ROYAL BLUE THEME
     ============================================ -->
     <div class="row g-4 mb-4">
         <div class="col-xl-3 col-md-6">
@@ -670,7 +692,7 @@
     </div>
 
     <!-- ============================================
-         FILTER SECTION - JU BLUE THEME
+         FILTER SECTION - ROYAL BLUE THEME
     ============================================ -->
     <div class="ju-filter-section mb-4" data-aos="fade-up" data-aos-delay="500">
         <form action="{{ route('feedback.index') }}" method="GET" class="row g-3 align-items-end">
@@ -732,7 +754,7 @@
                         <a href="{{ route('feedback.index') }}" class="btn btn-sm" style="
                             background: var(--ju-blue-soft);
                             color: var(--ju-blue);
-                            border-radius: 40px;
+                            border-radius: var(--radius-full);
                             padding: 0.5rem 1.5rem;
                             font-weight: 600;
                         ">
@@ -744,7 +766,7 @@
                         <a href="{{ route('feedback.analytics') }}" class="btn btn-sm" style="
                             background: var(--ju-blue-soft);
                             color: var(--ju-blue);
-                            border-radius: 40px;
+                            border-radius: var(--radius-full);
                             padding: 0.5rem 1.5rem;
                             font-weight: 600;
                         ">
@@ -753,16 +775,16 @@
                         <a href="{{ route('feedback.export') }}" class="btn btn-sm" style="
                             background: var(--ju-blue-soft);
                             color: var(--ju-blue);
-                            border-radius: 40px;
+                            border-radius: var(--radius-full);
                             padding: 0.5rem 1.5rem;
                             font-weight: 600;
                         ">
                             <i class="fas fa-download me-1"></i>Export
                         </a>
                         <button onclick="location.reload()" class="btn btn-sm" style="
-                            background: var(--gradient-primary);
+                            background: var(--ju-blue-gradient);
                             color: white;
-                            border-radius: 40px;
+                            border-radius: var(--radius-full);
                             padding: 0.5rem 1.5rem;
                             font-weight: 600;
                             border: none;
@@ -776,7 +798,7 @@
     </div>
 
     <!-- ============================================
-         FEEDBACK TABLE - JU BLUE THEME
+         FEEDBACK TABLE - ROYAL BLUE THEME
     ============================================ -->
     <div class="ju-table-container" data-aos="fade-up" data-aos-delay="600">
         @if($feedbacks->count() > 0)
@@ -802,7 +824,7 @@
                                 background: var(--ju-blue-soft);
                                 color: var(--ju-blue);
                                 padding: 0.4rem 0.8rem;
-                                border-radius: 8px;
+                                border-radius: var(--radius);
                                 font-weight: 700;
                                 font-size: 0.8rem;
                             ">#{{ str_pad($feedback->id, 4, '0', STR_PAD_LEFT) }}</span>
@@ -833,7 +855,7 @@
                                         background: rgba(40, 167, 69, 0.1);
                                         color: #28a745;
                                         padding: 0.2rem 0.6rem;
-                                        border-radius: 20px;
+                                        border-radius: var(--radius-full);
                                         font-size: 0.65rem;
                                         font-weight: 700;
                                     ">
@@ -845,7 +867,7 @@
                                         background: rgba(196, 167, 71, 0.1);
                                         color: var(--ju-gold);
                                         padding: 0.2rem 0.6rem;
-                                        border-radius: 20px;
+                                        border-radius: var(--radius-full);
                                         font-size: 0.65rem;
                                         font-weight: 700;
                                     ">
@@ -854,10 +876,10 @@
                                     @endif
                                     @if($feedback->event_id)
                                     <span style="
-                                        background: rgba(10, 44, 110, 0.1);
+                                        background: rgba(0, 39, 137, 0.1);
                                         color: var(--ju-blue);
                                         padding: 0.2rem 0.6rem;
-                                        border-radius: 20px;
+                                        border-radius: var(--radius-full);
                                         font-size: 0.65rem;
                                         font-weight: 700;
                                     ">
@@ -872,7 +894,7 @@
                                 <div style="
                                     width: 40px;
                                     height: 40px;
-                                    background: linear-gradient(135deg, var(--ju-blue-soft), #d4e1f0);
+                                    background: linear-gradient(135deg, var(--ju-blue-soft), #d4e0f0);
                                     border-radius: 50%;
                                     display: flex;
                                     align-items: center;
@@ -969,9 +991,9 @@
         </div>
 
         <!-- Pagination -->
-        <div class="d-flex justify-content-between align-items-center p-4 border-top">
+        <div class="d-flex justify-content-between align-items-center p-4 border-top" style="border-color: var(--ju-gray) !important;">
             <div class="small text-muted">
-                <i class="fas fa-info-circle me-1"></i>
+                <i class="fas fa-info-circle me-1" style="color: var(--ju-blue);"></i>
                 Showing <strong style="color: var(--ju-blue);">{{ $feedbacks->firstItem() }}</strong> 
                 to <strong style="color: var(--ju-blue);">{{ $feedbacks->lastItem() }}</strong> 
                 of <strong style="color: var(--ju-blue);">{{ $feedbacks->total() }}</strong> entries
@@ -989,16 +1011,16 @@
             <h4 style="color: var(--ju-blue); margin-bottom: 1rem;">No Feedback Found</h4>
             <p class="text-muted mb-4">There are no feedback entries matching your criteria.</p>
             <a href="{{ route('feedback.index') }}" style="
-                background: var(--gradient-primary);
+                background: var(--ju-blue-gradient);
                 color: white;
                 padding: 0.8rem 2rem;
-                border-radius: 40px;
+                border-radius: var(--radius-full);
                 text-decoration: none;
                 font-weight: 600;
                 display: inline-flex;
                 align-items: center;
                 gap: 0.5rem;
-                transition: all 0.3s ease;
+                transition: var(--transition);
             ">
                 <i class="fas fa-sync-alt"></i>
                 Reset Filters
@@ -1010,6 +1032,7 @@
 
 <!-- Notification Container -->
 <div id="notificationContainer" style="position: fixed; top: 90px; right: 20px; z-index: 9999;"></div>
+@endsection
 
 @push('scripts')
 <script>
@@ -1205,4 +1228,3 @@ document.querySelectorAll('.ju-feedback-row').forEach(row => {
 });
 </script>
 @endpush
-@endsection

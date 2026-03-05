@@ -1,464 +1,707 @@
+{{-- resources/views/events/my-events.blade.php --}}
 @extends('layouts.app')
 
-@section('title', 'My Events')
+@section('title', 'My Events | Jimma University')
 @section('page-title', 'My Events')
-@section('page-subtitle', 'Manage your event registrations and waitlists')
+@section('page-subtitle', 'View and manage your event registrations')
+
+@section('breadcrumb-items')
+    <li class="breadcrumb-item">
+        <a href="{{ route('home') }}" class="d-flex align-items-center text-decoration-none hover-lift">
+            <i class="fas fa-home me-2" style="color: var(--ju-gold);"></i>Home
+        </a>
+    </li>
+    <li class="breadcrumb-item active">
+        <span class="fw-semibold" style="color: var(--ju-blue-dark);">My Events</span>
+    </li>
+@endsection
 
 @section('content')
-<div class="container-fluid">
+<style>
+    :root {
+        --ju-blue: #002789;
+        --ju-blue-dark: #001a5c;
+        --ju-gold: #C4A747;
+        --ju-gold-dark: #a5862e;
+        --ju-success: #28a745;
+        --ju-warning: #ffc107;
+        --ju-danger: #dc3545;
+        --ju-info: #17a2b8;
+        --ju-gray-100: #f8f9fa;
+        --ju-gray-200: #e9ecef;
+        --ju-gray-600: #6c757d;
+        --ju-gray-800: #343a40;
+    }
+
+    .status-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 30px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .status-pending {
+        background: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeeba;
+    }
+
+    .status-confirmed {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+
+    .status-cancelled {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+
+    .status-waitlisted {
+        background: #d1ecf1;
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+    }
+
+    .status-attended {
+        background: #cce5ff;
+        color: #004085;
+        border: 1px solid #b8daff;
+    }
+
+    .event-card {
+        transition: all 0.3s ease;
+        border: 1px solid var(--ju-gray-200);
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 1rem;
+    }
+
+    .event-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(0,39,137,0.1);
+        border-color: var(--ju-blue);
+    }
+
+    .countdown-timer {
+        background: linear-gradient(145deg, #002789, #001a5c);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 30px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--ju-blue);
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid var(--ju-gold);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        background: white;
+        border-radius: 12px;
+        border: 2px dashed var(--ju-gray-200);
+    }
+
+    .empty-state i {
+        font-size: 4rem;
+        color: var(--ju-gray-600);
+        margin-bottom: 1rem;
+    }
+
+    .empty-state h3 {
+        color: var(--ju-gray-800);
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-state p {
+        color: var(--ju-gray-600);
+        margin-bottom: 1.5rem;
+    }
+</style>
+
+<div class="container-fluid px-lg-4">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div>
+                    <h2 class="section-title mb-0">
+                        <i class="fas fa-calendar-check me-2" style="color: var(--ju-gold);"></i>
+                        My Event Registrations
+                    </h2>
+                </div>
+                <div>
+                    <a href="{{ route('event-registration.index') }}" class="btn btn-primary" style="background: linear-gradient(145deg, #002789, #001a5c); border: none;">
+                        <i class="fas fa-calendar-plus me-2"></i>Browse Events
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Statistics Cards -->
     <div class="row mb-4">
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="stat-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                <div class="stat-icon">
-                    <i class="fas fa-calendar-check"></i>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card bg-primary text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-white-50">Total Registrations</h6>
+                            <h3 class="mb-0">{{ $registrations->total() }}</h3>
+                        </div>
+                        <i class="fas fa-ticket-alt fa-2x opacity-50"></i>
+                    </div>
                 </div>
-                <div class="stat-number">{{ $upcomingCount }}</div>
-                <div class="stat-label">Upcoming Events</div>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="stat-card" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">
-                <div class="stat-icon">
-                    <i class="fas fa-check-circle"></i>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card bg-warning text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-white-50">Pending Approval</h6>
+                            <h3 class="mb-0">{{ $registrations->where('status', 'pending')->count() }}</h3>
+                        </div>
+                        <i class="fas fa-clock fa-2x opacity-50"></i>
+                    </div>
                 </div>
-                <div class="stat-number">{{ $attendedCount }}</div>
-                <div class="stat-label">Events Attended</div>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="stat-card" style="background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);">
-                <div class="stat-icon">
-                    <i class="fas fa-clock"></i>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card bg-success text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-white-50">Confirmed</h6>
+                            <h3 class="mb-0">{{ $registrations->where('status', 'confirmed')->count() }}</h3>
+                        </div>
+                        <i class="fas fa-check-circle fa-2x opacity-50"></i>
+                    </div>
                 </div>
-                <div class="stat-number">{{ $waitlists->count() }}</div>
-                <div class="stat-label">Waitlist Positions</div>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="stat-card" style="background: linear-gradient(135deg, #17a2b8 0%, #20c997 100%);">
-                <div class="stat-icon">
-                    <i class="fas fa-history"></i>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card bg-info text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-white-50">Attended</h6>
+                            <h3 class="mb-0">{{ $attendedCount ?? 0 }}</h3>
+                        </div>
+                        <i class="fas fa-user-check fa-2x opacity-50"></i>
+                    </div>
                 </div>
-                <div class="stat-number">{{ $registrations->total() }}</div>
-                <div class="stat-label">Total Registrations</div>
             </div>
         </div>
     </div>
 
     <!-- Tabs Navigation -->
-    <div class="ju-card mb-4">
-        <div class="ju-card-body p-0">
-            <ul class="nav nav-tabs" id="myEventsTab" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="upcoming-tab" data-bs-toggle="tab" data-bs-target="#upcoming" type="button" role="tab">
-                        <i class="fas fa-calendar-alt me-1"></i> Upcoming Events
-                        @if($registrations->where('event.start_date', '>', now())->count() > 0)
-                        <span class="badge bg-primary ms-1">{{ $registrations->where('event.start_date', '>', now())->count() }}</span>
-                        @endif
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="waitlist-tab" data-bs-toggle="tab" data-bs-target="#waitlist" type="button" role="tab">
-                        <i class="fas fa-clock me-1"></i> Waitlist
-                        @if($waitlists->count() > 0)
-                        <span class="badge bg-warning ms-1">{{ $waitlists->count() }}</span>
-                        @endif
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="past-tab" data-bs-toggle="tab" data-bs-target="#past" type="button" role="tab">
-                        <i class="fas fa-history me-1"></i> Past Events
-                        @if($registrations->where('event.start_date', '<', now())->count() > 0)
-                        <span class="badge bg-secondary ms-1">{{ $registrations->where('event.start_date', '<', now())->count() }}</span>
-                        @endif
-                    </button>
-                </li>
-            </ul>
-        </div>
-    </div>
+    <ul class="nav nav-tabs mb-4" id="eventTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button" role="tab">
+                <i class="fas fa-list me-2"></i>All Events
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button" role="tab">
+                <i class="fas fa-clock me-2" style="color: #ffc107;"></i>Pending Approval
+                @if($registrations->where('status', 'pending')->count() > 0)
+                <span class="badge bg-warning text-dark ms-2">{{ $registrations->where('status', 'pending')->count() }}</span>
+                @endif
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="confirmed-tab" data-bs-toggle="tab" data-bs-target="#confirmed" type="button" role="tab">
+                <i class="fas fa-check-circle me-2" style="color: #28a745;"></i>Confirmed
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="waitlist-tab" data-bs-toggle="tab" data-bs-target="#waitlist" type="button" role="tab">
+                <i class="fas fa-list-ol me-2" style="color: #17a2b8;"></i>Waitlist
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="past-tab" data-bs-toggle="tab" data-bs-target="#past" type="button" role="tab">
+                <i class="fas fa-history me-2"></i>Past Events
+            </button>
+        </li>
+    </ul>
 
     <!-- Tab Content -->
-    <div class="tab-content" id="myEventsTabContent">
-        <!-- Upcoming Events Tab -->
-        <div class="tab-pane fade show active" id="upcoming" role="tabpanel">
-            @if($registrations->where('event.start_date', '>', now())->count() > 0)
-            <div class="ju-card">
-                <div class="ju-card-header">
-                    <h5 class="ju-card-title m-0">Your Upcoming Events</h5>
-                </div>
-                <div class="ju-card-body">
-                    <div class="table-responsive">
-                        <table class="table table-ju">
-                            <thead>
-                                <tr>
-                                    <th>Event</th>
-                                    <th>Date & Time</th>
-                                    <th>Venue</th>
-                                    <th>Registration No.</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($registrations as $registration)
-                                @if($registration->event->start_date > now())
-                                <tr>
-                                    <td>
-                                        <strong>{{ $registration->event->title }}</strong>
-                                        <br>
-                                        <small class="text-muted">{{ $registration->event->organizer }}</small>
-                                    </td>
-                                    <td>
-                                        {{ $registration->event->start_date->format('M d, Y') }}
-                                        <br>
-                                        <small class="text-muted">{{ $registration->event->start_date->format('h:i A') }}</small>
-                                    </td>
-                                    <td>{{ $registration->event->venue }}, {{ $registration->event->campus }}</td>
-                                    <td>
-                                        <code>{{ $registration->registration_number }}</code>
-                                        <br>
-                                        <small class="text-muted">{{ $registration->guest_count }} guest(s)</small>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-{{ $registration->status_color }}">
-                                            {{ ucfirst($registration->status) }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div class="btn-group btn-group-sm">
-                                            <!-- <a href="{{ route('events.guest.show', $registration->event) }}" 
-                                               class="btn btn-outline-primary" title="View Event">
-                                                <i class="fas fa-eye"></i>
-                                            </a> -->
-                                            <a href="{{ route('event-registration.show', $registration) }}" 
-                                               class="btn btn-outline-info" title="View Registration">
-                                                <i class="fas fa-ticket-alt"></i>
+    <div class="tab-content" id="eventTabsContent">
+        <!-- All Events Tab -->
+        <div class="tab-pane fade show active" id="all" role="tabpanel">
+            @if($registrations->count() > 0)
+                @foreach($registrations as $registration)
+                <div class="event-card bg-white">
+                    <div class="row g-0">
+                        <div class="col-md-2" style="background: linear-gradient(145deg, #002789, #001a5c);">
+                            <div class="h-100 d-flex align-items-center justify-content-center p-3">
+                                @if($registration->event->image)
+                                    <img src="{{ Storage::url($registration->event->image) }}" 
+                                         alt="{{ $registration->event->title }}" 
+                                         class="img-fluid rounded" 
+                                         style="max-height: 100px; object-fit: cover;">
+                                @else
+                                    <i class="fas fa-calendar-alt fa-3x text-white opacity-50"></i>
+                                @endif
+                            </div>
+                        </div>
+                        <div class="col-md-10">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <h5 class="fw-bold mb-2" style="color: var(--ju-blue);">
+                                            <a href="{{ route('events.guest.show', $registration->event) }}" class="text-decoration-none" style="color: var(--ju-blue);">
+                                                {{ $registration->event->title }}
                                             </a>
-                                            @if($registration->isConfirmed())
-                                            <form action="{{ route('event-registration.cancel', $registration->event) }}" 
-                                                  method="POST" class="d-inline">
-                                                @csrf
-                                                <button type="submit" class="btn btn-outline-danger" 
-                                                        onclick="return confirm('Are you sure you want to cancel this registration?')"
+                                        </h5>
+                                        
+                                        <div class="mb-2">
+                                            <span class="badge bg-light text-dark me-2">
+                                                <i class="fas fa-calendar me-1" style="color: var(--ju-blue);"></i>
+                                                {{ $registration->event->start_date->format('M d, Y') }}
+                                            </span>
+                                            <span class="badge bg-light text-dark me-2">
+                                                <i class="fas fa-clock me-1" style="color: var(--ju-blue);"></i>
+                                                {{ $registration->event->start_date->format('h:i A') }}
+                                            </span>
+                                            <span class="badge bg-light text-dark me-2">
+                                                <i class="fas fa-map-marker-alt me-1" style="color: var(--ju-blue);"></i>
+                                                {{ $registration->event->campus ?? 'Main Campus' }}
+                                            </span>
+                                        </div>
+                                        
+                                        <div class="mb-2">
+                                            <small class="text-muted">
+                                                <i class="fas fa-users me-1"></i>
+                                                Guests: <strong>{{ $registration->guest_count }}</strong> person(s)
+                                            </small>
+                                            <small class="text-muted ms-3">
+                                                <i class="fas fa-hashtag me-1"></i>
+                                                Reg #: {{ $registration->registration_number }}
+                                            </small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="d-flex flex-column align-items-end">
+                                            <!-- Status Badge -->
+                                            @if($registration->status == 'pending')
+                                                <span class="status-badge status-pending mb-2">
+                                                    <i class="fas fa-clock"></i> Pending Approval
+                                                </span>
+                                            @elseif($registration->status == 'confirmed')
+                                                <span class="status-badge status-confirmed mb-2">
+                                                    <i class="fas fa-check-circle"></i> Confirmed
+                                                </span>
+                                            @elseif($registration->status == 'cancelled')
+                                                <span class="status-badge status-cancelled mb-2">
+                                                    <i class="fas fa-times-circle"></i> Cancelled
+                                                </span>
+                                            @elseif($registration->status == 'waitlisted')
+                                                <span class="status-badge status-waitlisted mb-2">
+                                                    <i class="fas fa-list-ol"></i> Waitlisted
+                                                </span>
+                                            @endif
+                                            
+                                            <!-- Countdown Timer for Upcoming Events -->
+                                            @if($registration->status == 'confirmed' && $registration->event->start_date > now())
+                                                <div class="countdown-timer mb-2" data-date="{{ $registration->event->start_date->format('Y-m-d H:i:s') }}">
+                                                    <i class="fas fa-hourglass-half"></i>
+                                                    <span class="countdown-text">Starting soon</span>
+                                                </div>
+                                            @endif
+                                            
+                                            <!-- Attendance Status -->
+                                            @if($registration->attended)
+                                                <span class="status-badge status-attended mb-2">
+                                                    <i class="fas fa-user-check"></i> Attended
+                                                </span>
+                                            @endif
+                                            
+                                            <!-- Action Buttons -->
+                                            <div class="btn-group" role="group">
+                                                <a href="{{ route('event-registration.show', $registration->id) }}" 
+                                                   class="btn btn-sm btn-outline-primary" 
+                                                   data-bs-toggle="tooltip" 
+                                                   title="View Details">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                
+                                                @if($registration->status == 'confirmed' && $registration->event->start_date > now() && !$registration->attended)
+                                                <button type="button" 
+                                                        class="btn btn-sm btn-outline-danger" 
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#cancelModal{{ $registration->id }}"
                                                         title="Cancel Registration">
                                                     <i class="fas fa-times"></i>
                                                 </button>
-                                            </form>
-                                            @endif
+                                                @endif
+                                                
+                                                @if($registration->status == 'pending')
+                                                <span class="btn btn-sm btn-outline-warning" 
+                                                      data-bs-toggle="tooltip" 
+                                                      title="Awaiting admin approval">
+                                                    <i class="fas fa-hourglass-half"></i>
+                                                </span>
+                                                @endif
+                                            </div>
                                         </div>
-                                    </td>
-                                </tr>
-                                @endif
-                                @endforeach
-                            </tbody>
-                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    
-                    <!-- Pagination -->
-                    @if($registrations->hasPages())
-                    <div class="d-flex justify-content-center mt-4">
-                        {{ $registrations->withQueryString()->links() }}
-                    </div>
-                    @endif
                 </div>
-            </div>
+                
+                <!-- Cancel Modal for each registration -->
+                @if($registration->status == 'confirmed' && $registration->event->start_date > now())
+                <div class="modal fade" id="cancelModal{{ $registration->id }}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header" style="background: linear-gradient(145deg, #dc3545, #b02a37); color: white;">
+                                <h5 class="modal-title">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>Cancel Registration
+                                </h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            </div>
+                            <form action="{{ route('event-registration.cancel', $registration->event) }}" method="POST">
+                                @csrf
+                                <div class="modal-body">
+                                    <p>Are you sure you want to cancel your registration for:</p>
+                                    <h6 class="fw-bold mb-3" style="color: var(--ju-blue);">{{ $registration->event->title }}</h6>
+                                    
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        Your seat will be offered to someone on the waitlist.
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-danger">Confirm Cancellation</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                @endif
+                @endforeach
+                
+                <!-- Pagination -->
+                @if($registrations->hasPages())
+                <div class="d-flex justify-content-center mt-4">
+                    {{ $registrations->withQueryString()->links() }}
+                </div>
+                @endif
             @else
-            <div class="ju-card">
-                <div class="ju-card-body text-center py-5">
-                    <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
-                    <h4 class="text-muted">No upcoming events</h4>
-                    <p class="text-muted">You haven't registered for any upcoming events.</p>
-                    <a href="{{ route('event-registration.index') }}" class="btn btn-ju">
-                        <i class="fas fa-search me-1"></i> Browse Events
+                <div class="empty-state">
+                    <i class="fas fa-calendar-times"></i>
+                    <h3>No Registrations Yet</h3>
+                    <p>You haven't registered for any events. Browse available events and register today!</p>
+                    <a href="{{ route('event-registration.index') }}" class="btn btn-primary" style="background: linear-gradient(145deg, #002789, #001a5c); border: none;">
+                        <i class="fas fa-calendar-plus me-2"></i>Browse Events
                     </a>
                 </div>
-            </div>
             @endif
         </div>
-
+        
+        <!-- Pending Tab -->
+        <div class="tab-pane fade" id="pending" role="tabpanel">
+            @php $pendingRegistrations = $registrations->where('status', 'pending'); @endphp
+            @if($pendingRegistrations->count() > 0)
+                @foreach($pendingRegistrations as $registration)
+                <div class="event-card bg-white">
+                    <div class="row g-0">
+                        <div class="col-md-2" style="background: linear-gradient(145deg, #ffc107, #d39e00);">
+                            <div class="h-100 d-flex align-items-center justify-content-center p-3">
+                                <i class="fas fa-clock fa-3x text-white"></i>
+                            </div>
+                        </div>
+                        <div class="col-md-10">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <h5 class="fw-bold mb-2" style="color: var(--ju-blue);">
+                                            {{ $registration->event->title }}
+                                        </h5>
+                                        <div class="mb-2">
+                                            <span class="badge bg-light text-dark me-2">
+                                                <i class="fas fa-calendar me-1" style="color: var(--ju-blue);"></i>
+                                                {{ $registration->event->start_date->format('M d, Y') }}
+                                            </span>
+                                            <span class="badge bg-light text-dark me-2">
+                                                <i class="fas fa-clock me-1" style="color: var(--ju-blue);"></i>
+                                                {{ $registration->event->start_date->format('h:i A') }}
+                                            </span>
+                                        </div>
+                                        <p class="text-muted mb-0">
+                                            <i class="fas fa-users me-1"></i>Guests: {{ $registration->guest_count }}
+                                        </p>
+                                    </div>
+                                    <div class="col-md-4 text-end">
+                                        <span class="status-badge status-pending mb-2 d-inline-block">
+                                            <i class="fas fa-clock"></i> Pending Approval
+                                        </span>
+                                        <p class="text-muted small mt-2">
+                                            <i class="fas fa-info-circle"></i>
+                                            Awaiting admin confirmation
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+            @else
+                <div class="empty-state">
+                    <i class="fas fa-check-circle" style="color: #28a745;"></i>
+                    <h3>No Pending Registrations</h3>
+                    <p>All your registrations have been processed.</p>
+                </div>
+            @endif
+        </div>
+        
+        <!-- Confirmed Tab -->
+        <div class="tab-pane fade" id="confirmed" role="tabpanel">
+            @php $confirmedRegistrations = $registrations->where('status', 'confirmed'); @endphp
+            @if($confirmedRegistrations->count() > 0)
+                @foreach($confirmedRegistrations as $registration)
+                <div class="event-card bg-white">
+                    <div class="row g-0">
+                        <div class="col-md-2" style="background: linear-gradient(145deg, #28a745, #1e7e34);">
+                            <div class="h-100 d-flex align-items-center justify-content-center p-3">
+                                <i class="fas fa-check-circle fa-3x text-white"></i>
+                            </div>
+                        </div>
+                        <div class="col-md-10">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <h5 class="fw-bold mb-2" style="color: var(--ju-blue);">
+                                            {{ $registration->event->title }}
+                                        </h5>
+                                        <div class="mb-2">
+                                            <span class="badge bg-light text-dark me-2">
+                                                <i class="fas fa-calendar me-1" style="color: var(--ju-blue);"></i>
+                                                {{ $registration->event->start_date->format('M d, Y') }}
+                                            </span>
+                                            <span class="badge bg-light text-dark me-2">
+                                                <i class="fas fa-clock me-1" style="color: var(--ju-blue);"></i>
+                                                {{ $registration->event->start_date->format('h:i A') }}
+                                            </span>
+                                        </div>
+                                        @if($registration->event->start_date > now())
+                                        <div class="countdown-timer mt-2" data-date="{{ $registration->event->start_date->format('Y-m-d H:i:s') }}">
+                                            <i class="fas fa-hourglass-half"></i>
+                                            <span class="countdown-text">Calculating...</span>
+                                        </div>
+                                        @endif
+                                    </div>
+                                    <div class="col-md-4 text-end">
+                                        <span class="status-badge status-confirmed mb-2 d-inline-block">
+                                            <i class="fas fa-check-circle"></i> Confirmed
+                                        </span>
+                                        <div class="mt-2">
+                                            <a href="{{ route('event-registration.show', $registration->id) }}" class="btn btn-sm btn-outline-primary">
+                                                View Details
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+            @else
+                <div class="empty-state">
+                    <i class="fas fa-ticket-alt"></i>
+                    <h3>No Confirmed Registrations</h3>
+                    <p>You don't have any confirmed event registrations yet.</p>
+                </div>
+            @endif
+        </div>
+        
         <!-- Waitlist Tab -->
         <div class="tab-pane fade" id="waitlist" role="tabpanel">
-            @if($waitlists->count() > 0)
-            <div class="ju-card">
-                <div class="ju-card-header">
-                    <h5 class="ju-card-title m-0">Your Waitlist Positions</h5>
-                </div>
-                <div class="ju-card-body">
-                    <div class="table-responsive">
-                        <table class="table table-ju">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Event</th>
-                                    <th>Date & Time</th>
-                                    <th>Position</th>
-                                    <th>Joined On</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($waitlists as $waitlist)
-                                <tr>
-                                    <td>{{ $loop->iteration }}</td>
-                                    <td>
-                                        <strong>{{ $waitlist->event->title }}</strong>
-                                        <br>
-                                        <small class="text-muted">{{ $waitlist->event->organizer }}</small>
-                                    </td>
-                                    <td>
-                                        {{ $waitlist->event->start_date->format('M d, Y') }}
-                                        <br>
-                                        <small class="text-muted">{{ $waitlist->event->start_date->format('h:i A') }}</small>
-                                    </td>
-                                    <td>
-                                        <div class="waitlist-position d-inline-flex">
-                                            {{ $waitlist->position }}
+            @if(isset($waitlists) && $waitlists->count() > 0)
+                @foreach($waitlists as $waitlist)
+                <div class="event-card bg-white">
+                    <div class="row g-0">
+                        <div class="col-md-2" style="background: linear-gradient(145deg, #17a2b8, #117a8b);">
+                            <div class="h-100 d-flex align-items-center justify-content-center p-3">
+                                <i class="fas fa-list-ol fa-3x text-white"></i>
+                            </div>
+                        </div>
+                        <div class="col-md-10">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <h5 class="fw-bold mb-2" style="color: var(--ju-blue);">
+                                            {{ $waitlist->event->title }}
+                                        </h5>
+                                        <div class="mb-2">
+                                            <span class="badge bg-light text-dark me-2">
+                                                <i class="fas fa-calendar me-1" style="color: var(--ju-blue);"></i>
+                                                {{ $waitlist->event->start_date->format('M d, Y') }}
+                                            </span>
+                                            <span class="badge bg-light text-dark me-2">
+                                                <i class="fas fa-clock me-1" style="color: var(--ju-blue);"></i>
+                                                {{ $waitlist->event->start_date->format('h:i A') }}
+                                            </span>
                                         </div>
-                                        @if($waitlist->position == 1)
-                                        <br><small class="text-success">Next in line!</small>
-                                        @endif
-                                    </td>
-                                    <td>{{ $waitlist->joined_at->format('M d, Y') }}</td>
-                                    <td>
-                                        <div class="btn-group btn-group-sm">
-                                            <a href="{{ route('events.guest.show', $waitlist->event) }}" 
-                                               class="btn btn-outline-primary" title="View Event">
-                                                <i class="fas fa-eye"></i>
-                                            </a>
-                                            <form action="{{ route('events.waitlist.remove', $waitlist) }}" 
-                                                  method="POST" class="d-inline">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-outline-danger" 
-                                                        onclick="return confirm('Are you sure you want to leave the waitlist?')"
-                                                        title="Leave Waitlist">
-                                                    <i class="fas fa-sign-out-alt"></i>
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    <!-- Waitlist Information -->
-                    <div class="alert alert-info mt-3">
-                        <h6><i class="fas fa-info-circle me-2"></i> Waitlist Information</h6>
-                        <ul class="mb-0">
-                            <li>Your position determines when you'll get a seat if one becomes available.</li>
-                            <li>You'll be notified by email when a seat becomes available.</li>
-                            <li>You have 24 hours to confirm when notified.</li>
-                            <li>You can leave the waitlist anytime.</li>
-                        </ul>
+                                    </div>
+                                    <div class="col-md-4 text-end">
+                                        <span class="status-badge status-waitlisted mb-2 d-inline-block">
+                                            <i class="fas fa-list-ol"></i> Position #{{ $waitlist->position }}
+                                        </span>
+                                        <p class="text-muted small mt-2">
+                                            <i class="fas fa-info-circle"></i>
+                                            You'll be notified if a spot opens
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
+                @endforeach
             @else
-            <div class="ju-card">
-                <div class="ju-card-body text-center py-5">
-                    <i class="fas fa-clock fa-3x text-muted mb-3"></i>
-                    <h4 class="text-muted">No waitlist positions</h4>
-                    <p class="text-muted">You're not on any waitlists.</p>
+                <div class="empty-state">
+                    <i class="fas fa-list-ol"></i>
+                    <h3>No Waitlist Positions</h3>
+                    <p>You're not on any event waitlists.</p>
                 </div>
-            </div>
             @endif
         </div>
-
+        
         <!-- Past Events Tab -->
         <div class="tab-pane fade" id="past" role="tabpanel">
-            @if($registrations->where('event.start_date', '<', now())->count() > 0)
-            <div class="ju-card">
-                <div class="ju-card-header">
-                    <h5 class="ju-card-title m-0">Your Past Events</h5>
-                </div>
-                <div class="ju-card-body">
-                    <div class="table-responsive">
-                        <table class="table table-ju">
-                            <thead>
-                                <tr>
-                                    <th>Event</th>
-                                    <th>Date</th>
-                                    <th>Status</th>
-                                    <th>Attended</th>
-                                    <th>Registration No.</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($registrations as $registration)
-                                @if($registration->event->start_date < now())
-                                <tr>
-                                    <td>
-                                        <strong>{{ $registration->event->title }}</strong>
-                                        <br>
-                                        <small class="text-muted">{{ $registration->event->organizer }}</small>
-                                    </td>
-                                    <td>{{ $registration->event->start_date->format('M d, Y') }}</td>
-                                    <td>
-                                        <span class="badge bg-{{ $registration->status_color }}">
-                                            {{ ucfirst($registration->status) }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        @if($registration->attended)
-                                        <span class="badge bg-success"><i class="fas fa-check"></i> Yes</span>
-                                        @if($registration->check_in_time)
-                                        <br><small>{{ $registration->check_in_time->format('h:i A') }}</small>
-                                        @endif
-                                        @else
-                                        <span class="badge bg-secondary">No</span>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        <code>{{ $registration->registration_number }}</code>
-                                    </td>
-                                    <td>
-                                        <div class="btn-group btn-group-sm">
-                                            <a href="{{ route('events.guest.show', $registration->event) }}" 
-                                               class="btn btn-outline-primary" title="View Event">
-                                                <i class="fas fa-eye"></i>
-                                            </a>
-                                            <a href="{{ route('event-registration.show', $registration) }}" 
-                                               class="btn btn-outline-info" title="View Registration">
-                                                <i class="fas fa-ticket-alt"></i>
-                                            </a>
+            @php $pastRegistrations = $registrations->where('event.end_date', '<', now()); @endphp
+            @if($pastRegistrations->count() > 0)
+                @foreach($pastRegistrations as $registration)
+                <div class="event-card bg-white">
+                    <div class="row g-0">
+                        <div class="col-md-2" style="background: linear-gradient(145deg, #6c757d, #545b62);">
+                            <div class="h-100 d-flex align-items-center justify-content-center p-3">
+                                <i class="fas fa-history fa-3x text-white"></i>
+                            </div>
+                        </div>
+                        <div class="col-md-10">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <h5 class="fw-bold mb-2" style="color: var(--ju-blue);">
+                                            {{ $registration->event->title }}
+                                        </h5>
+                                        <div class="mb-2">
+                                            <span class="badge bg-light text-dark me-2">
+                                                <i class="fas fa-calendar me-1" style="color: var(--ju-blue);"></i>
+                                                {{ $registration->event->start_date->format('M d, Y') }}
+                                            </span>
                                         </div>
-                                    </td>
-                                </tr>
-                                @endif
-                                @endforeach
-                            </tbody>
-                        </table>
+                                    </div>
+                                    <div class="col-md-4 text-end">
+                                        @if($registration->attended)
+                                        <span class="status-badge status-attended mb-2 d-inline-block">
+                                            <i class="fas fa-user-check"></i> Attended
+                                        </span>
+                                        @else
+                                        <span class="status-badge bg-secondary text-white mb-2 d-inline-block">
+                                            <i class="fas fa-times-circle"></i> Not Attended
+                                        </span>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    
-                    <!-- Pagination -->
-                    @if($registrations->hasPages())
-                    <div class="d-flex justify-content-center mt-4">
-                        {{ $registrations->withQueryString()->links() }}
-                    </div>
-                    @endif
                 </div>
-            </div>
+                @endforeach
             @else
-            <div class="ju-card">
-                <div class="ju-card-body text-center py-5">
-                    <i class="fas fa-history fa-3x text-muted mb-3"></i>
-                    <h4 class="text-muted">No past events</h4>
-                    <p class="text-muted">You haven't attended any events yet.</p>
+                <div class="empty-state">
+                    <i class="fas fa-calendar-check"></i>
+                    <h3>No Past Events</h3>
+                    <p>You haven't attended any events yet.</p>
                 </div>
-            </div>
             @endif
-        </div>
-    </div>
-
-    <!-- Quick Actions -->
-    <div class="ju-card mt-4">
-        <div class="ju-card-body">
-            <div class="row">
-                <div class="col-md-4 text-center mb-3">
-                    <a href="{{ route('event-registration.index') }}" class="btn btn-ju-outline w-100 py-3">
-                        <i class="fas fa-search fa-2x mb-2 d-block"></i>
-                        Browse More Events
-                    </a>
-                </div>
-                <div class="col-md-4 text-center mb-3">
-                    <a href="{{ route('dashboard') }}" class="btn btn-ju-outline w-100 py-3">
-                        <i class="fas fa-tachometer-alt fa-2x mb-2 d-block"></i>
-                        Go to Dashboard
-                    </a>
-                </div>
-                <div class="col-md-4 text-center mb-3">
-                    <a href="{{ route('home') }}" class="btn btn-ju-outline w-100 py-3">
-                        <i class="fas fa-home fa-2x mb-2 d-block"></i>
-                        Return to Home
-                    </a>
-                </div>
-            </div>
         </div>
     </div>
 </div>
-@endsection
-
-@push('styles')
-<style>
-    .nav-tabs .nav-link {
-        border: none;
-        border-bottom: 3px solid transparent;
-        color: #6c757d;
-        font-weight: 500;
-        padding: 1rem 1.5rem;
-        transition: all 0.3s;
-    }
-    
-    .nav-tabs .nav-link:hover {
-        border-bottom-color: #dee2e6;
-        color: var(--ju-green);
-    }
-    
-    .nav-tabs .nav-link.active {
-        color: var(--ju-green);
-        border-bottom-color: var(--ju-green);
-        background-color: transparent;
-    }
-    
-    .waitlist-position {
-        background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
-        color: white;
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        font-size: 1.2rem;
-        box-shadow: 0 3px 10px rgba(255, 193, 7, 0.3);
-    }
-    
-    .tab-content {
-        animation: fadeIn 0.3s ease;
-    }
-    
-    @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
-    }
-</style>
-@endpush
 
 @push('scripts')
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function() {
-        // Activate tab based on URL hash
-        var hash = window.location.hash;
-        if (hash) {
-            $('.nav-tabs button[data-bs-target="' + hash + '"]').tab('show');
+        // Initialize tooltips
+        $('[data-bs-toggle="tooltip"]').tooltip();
+        
+        // Countdown timers
+        function updateCountdowns() {
+            $('.countdown-timer').each(function() {
+                const eventDateStr = $(this).data('date');
+                if (!eventDateStr) return;
+                
+                const eventDate = new Date(eventDateStr).getTime();
+                const now = new Date().getTime();
+                const distance = eventDate - now;
+                
+                if (distance < 0) {
+                    $(this).find('.countdown-text').text('Event started');
+                    return;
+                }
+                
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                
+                let countdownText = '';
+                if (days > 0) {
+                    countdownText = days + 'd ' + hours + 'h ' + minutes + 'm';
+                } else if (hours > 0) {
+                    countdownText = hours + 'h ' + minutes + 'm';
+                } else {
+                    countdownText = minutes + 'm';
+                }
+                
+                $(this).find('.countdown-text').text(countdownText);
+            });
         }
-
-        // Update URL hash when tab changes
-        $('button[data-bs-toggle="tab"]').on('shown.bs.tab', function(e) {
-            window.location.hash = e.target.getAttribute('data-bs-target');
+        
+        // Update countdowns every minute
+        updateCountdowns();
+        setInterval(updateCountdowns, 60000);
+        
+        // Tab persistence
+        const activeTab = localStorage.getItem('activeEventTab');
+        if (activeTab) {
+            $('#eventTabs button[data-bs-target="' + activeTab + '"]').tab('show');
+        }
+        
+        $('#eventTabs button').on('shown.bs.tab', function(e) {
+            localStorage.setItem('activeEventTab', $(e.target).data('bs-target'));
         });
         
-        // Initialize DataTable for tables
-        $('.table-ju').DataTable({
-            "pageLength": 10,
-            "responsive": true,
-            "language": {
-                "search": "Search:",
-                "lengthMenu": "Show _MENU_ entries",
-                "info": "Showing _START_ to _END_ of _TOTAL_ entries",
-                "paginate": {
-                    "first": "First",
-                    "last": "Last",
-                    "next": "Next",
-                    "previous": "Previous"
-                }
-            }
-        });
+        // Print registration details
+        window.printRegistration = function(registrationId) {
+            window.open('/my-registrations/' + registrationId + '/print', '_blank');
+        };
     });
 </script>
 @endpush
+@endsection

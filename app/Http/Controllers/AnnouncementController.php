@@ -1,8 +1,10 @@
 <?php
+// app/Http/Controllers/AnnouncementController.php
 
 namespace App\Http\Controllers;
 
 use App\Models\Announcement;
+use App\Models\Event;
 use App\Models\User;
 use App\Models\Notification;
 use Illuminate\Http\Request;
@@ -16,13 +18,13 @@ class AnnouncementController extends Controller
 {
     public function __construct()
     {
-        // Only require auth for create, edit, update, destroy
-        $this->middleware('auth')->only(['create', 'store', 'edit', 'update', 'destroy', 'togglePublish', 'statistics']);
-        
-        // Add debugging
+        $this->middleware('auth')->except(['index', 'show']);
         Log::info('AnnouncementController initialized');
     }
 
+    /**
+     * Display a listing of announcements
+     */
     public function index(Request $request)
     {
         $user = Auth::user();
@@ -86,7 +88,7 @@ class AnnouncementController extends Controller
         }
         
         // Order by priority: urgent first, then by date
-        $query->orderByRaw("CASE WHEN type = 'urgent' THEN 0 ELSE 1 END")
+        $query->orderByRaw("CASE WHEN type = 'urgent' OR title LIKE 'CANCELLED:%' THEN 0 ELSE 1 END")
               ->orderBy('created_at', 'desc');
         
         $announcements = $query->paginate(12);
@@ -97,12 +99,12 @@ class AnnouncementController extends Controller
         return view('announcements.index', compact('announcements', 'stats'));
     }
 
+    /**
+     * Show form to create announcement with optional event cancellation
+     */
     public function create()
     {
-        Log::info('AnnouncementController@create called', [
-            'user' => Auth::user() ? Auth::user()->id : 'guest',
-            'url' => request()->fullUrl()
-        ]);
+        Log::info('AnnouncementController@create called');
         
         $users = User::where('is_active', true)
                      ->orWhereNull('is_active')
@@ -110,55 +112,102 @@ class AnnouncementController extends Controller
                      ->orderBy('name')
                      ->get(['id', 'name', 'email', 'role_id']);
         
-        return view('announcements.create', compact('users'));
+        // Get events that can be cancelled (upcoming/ongoing, not cancelled)
+        $cancellableEvents = Event::with(['campusRelation', 'venueRelation'])
+            ->where(function($q) {
+                $q->where('is_cancelled', false)
+                  ->orWhereNull('is_cancelled');
+            })
+            ->where('end_date', '>=', now())
+            ->orderBy('start_date')
+            ->get();
+        
+        return view('announcements.create', compact('users', 'cancellableEvents'));
     }
 
+    /**
+     * Store a new announcement (with optional event cancellation)
+     */
     public function store(Request $request)
-    {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'required|string',
-            'type' => 'required|in:event,campus,general,urgent',
-            'audience' => 'required|in:all,students,faculty,staff,specific',
-            'target_ids' => 'nullable|array',
-            'target_ids.*' => 'exists:users,id',
-            'expires_at' => 'nullable|date|after:now',
-            'publish_now' => 'boolean',
-            'send_notification' => 'boolean',
-            'notification_priority' => 'nullable|in:normal,high,urgent',
-            'notification_type' => 'nullable|in:announcement,alert,info,warning',
-        ]);
+{
+    // Base validation rules for all announcements
+    $rules = [
+        'title' => 'required|string|max:255',
+        'content' => 'required|string',
+        'type' => 'required|in:event,campus,general,urgent',
+        'audience' => 'required|in:all,students,faculty,staff,specific',
+        'target_ids' => 'nullable|array',
+        'target_ids.*' => 'exists:users,id',
+        'expires_at' => 'nullable|date|after:now',
+        'publish_now' => 'boolean',
+        'send_notification' => 'boolean',
+        'notification_priority' => 'nullable|in:normal,high,urgent',
+        'notification_type' => 'nullable|in:announcement,alert,info,warning',
+    ];
+    
+    // Add cancellation validation rules ONLY if is_event_cancellation is checked AND present
+    if ($request->has('is_event_cancellation') && $request->boolean('is_event_cancellation')) {
+        $rules['cancelled_event_id'] = 'required|exists:events,id';
+        $rules['cancellation_reason'] = 'required|string|max:1000';
+    }
+    
+    // Validate the request
+    $validated = $request->validate($rules);
+    
+    // If this is an event cancellation, handle the event cancellation first
+    if ($request->has('is_event_cancellation') && $request->boolean('is_event_cancellation')) {
+        $event = Event::findOrFail($request->cancelled_event_id);
         
-        $announcement = Announcement::create([
-            'title' => $request->title,
-            'content' => $request->content,
-            'type' => $request->type,
-            'audience' => $request->audience,
-            'target_ids' => $request->audience == 'specific' ? $request->target_ids : null,
-            'created_by' => Auth::id(),
-            'is_published' => $request->has('publish_now'),
-            'published_at' => $request->has('publish_now') ? now() : null,
-            'expires_at' => $request->expires_at,
-        ]);
+        // Check if event is already cancelled
+        if ($event->is_cancelled) {
+            return back()->with('error', 'This event is already cancelled.')->withInput();
+        }
         
-        // Send notification if requested
-        if ($request->has('publish_now') && $request->boolean('send_notification', true)) {
-            $this->sendAnnouncementNotification($announcement, $request);
-            
-            return redirect()->route('announcements.show', $announcement->id)
-                ->with('success', 'Announcement created and notification sent successfully!');
+        // Cancel the event
+        $event->cancel($request->cancellation_reason);
+        
+        // Auto-set announcement type to urgent for cancellations
+        $request->merge(['type' => 'urgent']);
+    }
+    
+    // Create the announcement
+    $announcement = Announcement::create([
+        'title' => $request->title,
+        'content' => $request->content,
+        'type' => $request->type,
+        'audience' => $request->audience,
+        'target_ids' => $request->audience == 'specific' ? $request->target_ids : null,
+        'created_by' => Auth::id(),
+        'is_published' => $request->has('publish_now') && $request->boolean('publish_now'),
+        'published_at' => ($request->has('publish_now') && $request->boolean('publish_now')) ? now() : null,
+        'expires_at' => $request->expires_at,
+    ]);
+    
+    // Send notification if requested
+    if ($request->has('publish_now') && $request->boolean('publish_now') && $request->boolean('send_notification', true)) {
+        $this->sendAnnouncementNotification($announcement, $request);
+        
+        // If this was an event cancellation, also notify registered attendees specifically
+        if ($request->has('is_event_cancellation') && $request->boolean('is_event_cancellation') && isset($event)) {
+            $this->notifyEventAttendees($event, $announcement, $request);
         }
         
         return redirect()->route('announcements.show', $announcement->id)
-            ->with('success', 'Announcement created successfully!')
-            ->with('info', 'Notification was not sent. You can send it later when publishing.');
+            ->with('success', 'Announcement created and notification sent successfully!');
     }
+    
+    return redirect()->route('announcements.show', $announcement->id)
+        ->with('success', 'Announcement created successfully!')
+        ->with('info', 'Notification was not sent. You can send it later when publishing.');
+}
 
+    /**
+     * Display the specified announcement
+     */
     public function show($id)
     {
         Log::info('AnnouncementController@show called', ['id' => $id]);
         
-        // If the ID is "create" or "statistics", show 404
         if ($id === 'create' || $id === 'statistics') {
             abort(404, 'Announcement not found');
         }
@@ -267,14 +316,12 @@ class AnnouncementController extends Controller
             'is_published' => $request->is_published ?? $announcement->is_published,
         ];
         
-        // Set published_at if publishing for the first time
         if ($request->is_published && !$announcement->published_at) {
             $data['published_at'] = now();
         }
         
         $announcement->update($data);
         
-        // Send notification if newly published or notification requested
         if (($request->is_published && !$wasPublished) || $request->boolean('send_notification', false)) {
             $this->sendAnnouncementNotification($announcement, $request);
             
@@ -318,7 +365,6 @@ class AnnouncementController extends Controller
         
         $message = $announcement->is_published ? 'published' : 'unpublished';
         
-        // Send notification if publishing for the first time
         if ($announcement->is_published && !$wasPublished) {
             $this->sendAnnouncementNotification($announcement);
             
@@ -328,7 +374,7 @@ class AnnouncementController extends Controller
         return back()->with('success', "Announcement {$message} successfully!");
     }
     
-        public function sendNotification($id)
+    public function sendNotification($id)
     {
         Log::info('AnnouncementController@sendNotification called', ['id' => $id]);
         
@@ -343,13 +389,55 @@ class AnnouncementController extends Controller
         return back()->with('success', 'Notification sent successfully to all target users!');
     }
 
-    public function statistics()
+    /**
+     * Notify event attendees specifically about cancellation
+     */
+    protected function notifyEventAttendees($event, $announcement, $request)
     {
-        Log::info('AnnouncementController@statistics called', [
-            'user' => Auth::user() ? Auth::user()->id : 'guest'
+        // Check if registrations method exists
+        if (!method_exists($event, 'registrations')) {
+            return;
+        }
+        
+        $attendees = $event->registrations()
+            ->whereIn('status', ['confirmed', 'pending'])
+            ->with('user')
+            ->get()
+            ->pluck('user')
+            ->filter();
+        
+        if ($attendees->isEmpty()) {
+            return;
+        }
+        
+        $notification = Notification::create([
+            'title' => "🚫 EVENT CANCELLED: {$event->title}",
+            'message' => "The event you registered for has been cancelled. Reason: {$request->cancellation_reason}",
+            'type' => 'alert',
+            'priority' => 2,
+            'action_url' => route('announcements.show', $announcement->id),
+            'action_text' => 'View Details',
+            'data' => [
+                'event_id' => $event->id,
+                'event_title' => $event->title,
+                'cancellation_reason' => $request->cancellation_reason,
+                'announcement_id' => $announcement->id
+            ],
+            'created_by' => Auth::id(),
         ]);
         
-        // Get basic stats
+        foreach ($attendees as $user) {
+            $notification->users()->attach($user->id, [
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+        }
+    }
+
+    public function statistics()
+    {
+        Log::info('AnnouncementController@statistics called');
+        
         $totalAnnouncements = Announcement::count();
         $publishedAnnouncements = Announcement::where('is_published', true)->count();
         
@@ -361,31 +449,26 @@ class AnnouncementController extends Controller
         
         $totalViews = Announcement::sum('views');
         
-        // Get type distribution
         $byType = Announcement::select('type', DB::raw('count(*) as count'), DB::raw('sum(views) as total_views'))
             ->groupBy('type')
             ->orderBy('count', 'desc')
             ->get();
         
-        // Get audience distribution
         $byAudience = Announcement::select('audience', DB::raw('count(*) as count'))
             ->groupBy('audience')
             ->orderBy('count', 'desc')
             ->get();
         
-        // Get most viewed
         $mostViewed = Announcement::where('is_published', true)
             ->orderBy('views', 'desc')
             ->limit(10)
             ->get();
         
-        // Get recent announcements
         $recentAnnouncements = Announcement::where('is_published', true)
             ->orderBy('created_at', 'desc')
             ->limit(10)
             ->get();
         
-        // Get monthly trend
         $monthlyTrend = Announcement::select(
                 DB::raw("DATE_FORMAT(created_at, '%Y-%m') as month"),
                 DB::raw("COUNT(*) as count"),
@@ -412,7 +495,6 @@ class AnnouncementController extends Controller
     private function sendAnnouncementNotification($announcement, $request = null)
     {
         try {
-            // Get target users based on audience
             $users = $this->getTargetUsersForAnnouncement($announcement);
             
             if ($users->isEmpty()) {
@@ -421,16 +503,13 @@ class AnnouncementController extends Controller
                     'audience' => $announcement->audience
                 ]);
                 
-                // Still create notification but log warning
                 $this->createNotificationRecord($announcement, collect([]), $request);
                 return;
             }
             
-            // Determine notification priority and type from request or announcement type
             $priority = $request->notification_priority ?? ($announcement->type == 'urgent' ? 'urgent' : 'normal');
             $notificationType = $request->notification_type ?? 'announcement';
             
-            // Map priority to numeric value
             $priorityMap = [
                 'normal' => 0,
                 'high' => 1,
@@ -438,7 +517,6 @@ class AnnouncementController extends Controller
             ];
             $priorityValue = $priorityMap[$priority] ?? 0;
             
-            // Create notification record and attach to users
             $this->createNotificationRecord($announcement, $users, $request, $priorityValue, $notificationType);
             
             Log::info('Announcement notification sent', [
@@ -455,57 +533,53 @@ class AnnouncementController extends Controller
                 'trace' => $e->getTraceAsString()
             ]);
             
-            throw $e; // Re-throw for controller to handle
+            throw $e;
         }
     }
     
-   private function createNotificationRecord($announcement, $users, $request = null, $priority = 0, $notificationType = 'announcement')
-{
-    // Prepare notification data
-    $notificationData = [
-        'title' => "📢 " . ($announcement->type == 'urgent' ? 'URGENT: ' : '') . $announcement->title,
-        'message' => strip_tags(Str::limit($announcement->content, 200)),
-        'type' => $notificationType,
-        'action_url' => route('announcements.show', $announcement->id),
-        'action_text' => 'View Announcement',
-        'priority' => $priority,
-        'data' => [
-            'announcement_id' => $announcement->id,
-            'announcement_type' => $announcement->type,
-            'audience' => $announcement->audience,
-            'source' => 'announcement',
-            'published_at' => $announcement->published_at ? $announcement->published_at->toIso8601String() : null,
-        ],
-    ];
-    
-    // Only add created_by if the column exists
-    if (\Schema::hasColumn('notifications', 'created_by')) {
-        $notificationData['created_by'] = Auth::id();
-    }
-    
-    // Create the notification
-    $notification = Notification::create($notificationData);
-    
-    // Attach notification to users if there are any
-    if ($users->isNotEmpty()) {
-        $userNotificationsData = [];
-        foreach ($users as $user) {
-            $userNotificationsData[$user->id] = [
-                'created_at' => now(),
-                'updated_at' => now(),
-            ];
+    private function createNotificationRecord($announcement, $users, $request = null, $priority = 0, $notificationType = 'announcement')
+    {
+        $notificationData = [
+            'title' => "📢 " . ($announcement->type == 'urgent' ? 'URGENT: ' : '') . $announcement->title,
+            'message' => strip_tags(Str::limit($announcement->content, 200)),
+            'type' => $notificationType,
+            'action_url' => route('announcements.show', $announcement->id),
+            'action_text' => 'View Announcement',
+            'priority' => $priority,
+            'data' => [
+                'announcement_id' => $announcement->id,
+                'announcement_type' => $announcement->type,
+                'audience' => $announcement->audience,
+                'source' => 'announcement',
+                'published_at' => $announcement->published_at ? $announcement->published_at->toIso8601String() : null,
+            ],
+        ];
+        
+        if (\Schema::hasColumn('notifications', 'created_by')) {
+            $notificationData['created_by'] = Auth::id();
         }
         
-        $notification->users()->attach($userNotificationsData);
+        $notification = Notification::create($notificationData);
         
-        Log::info('Notification attached to users', [
-            'notification_id' => $notification->id,
-            'users_count' => $users->count()
-        ]);
+        if ($users->isNotEmpty()) {
+            $userNotificationsData = [];
+            foreach ($users as $user) {
+                $userNotificationsData[$user->id] = [
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+            }
+            
+            $notification->users()->attach($userNotificationsData);
+            
+            Log::info('Notification attached to users', [
+                'notification_id' => $notification->id,
+                'users_count' => $users->count()
+            ]);
+        }
+        
+        return $notification;
     }
-    
-    return $notification;
-}
 
     private function getTargetUsersForAnnouncement($announcement)
     {
@@ -516,7 +590,6 @@ class AnnouncementController extends Controller
         
         switch ($announcement->audience) {
             case 'all':
-                // All active users - no additional filter
                 break;
                 
             case 'students':
@@ -541,13 +614,11 @@ class AnnouncementController extends Controller
                 if ($announcement->target_ids && is_array($announcement->target_ids)) {
                     $query->whereIn('id', $announcement->target_ids);
                 } else {
-                    // Return empty collection if no specific users selected
                     return collect();
                 }
                 break;
                 
             default:
-                // For any other audience type, return empty
                 return collect();
         }
         
@@ -559,7 +630,6 @@ class AnnouncementController extends Controller
         $totalAnnouncements = Announcement::count();
         $publishedAnnouncements = Announcement::where('is_published', true)->count();
         
-        // Count active announcements (not expired)
         $activeAnnouncements = Announcement::where('is_published', true)
             ->where(function($q) {
                 $q->whereNull('expires_at')

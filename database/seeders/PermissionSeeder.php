@@ -1,11 +1,11 @@
 <?php
+// database/seeders/PermissionSeeder.php
 
 namespace Database\Seeders;
 
 use App\Models\Permission;
 use App\Models\Role;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class PermissionSeeder extends Seeder
 {
@@ -80,12 +80,35 @@ class PermissionSeeder extends Seeder
             ['name' => 'Respond to Feedback', 'slug' => 'respond_feedback', 'description' => 'Can respond to feedback'],
             ['name' => 'Export Feedback', 'slug' => 'export_feedback', 'description' => 'Can export feedback data'],
             ['name' => 'View Feedback Analytics', 'slug' => 'view_feedback_analytics', 'description' => 'Can view feedback analytics'],
+        
+            // Event Registration permissions - REMOVED THE 'group' FIELD
+            ['name' => 'Manage Event Registrations', 'slug' => 'manage_event_registrations', 'description' => 'Can manage all event registrations'],
+            ['name' => 'View Registrations', 'slug' => 'view_registrations', 'description' => 'Can view registrations'],
+            ['name' => 'Confirm Registrations', 'slug' => 'confirm_registrations', 'description' => 'Can confirm registrations'],
+            ['name' => 'Cancel Registrations', 'slug' => 'cancel_registrations', 'description' => 'Can cancel registrations'],
+            ['name' => 'Export Registrations', 'slug' => 'export_registrations', 'description' => 'Can export registrations'],
+            
+            // Campus Management
+            ['name' => 'Manage Campuses', 'slug' => 'manage_campuses', 'description' => 'Can manage campuses'],
+            ['name' => 'View Campuses', 'slug' => 'view_campuses', 'description' => 'Can view campuses'],
+            
+            // Building Management
+            ['name' => 'Manage Buildings', 'slug' => 'manage_buildings', 'description' => 'Can manage buildings'],
+            ['name' => 'View Buildings', 'slug' => 'view_buildings', 'description' => 'Can view buildings'],
+            
+            // Venue Management
+            ['name' => 'Manage Venues', 'slug' => 'manage_venues', 'description' => 'Can manage venues'],
+            ['name' => 'View Venues', 'slug' => 'view_venues', 'description' => 'Can view venues'],
+            ['name' => 'Book Venues', 'slug' => 'book_venues', 'description' => 'Can book venues'],
         ];
 
         foreach ($permissions as $permission) {
             Permission::updateOrCreate(
                 ['slug' => $permission['slug']],
-                $permission
+                [
+                    'name' => $permission['name'],
+                    'description' => $permission['description'] ?? null,
+                ]
             );
         }
 
@@ -111,7 +134,12 @@ class PermissionSeeder extends Seeder
                 'manage_announcements', 'view_announcements', 'create_announcements', 
                 'edit_announcements', 'delete_announcements', 'view_announcement_stats',
                 'manage_feedback', 'view_feedback', 'update_feedback', 'respond_feedback', 
-                'export_feedback', 'view_feedback_analytics'
+                'export_feedback', 'view_feedback_analytics',
+                'manage_event_registrations', 'view_registrations', 'confirm_registrations', 
+                'cancel_registrations', 'export_registrations',
+                'manage_campuses', 'view_campuses',
+                'manage_buildings', 'view_buildings',
+                'manage_venues', 'view_venues', 'book_venues',
             ])->get();
             $admin->permissions()->sync($adminPermissions->pluck('id'));
         }
@@ -127,7 +155,9 @@ class PermissionSeeder extends Seeder
                 'edit_event_request', 'approve_event_requests', 'reject_event_requests',
                 'manage_notifications', 'view_notifications', 'send_notifications',
                 'view_announcements',
-                'view_feedback', 'create_feedback'
+                'view_feedback', 'create_feedback',
+                'view_registrations', 'confirm_registrations', 'cancel_registrations',
+                'view_campuses', 'view_buildings', 'view_venues', 'book_venues',
             ])->get();
             $eventManager->permissions()->sync($eventManagerPermissions->pluck('id'));
         }
@@ -140,7 +170,9 @@ class PermissionSeeder extends Seeder
                 'create_event_request', 'view_event_requests', 'edit_event_request',
                 'view_notifications',
                 'view_announcements',
-                'create_feedback', 'view_feedback'
+                'create_feedback', 'view_feedback',
+                'view_registrations',
+                'view_campuses', 'view_buildings', 'view_venues', 'book_venues',
             ])->get();
             $faculty->permissions()->sync($facultyPermissions->pluck('id'));
         }
@@ -153,7 +185,9 @@ class PermissionSeeder extends Seeder
                 'create_event_request', 'view_event_requests',
                 'view_notifications',
                 'view_announcements',
-                'create_feedback'
+                'create_feedback',
+                'view_registrations',
+                'view_campuses', 'view_buildings', 'view_venues',
             ])->get();
             $student->permissions()->sync($studentPermissions->pluck('id'));
         }
@@ -163,9 +197,11 @@ class PermissionSeeder extends Seeder
         if ($guest) {
             $guestPermissions = Permission::whereIn('slug', [
                 'view_events',
-                'create_feedback'
+                'create_feedback',
             ])->get();
             $guest->permissions()->sync($guestPermissions->pluck('id'));
         }
+        
+        $this->command->info('Permissions seeded successfully!');
     }
 }
